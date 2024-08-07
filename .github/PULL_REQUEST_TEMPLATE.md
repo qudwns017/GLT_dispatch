@@ -1,4 +1,4 @@
-<!-- PR 예시 : Refactor/#2 UserEntity 수정 --!>
+<!-- PR 예시 : Feat: Issues Template 및 Pull Request Template 추가 --!>
 <!-- 라벨과 리뷰어를 등록해주세요. -->
 
 ## 작업 대상
