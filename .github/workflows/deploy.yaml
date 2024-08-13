@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ toLower(github.repository) }}
+  IMAGE_NAME: ${{ github.repository }}
   IMAGE_TAG: main
 
 jobs:
@@ -81,7 +81,7 @@ jobs:
 
           # 도커 작업
           script: |
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            docker pull ${{ env.REGISTRY }}/fastcampus-final-group2/finalproject_server:main:${{ env.IMAGE_TAG }}
             docker stop $(docker ps -a -q)
             docker rm $(docker ps -a -q)
             docker run -d --name fc-final-container --restart unless-stopped --log-driver=syslog -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
