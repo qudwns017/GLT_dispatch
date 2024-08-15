@@ -49,7 +49,4 @@ public class Center extends BaseEntity {
 
     @OneToMany(mappedBy = "center")
     private List<Vehicle> vehicleList;
-
-    @OneToMany(mappedBy = "center")
-    private List<Center> centerList;
 }
