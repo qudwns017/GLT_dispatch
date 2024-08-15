@@ -1,7 +1,5 @@
 package com.team2.finalproject.global.security.details;
 
-import com.team2.finalproject.domain.users.exception.UsersErrorCode;
-import com.team2.finalproject.domain.users.exception.UsersException;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;

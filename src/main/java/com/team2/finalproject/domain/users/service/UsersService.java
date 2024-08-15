@@ -125,8 +125,6 @@ public class UsersService {
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         log.info("사용자 로그아웃 시도");
         String username = invalidateToken(request);
-        CookieUtil.deleteCookie(response, "accessToken");
-        CookieUtil.deleteCookie(response, "refreshToken");
         log.info("사용자 로그아웃 성공: {}", username);
     }
 
@@ -135,8 +133,6 @@ public class UsersService {
         log.info("사용자 삭제 시도");
         String username = invalidateToken(request);
         usersRepository.deleteByUsername(username);
-        CookieUtil.deleteCookie(response, "accessToken");
-        CookieUtil.deleteCookie(response, "refreshToken");
         log.info("사용자 삭제 성공: {}", username);
     }
 

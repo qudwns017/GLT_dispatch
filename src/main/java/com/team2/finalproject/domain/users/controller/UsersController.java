@@ -5,6 +5,7 @@ import com.team2.finalproject.domain.users.model.dto.LoginResponse;
 import com.team2.finalproject.domain.users.model.dto.RegisterAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.RegisterDriverRequest;
 import com.team2.finalproject.domain.users.service.UsersService;
+import com.team2.finalproject.global.util.cookies.CookieUtil;
 import com.team2.finalproject.global.util.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,12 +44,16 @@ public class UsersController {
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         usersService.logout(request, response);
+        CookieUtil.deleteCookie(response, "accessToken");
+        CookieUtil.deleteCookie(response, "refreshToken");
         return ApiResponse.OK();
     }
 
     @GetMapping("/withdraw")
     public ResponseEntity<Void> withdraw(HttpServletRequest request, HttpServletResponse response) {
         usersService.withdraw(request, response);
+        CookieUtil.deleteCookie(response, "accessToken");
+        CookieUtil.deleteCookie(response, "refreshToken");
         return ApiResponse.DELETED();
     }
 }
