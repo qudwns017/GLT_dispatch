@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum CenterErrorCode implements ErrorCode {
-
+    NOT_FOUND_CENTER(HttpStatus.NOT_FOUND, "존재하지 않는 센터입니다.")
     ;
 
     private final HttpStatus httpStatus;
