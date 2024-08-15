@@ -14,3 +14,15 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 100
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  data:
+    redis:
+      host: {hostName}
+      port: {port}
+
+  jwt:
+    access-secret: {accessSecret}
+    refresh-secret: {refreshSecret}
+    access-expiration: {accessExpiration}
+    refresh-expiration: {refreshExpiration}
