@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class LoginResponse {
 
     private String name;
+    private Long centerId;
 }

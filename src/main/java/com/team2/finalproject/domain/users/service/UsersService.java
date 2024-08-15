@@ -5,6 +5,7 @@ import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.users.exception.UsersErrorCode;
 import com.team2.finalproject.domain.users.exception.UsersException;
 import com.team2.finalproject.domain.users.model.dto.LoginRequest;
+import com.team2.finalproject.domain.users.model.dto.LoginResponse;
 import com.team2.finalproject.domain.users.model.dto.RegisterAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.RegisterDriverRequest;
 import com.team2.finalproject.domain.users.model.entity.Users;
@@ -98,7 +99,7 @@ public class UsersService {
     }
 
     @Transactional
-    public String login(LoginRequest loginRequest, HttpServletResponse response) {
+    public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("사용자 로그인 시도: 아이디={}", loginRequest.getUsername());
 
         Users users = usersRepository.findByUsername(loginRequest.getUsername())
@@ -115,7 +116,10 @@ public class UsersService {
         tokenService.saveRefreshToken(users.getUsername(), refreshToken);
         log.info("사용자 로그인 성공: {}", users.getName());
 
-        return users.getName();
+        return LoginResponse.builder()
+                .name(users.getName())
+                //.centerId(users.getCenter().getId())
+                .build();
     }
 
     @Transactional

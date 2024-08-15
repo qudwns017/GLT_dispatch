@@ -36,8 +36,7 @@ public class UsersController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        String name = usersService.login(loginRequest, response);
-        LoginResponse loginResponse = LoginResponse.builder().name(name).build();
+        LoginResponse loginResponse = usersService.login(loginRequest, response);
         return ApiResponse.OK(loginResponse);
     }
 
