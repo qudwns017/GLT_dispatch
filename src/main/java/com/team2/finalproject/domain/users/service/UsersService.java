@@ -102,8 +102,7 @@ public class UsersService {
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("사용자 로그인 시도: 아이디={}", loginRequest.getUsername());
 
-        Users users = usersRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new UsersException(UsersErrorCode.NOT_FOUND_USER));
+        Users users = usersRepository.findByUsernameOrThrow(loginRequest.getUsername());
 
         if (!passwordEncoder.matches(loginRequest.getEncryptedPassword(), users.getEncryptedPassword())) {
             throw new UsersException(UsersErrorCode.PASSWORD_MISMATCH);
