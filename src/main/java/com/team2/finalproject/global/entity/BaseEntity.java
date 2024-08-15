@@ -30,4 +30,5 @@ public class BaseEntity {
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updateAt;
+
 }
