@@ -39,4 +39,12 @@ public class DeliveryDestination extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;
+
+    //배송처명
+
+    //담당자명
+
+    //담당자 전화번호
+
+    //진입 불가 톤코드
 }
