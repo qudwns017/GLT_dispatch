@@ -57,7 +57,7 @@ public class UsersService {
                 //.center(centerRepository.findById(registerAdminRequest.getCenterId()).get())
                 .name(registerAdminRequest.getName())
                 .username(registerAdminRequest.getUsername())
-                .encryptedPassword(passwordEncoder.encode(registerAdminRequest.getEncryptedPassword()))
+                .encryptedPassword(passwordEncoder.encode(registerAdminRequest.getPassword()))
                 .phoneNumber(registerAdminRequest.getPhoneNumber())
                 .role(Role.ADMIN)
                 .build();
@@ -89,7 +89,7 @@ public class UsersService {
                 //.sm(smRepository.findById(registerDriverRequest.getSmId()).get())
                 .name(registerDriverRequest.getName())
                 .username(registerDriverRequest.getUsername())
-                .encryptedPassword(passwordEncoder.encode(registerDriverRequest.getEncryptedPassword()))
+                .encryptedPassword(passwordEncoder.encode(registerDriverRequest.getPassword()))
                 .phoneNumber(registerDriverRequest.getPhoneNumber())
                 .role(Role.DRIVER)
                 .build();
@@ -104,7 +104,7 @@ public class UsersService {
 
         Users users = usersRepository.findByUsernameOrThrow(loginRequest.getUsername());
 
-        if (!passwordEncoder.matches(loginRequest.getEncryptedPassword(), users.getEncryptedPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), users.getEncryptedPassword())) {
             throw new UsersException(UsersErrorCode.PASSWORD_MISMATCH);
         }
 
@@ -122,14 +122,14 @@ public class UsersService {
     }
 
     @Transactional
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request) {
         log.info("사용자 로그아웃 시도");
         String username = invalidateToken(request);
         log.info("사용자 로그아웃 성공: {}", username);
     }
 
     @Transactional
-    public void withdraw(HttpServletRequest request, HttpServletResponse response) {
+    public void withdraw(HttpServletRequest request) {
         log.info("사용자 삭제 시도");
         String username = invalidateToken(request);
         usersRepository.deleteByUsername(username);

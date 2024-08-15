@@ -15,6 +15,6 @@ public class RegisterDriverRequest {
     private long smId;
     private String name;
     private String username;
-    private String encryptedPassword;
+    private String password;
     private String phoneNumber;
 }

@@ -43,7 +43,7 @@ public class UsersController {
 
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        usersService.logout(request, response);
+        usersService.logout(request);
         CookieUtil.deleteCookie(response, "accessToken");
         CookieUtil.deleteCookie(response, "refreshToken");
         return ApiResponse.OK();
@@ -51,7 +51,7 @@ public class UsersController {
 
     @GetMapping("/withdraw")
     public ResponseEntity<Void> withdraw(HttpServletRequest request, HttpServletResponse response) {
-        usersService.withdraw(request, response);
+        usersService.withdraw(request);
         CookieUtil.deleteCookie(response, "accessToken");
         CookieUtil.deleteCookie(response, "refreshToken");
         return ApiResponse.DELETED();

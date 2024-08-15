@@ -14,6 +14,6 @@ public class RegisterAdminRequest {
     private long centerId;
     private String name;
     private String username;
-    private String encryptedPassword;
+    private String password;
     private String phoneNumber;
 }
