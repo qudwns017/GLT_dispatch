@@ -36,7 +36,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return users.getPassword();
+        return users.getEncryptedPassword();
     }
 
     @Override

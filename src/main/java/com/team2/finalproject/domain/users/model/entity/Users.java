@@ -24,7 +24,7 @@ public class Users extends BaseEntity {
     private String username;  // 아이디
 
     @Column(nullable = false, length = 80)
-    private String password;  // 비밀번호
+    private String encryptedPassword;  // 비밀번호
 
     @Column(nullable = false, length = 20)
     private String phoneNumber;  // 전화번호

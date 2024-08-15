@@ -57,7 +57,7 @@ public class UsersService {
                 //.center(centerRepository.findById(registerAdminRequest.getCenterId()).get())
                 .name(registerAdminRequest.getName())
                 .username(registerAdminRequest.getUsername())
-                .password(passwordEncoder.encode(registerAdminRequest.getPassword()))
+                .encryptedPassword(passwordEncoder.encode(registerAdminRequest.getPassword()))
                 .phoneNumber(registerAdminRequest.getPhoneNumber())
                 .role(Role.ADMIN)
                 .build();
@@ -89,7 +89,7 @@ public class UsersService {
                 //.sm(smRepository.findById(registerDriverRequest.getSmId()).get())
                 .name(registerDriverRequest.getName())
                 .username(registerDriverRequest.getUsername())
-                .password(passwordEncoder.encode(registerDriverRequest.getPassword()))
+                .encryptedPassword(passwordEncoder.encode(registerDriverRequest.getPassword()))
                 .phoneNumber(registerDriverRequest.getPhoneNumber())
                 .role(Role.DRIVER)
                 .build();
@@ -105,7 +105,7 @@ public class UsersService {
         Users users = usersRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new UsersException(UsersErrorCode.NOT_FOUND_USER));
 
-        if (!passwordEncoder.matches(loginRequest.getPassword(), users.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), users.getEncryptedPassword())) {
             throw new UsersException(UsersErrorCode.PASSWORD_MISMATCH);
         }
 
