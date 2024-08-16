@@ -1,15 +1,11 @@
 package com.team2.finalproject.domain.vehicle.model.entity;
 
-import com.team2.finalproject.domain.center.model.entity.Center;
-import com.team2.finalproject.domain.sm.model.entity.Sm;
-import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -62,12 +58,12 @@ public class Vehicle extends BaseEntity {
     @Column(nullable = false)
     private String updatedBy; // 수정한 사용자
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Center center;
+    @Column(nullable = false)
+    private Long centerId;
 
-    @OneToOne
-    private Sm sm;
+    @Column(nullable = true)
+    private Long smId;
 
-    @OneToMany(mappedBy = "vehicle")
-    private List<VehicleDetail> vehicleDetail;
+    @Column(nullable = false)
+    private Long vehicleDetailId;
 }

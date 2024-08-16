@@ -1,11 +1,8 @@
 package com.team2.finalproject.domain.deliverydestination.model.entity;
 
-import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -16,8 +13,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DeliveryDestination extends BaseEntity {
 
-    @Column(nullable = false, length = 50)
-    private String field;  // 필드
+    @Column(nullable = false)
+    private Long centerId;
+
+    @Column(nullable = false, length = 100)
+    private String destinationName; // 배송처명
 
     @Column(nullable = false, length = 50)
     private String basicAddress;  // 기본주소
@@ -29,6 +29,12 @@ public class DeliveryDestination extends BaseEntity {
     private String postalCode;  // 우편번호
 
     @Column(nullable = false, length = 30)
+    private String managerName;
+
+    @Column(nullable = false, length = 20)
+    private String managerPhoneNumber;
+
+    @Column(nullable = false, length = 30)
     private String businessNumber;  // 사업자번호
 
     @Column(nullable = false)
@@ -37,14 +43,6 @@ public class DeliveryDestination extends BaseEntity {
     @Column(nullable = false)
     private Double longitude;  // 경도
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Center center;
-
-    //배송처명
-
-    //담당자명
-
-    //담당자 전화번호
-
-    //진입 불가 톤코드
+    @Column(nullable = true, length = 10)
+    private String restrictedTonCode;    // 진입 불가 톤 코드
 }
