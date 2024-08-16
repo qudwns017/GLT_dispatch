@@ -1,7 +1,5 @@
 package com.team2.finalproject.domain.users.model.entity;
 
-import com.team2.finalproject.domain.center.model.entity.Center;
-import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.users.model.type.Role;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -33,9 +31,10 @@ public class Users extends BaseEntity {
     @Column(nullable = false)
     private Role role;  // 사용자 권한
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Center center;
+    @Column(nullable = false)
+    private Long centerId;
 
-    @OneToOne(mappedBy = "users")
-    private Sm sm;
+    @Column(nullable = false)
+    private Long smId;
+
 }

@@ -1,12 +1,8 @@
 package com.team2.finalproject.domain.vehicledetail.model.entity;
 
-import com.team2.finalproject.domain.center.model.entity.Center;
-import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -26,9 +22,6 @@ public class VehicleDetail extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String vehicleType;  // 차량종류
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Center center;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Vehicle vehicle;
+    @Column(nullable = false)
+    private Long centerId;
 }
