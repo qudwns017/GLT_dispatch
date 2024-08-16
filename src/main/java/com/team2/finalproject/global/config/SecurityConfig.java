@@ -1,6 +1,7 @@
 package com.team2.finalproject.global.config;
 
 import com.team2.finalproject.global.security.details.UserDetailsServiceImpl;
+import com.team2.finalproject.global.security.exception.JwtAuthenticationEntryPoint;
 import com.team2.finalproject.global.security.filter.JwtAuthenticationFilter;
 import com.team2.finalproject.global.security.jwt.JwtProvider;
 import com.team2.finalproject.global.security.jwt.TokenService;
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final TokenService tokenService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -59,7 +61,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenService, userDetailsService),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         return http.build();
     }

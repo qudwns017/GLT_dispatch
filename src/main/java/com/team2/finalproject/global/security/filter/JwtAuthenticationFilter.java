@@ -35,34 +35,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws IOException, ServletException {
 
-        String accessToken = jwtProvider.resolveToken(request, TokenType.ACCESS);
-        String cookieRefreshToken = jwtProvider.resolveToken(request, TokenType.REFRESH);
-        if (accessToken != null) {
-            if (tokenService.isBlacklistedToken(accessToken)) {
-                throw new SecurityException(SecurityErrorCode.BLACKLISTED_TOKEN);
-            }
+        try {
+            String accessToken = jwtProvider.resolveToken(request, TokenType.ACCESS);
+            String cookieRefreshToken = jwtProvider.resolveToken(request, TokenType.REFRESH);
+            if (accessToken != null) {
+                if (tokenService.isBlacklistedToken(accessToken)) {
+                    throw new SecurityException(SecurityErrorCode.BLACKLISTED_TOKEN);
+                }
 
-            TokenStatus tokenStatus = jwtProvider.validateToken(accessToken, TokenType.ACCESS);
-            String username = jwtProvider.getUserNameFromToken(accessToken, TokenType.ACCESS);
-            String redisRefreshToken = tokenService.getRefreshToken(username);
-            if (tokenStatus == TokenStatus.VALID) {
-                // 엑세스 토큰의 유효기간이 5분 미만이면, 재발급
-                if (isAccessTokenExpiringSoon(accessToken) && cookieRefreshToken.equals(redisRefreshToken)) {
-                    log.info("JWT 토큰 재발급 필요");
+                TokenStatus tokenStatus = jwtProvider.validateToken(accessToken, TokenType.ACCESS);
+                String username = jwtProvider.getUserNameFromToken(accessToken, TokenType.ACCESS);
+                String redisRefreshToken = tokenService.getRefreshToken(username);
+                if (tokenStatus == TokenStatus.VALID) {
+                    // 엑세스 토큰의 유효기간이 5분 미만이면, 재발급
+                    if (isAccessTokenExpiringSoon(accessToken) && cookieRefreshToken.equals(redisRefreshToken)) {
+                        log.info("JWT 토큰 재발급 필요");
+                        refreshToken(response, username);
+                        tokenService.addToBlacklist(accessToken);
+                    } else {
+                        setAuthentication(username);
+                    }
+                } else if(tokenStatus == TokenStatus.EXPIRED && cookieRefreshToken.equals(redisRefreshToken)) {
+                    log.info("JWT 토큰 재발급 필요(만료)");
                     refreshToken(response, username);
                     tokenService.addToBlacklist(accessToken);
-                } else {
-                    setAuthentication(username);
+                } else if (tokenStatus == TokenStatus.INVALID) {
+                    throw new SecurityException(SecurityErrorCode.INVALID_TOKEN);
                 }
-            } else if(tokenStatus == TokenStatus.EXPIRED && cookieRefreshToken.equals(redisRefreshToken)) {
-                log.info("JWT 토큰 재발급 필요(만료)");
-                refreshToken(response, username);
-                tokenService.addToBlacklist(accessToken);
-            } else if (tokenStatus == TokenStatus.INVALID) {
-                throw new SecurityException(SecurityErrorCode.INVALID_TOKEN);
             }
+            filterChain.doFilter(request, response);
+        }catch (SecurityException e) {
+            request.setAttribute("securityException", e);
+            throw e;
         }
-        filterChain.doFilter(request, response);
     }
 
     private boolean isAccessTokenExpiringSoon(String accessToken) {
