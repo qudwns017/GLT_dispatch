@@ -63,6 +63,7 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = true, length = 100)
     private String customerNotes;   // 고객 전달 사항
 
+    @Builder.Default
     @Column(nullable = true)
     private LocalTime estimatedWorkTime = LocalTime.of(0,1);  // 예상작업시간
 
@@ -89,6 +90,7 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false,length = 4)
     private String centerId; // 센터 id
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean isPending = false;
 }

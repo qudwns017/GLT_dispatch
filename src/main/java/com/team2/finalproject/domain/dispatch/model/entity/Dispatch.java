@@ -4,6 +4,8 @@ import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
@@ -35,6 +37,7 @@ public class Dispatch extends BaseEntity {
     @Column(nullable = false)
     private int deliveryOrderCount; // 운송오더수
 
+    @Builder.Default
     @Column(nullable = false)
     private int totalOrderCount = 0; // 완료오더수
 
@@ -65,6 +68,8 @@ public class Dispatch extends BaseEntity {
     @Column(nullable = false)
     private int loadingRate; // 적재율
 
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DispatchStatus deliveryStatus = DispatchStatus.IN_TRANSIT; // 배차상태
 

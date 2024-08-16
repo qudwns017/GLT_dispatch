@@ -4,6 +4,8 @@ import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailSta
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +45,8 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = false)
     private Long distance; //이동거리
 
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DispatchDetailStatus dispatchDetailStatus = DispatchDetailStatus.PENDING; // 배차상세상태
 
