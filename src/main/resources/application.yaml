@@ -16,6 +16,13 @@ spring:
         default_batch_fetch_size: 100
         hibernate:
           dialect: org.hibernate.dialect.MySQLDialect
+
+  jwt:
+    access-secret: ${JWT_ACCESS_SECRET}
+    refresh-secret: ${JWT_REFRESH_SECRET}
+    access-expiration: ${JWT_ACCESS_EXPIRATION}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
 redis:
   host: ${REDIS_HOST}
   port: ${REDIS_PORT}

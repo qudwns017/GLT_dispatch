@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum SmErrorCode implements ErrorCode {
-
+    NOT_FOUND_SM(HttpStatus.NOT_FOUND, "존재하지 않는 SM입니다.")
     ;
 
     private final HttpStatus httpStatus;
