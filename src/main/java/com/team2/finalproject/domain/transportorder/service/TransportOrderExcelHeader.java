@@ -8,8 +8,8 @@ public record TransportOrderExcelHeader(String name, String required, String com
     public static List<TransportOrderExcelHeader> getTransportOrders() {
         List<TransportOrderExcelHeader> transportOrders = new ArrayList<>();
         transportOrders.add(new TransportOrderExcelHeader(
-                "배송유형 (지입/용차/배달)", "필수",
-                "배송유형은 지입/용차/배달로 구분하여 입력해주세요.",
+                "배송유형 (지입/용차/택배)", "필수",
+                "배송유형은 지입/용차/택배로 구분하여 입력해주세요.",
                 "예시) 지입"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
@@ -74,7 +74,7 @@ public record TransportOrderExcelHeader(String name, String required, String com
         ));
         transportOrders.add(new TransportOrderExcelHeader(
                 "볼륨", "필수",
-                "볼륨을 정수 형태로 입력해주세요.\n*가로 x 세로 x 높이 값을 cm^3을 기준으로 작성해주세요.",
+                "볼륨을 숫자 형태로 입력해주세요.\n*가로 x 세로 x 높이 값을 m^3을 기준으로 작성해주세요.",
                 "예시) 600"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
@@ -106,11 +106,6 @@ public record TransportOrderExcelHeader(String name, String required, String com
                 "상품 수량", "필수",
                 "상품의 수량을 정수 형태로 입력해주세요.\n상품수량 셀이 비어있으면 기본값으로 1을 인식합니다.",
                 "예시) 5"
-        ));
-        transportOrders.add(new TransportOrderExcelHeader(
-                "배차우선순위(긴급/보류)", "선택",
-                "배차우선순위를 입력할 수 있습니다.\n긴급/보류로 구분하여 입력해주세요.",
-                "예시) 긴급"
         ));
 
         return transportOrders;
