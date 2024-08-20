@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transport-order")
 @RequiredArgsConstructor
-public class TransportOrderController {
+public class TransportOrderController implements SwaggerTransportOrderController{
 
     private final TransportOrderService transportOrderService;
 
