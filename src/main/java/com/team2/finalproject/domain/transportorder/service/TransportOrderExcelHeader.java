@@ -14,7 +14,7 @@ public record TransportOrderExcelHeader(String name, String required, String com
         ));
         transportOrders.add(new TransportOrderExcelHeader(
                 "SM명", "필수",
-                "특정 주문을 작업할 담당 드라이버를 지정해주세요. \nGLT 코리아에 등록되지 않은 드라이버의 이름을 입력하면 오류가 발생합니다.",
+                "특정 주문을 작업할 담당 드라이버를 지정해주세요.\nGLT 코리아에 등록되지 않은 드라이버의 이름을 입력하면 오류가 발생합니다.",
                 "예시) 이서원"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
