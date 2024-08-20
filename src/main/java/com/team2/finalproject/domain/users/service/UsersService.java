@@ -55,6 +55,7 @@ public class UsersService {
 
         Users users = Users.builder()
                 //.center(centerRepository.findById(registerAdminRequest.getCenterId()).get())
+                .centerId(1L)
                 .name(registerAdminRequest.getName())
                 .username(registerAdminRequest.getUsername())
                 .encryptedPassword(passwordEncoder.encode(registerAdminRequest.getPassword()))
@@ -117,6 +118,7 @@ public class UsersService {
 
         return LoginResponse.builder()
                 .name(users.getName())
+                .centerId(1L)
                 //.centerId(users.getCenter().getId())
                 .build();
     }
