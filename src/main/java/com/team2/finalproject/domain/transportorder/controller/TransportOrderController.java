@@ -24,7 +24,7 @@ public class TransportOrderController {
 
     private final TransportOrderService transportOrderService;
 
-    @GetMapping
+    @GetMapping("/excel-example")
     public ResponseEntity<Void> downloadOrderFormExcel(HttpServletResponse response) {
         String fileName = "운송_주문_양식.xlsx";
         String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
