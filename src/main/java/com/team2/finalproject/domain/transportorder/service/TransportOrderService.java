@@ -1,8 +1,11 @@
 package com.team2.finalproject.domain.transportorder.service;
 
+import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
+import com.team2.finalproject.domain.sm.repository.SmRepository;
+import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndPostalCodeRequest;
+import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndPostalCodeResponse;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -11,15 +14,23 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TransportOrderService {
+  
+    private final SmRepository smRepository;
+    private final DeliveryDestinationRepository deliveryDestinationRepository;
 
     private static final short FONT_SIZE_NAME = 14;
     private static final short FONT_SIZE_REQUIRED = 12;
     private static final short COMMENT_ROW_HEIGHT = 2000;
     private static final int COLUMN_PADDING = 8192;
-
+    
     public void downloadOrderFormExcel(HttpServletResponse response) {
         List<TransportOrderExcelHeader> transportOrdersList = TransportOrderExcelHeader.getTransportOrders();
 
@@ -52,6 +63,20 @@ public class TransportOrderService {
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+    
+    public List<SmNameAndPostalCodeResponse> validateSmNameAndPostalCodes(List<SmNameAndPostalCodeRequest> requests) {
+        Map<String, Integer> smNameWithIdMap = smRepository.findAllSmNameWithIdsToMap();
+        Map<String, Integer> postalWithIdMap = deliveryDestinationRepository.findAllPostalCodeWithIdsToMap();
+
+        return requests.stream()
+                .map(request -> SmNameAndPostalCodeResponse.builder()
+                        .postalCodeValid(postalWithIdMap.containsKey(request.postalCode()))
+                        .deliveryDestinationId(postalWithIdMap.getOrDefault(request.postalCode(), 0))
+                        .smNameValid(smNameWithIdMap.containsKey(request.smName()))
+                        .smId(smNameWithIdMap.getOrDefault(request.smName(), 0))
+                        .build())
+                .toList();
     }
 
     private XSSFCellStyle createCellStyle(XSSFWorkbook workbook, IndexedColors backgroundColor, short fontSize, boolean bold, HorizontalAlignment hAlign, VerticalAlignment vAlign) {
@@ -100,3 +125,4 @@ public class TransportOrderService {
         }
     }
 }
+
