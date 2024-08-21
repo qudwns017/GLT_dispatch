@@ -10,12 +10,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Builder
 public class Dispatch extends BaseEntity {
 
@@ -39,7 +41,7 @@ public class Dispatch extends BaseEntity {
 
     @Builder.Default
     @Column(nullable = false)
-    private int totalOrderCount = 0; // 완료오더수
+    private int completedOrderCount = 0; // 완료오더수
 
     @Column(nullable = false)
     private Long totalDistance;   //총거리
@@ -52,9 +54,6 @@ public class Dispatch extends BaseEntity {
 
     @Column(nullable = false, length = 50)
     private String departurePlaceName; // 출발지명
-
-    @Column(nullable = false)
-    private LocalDateTime departureTime; // 출발시간
 
     @Column(nullable = true)
     private LocalDateTime arrivalTime; // 도착시간   주행 완료 후의 시간
@@ -78,7 +77,4 @@ public class Dispatch extends BaseEntity {
 
     @Column(nullable = false, length = 100)
     private String issue; // 이슈
-
-
-
 }
