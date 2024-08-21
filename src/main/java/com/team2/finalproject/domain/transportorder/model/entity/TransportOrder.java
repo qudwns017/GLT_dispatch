@@ -67,9 +67,6 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = true)
     private LocalTime estimatedWorkTime = LocalTime.of(0,1);  // 예상작업시간
 
-    @Column(nullable = false)
-    private Long deliveryDestinationId; // 배송처 id
-
     @Column(nullable = false, length = 20)
     private String deliveryDestinationCode; // 배송처코드
 
@@ -83,14 +80,10 @@ public class TransportOrder extends BaseEntity {
     private int productCount; // 아이템수량
 
 
-    @Column(nullable = true, length = 10)
-    private String dispatchPriority;    // 배차 우선 순위 ex) 긴급, 보류
-
-
     @Column(nullable = false,length = 4)
     private String centerId; // 센터 id
 
     @Builder.Default
     @Column(nullable = false)
-    private boolean isPending = false;
+    private boolean isPending = false; // 보류여부
 }
