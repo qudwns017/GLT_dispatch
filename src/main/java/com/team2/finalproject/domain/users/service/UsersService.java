@@ -4,10 +4,10 @@ import com.team2.finalproject.domain.center.repository.CenterRepository;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.users.exception.UsersErrorCode;
 import com.team2.finalproject.domain.users.exception.UsersException;
-import com.team2.finalproject.domain.users.model.dto.LoginRequest;
-import com.team2.finalproject.domain.users.model.dto.LoginResponse;
-import com.team2.finalproject.domain.users.model.dto.RegisterAdminRequest;
-import com.team2.finalproject.domain.users.model.dto.RegisterDriverRequest;
+import com.team2.finalproject.domain.users.model.dto.request.LoginRequest;
+import com.team2.finalproject.domain.users.model.dto.response.LoginResponse;
+import com.team2.finalproject.domain.users.model.dto.request.RegisterAdminRequest;
+import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverRequest;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.model.type.Role;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
@@ -54,7 +54,7 @@ public class UsersService {
 //        }
 
         Users users = Users.builder()
-                //.center(centerRepository.findById(registerAdminRequest.getCenterId()).get())
+                .centerId(registerAdminRequest.getCenterId())
                 .name(registerAdminRequest.getName())
                 .username(registerAdminRequest.getUsername())
                 .encryptedPassword(passwordEncoder.encode(registerAdminRequest.getPassword()))
@@ -85,8 +85,8 @@ public class UsersService {
 //        }
 
         Users users = Users.builder()
-                //.center(centerRepository.findById(registerDriverRequest.getCenterId()).get())
-                //.sm(smRepository.findById(registerDriverRequest.getSmId()).get())
+                .centerId(registerDriverRequest.getCenterId())
+                .smId(registerDriverRequest.getSmId())
                 .name(registerDriverRequest.getName())
                 .username(registerDriverRequest.getUsername())
                 .encryptedPassword(passwordEncoder.encode(registerDriverRequest.getPassword()))

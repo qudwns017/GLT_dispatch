@@ -34,7 +34,6 @@ public class Users extends BaseEntity {
     @Column(nullable = false)
     private Long centerId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long smId;
-
 }
