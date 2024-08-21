@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum DispatchErrorCode implements ErrorCode {
+    DISPATCH_NOT_FOUND(HttpStatus.NOT_FOUND, "Dispatch not found")
     ;
 
     private final HttpStatus httpStatus;
