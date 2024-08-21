@@ -1,4 +1,4 @@
-package com.team2.finalproject.domain.users.model.dto;
+package com.team2.finalproject.domain.users.model.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class LoginResponse {
 
-    private String username;
-    private String password;
+    private String name;
+    private Long centerId;
 }

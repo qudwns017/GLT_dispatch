@@ -1,4 +1,4 @@
-package com.team2.finalproject.domain.users.model.dto;
+package com.team2.finalproject.domain.users.model.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,12 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterDriverRequest {
+public class LoginRequest {
 
-    private long centerId;
-    private long smId;
-    private String name;
     private String username;
     private String password;
-    private String phoneNumber;
 }

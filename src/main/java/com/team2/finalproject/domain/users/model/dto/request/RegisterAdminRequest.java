@@ -1,4 +1,4 @@
-package com.team2.finalproject.domain.users.model.dto;
+package com.team2.finalproject.domain.users.model.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
