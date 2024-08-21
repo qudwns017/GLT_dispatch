@@ -19,6 +19,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -152,11 +153,14 @@ public class DispatchService {
     // 담당자에 대한 검색
     private List<DispatchNumber> searchByAdminId(DispatchSearchRequest request, Long userId, Long centerId,
                                                  LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
-        if (isManager && userId.toString().equals(request.getSearchKeyword())) {
+        Long targetId = usersRepository.findIdByNameOrThrow(request.getSearchKeyword());
+        // 자신 담당만 보기 & 다른 사람 검색 이면 빈 값 출력
+        if (isManager && !Objects.equals(userId, targetId)) {
+            return new ArrayList<>();
+        }else {
             return dispatchNumberRepository.findByCenterIdAndAdminIdAndLoadStartDateTimeBetween(
-                    centerId, userId, startDateTime, endDateTime);
+                    centerId, targetId, startDateTime, endDateTime);
         }
-        return null;
     }
 
     // 검색이 없는 경우
