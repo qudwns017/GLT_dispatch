@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -21,13 +22,16 @@ public class DispatchNumber extends BaseEntity {
     private Long centerId; // 센터코드
 
     @Column(nullable = false)
-    private Long driverId; // 담당자Id
+    private Long adminId; // 담당자Id
+
+    @Column(nullable = false)
+    private LocalDateTime loadingStartTime;
 
     @Column(nullable = false, length = 20)
     private String dispatchNumber; // 배차번호
 
     @Column(nullable = false, length = 50)
-    private String dispatchType; // 배차명
+    private String dispatchName; // 배차명
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
