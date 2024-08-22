@@ -1,8 +1,17 @@
 package com.team2.finalproject.domain.center.model.entity;
 
+import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
+import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
+import com.team2.finalproject.domain.sm.model.entity.Sm;
+import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
+import com.team2.finalproject.domain.users.model.entity.Users;
+import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
+import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -37,5 +46,26 @@ public class Center extends BaseEntity {
 
     @Column(nullable = false, length = 20)
     private String phoneNumber; //전화번호
+
+    @OneToMany(mappedBy = "center")
+    List<DeliveryDestination> deliveryDestinationList;
+
+    @OneToMany(mappedBy = "center")
+    List<Users> usersList;
+
+    @OneToMany(mappedBy = "center")
+    List<Sm> smList;
+
+    @OneToMany(mappedBy = "center")
+    List<Vehicle> vehicleList;
+
+    @OneToMany(mappedBy = "center")
+    List<VehicleDetail> vehicleDetailList;
+
+    @OneToMany(mappedBy = "center")
+    List<DispatchNumber> dispatchNumberList;
+
+    @OneToMany(mappedBy = "center")
+    List<TransportOrder> transportOrderList;
 
 }

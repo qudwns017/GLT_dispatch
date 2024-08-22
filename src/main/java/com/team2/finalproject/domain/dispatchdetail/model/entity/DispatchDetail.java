@@ -1,12 +1,17 @@
 package com.team2.finalproject.domain.dispatchdetail.model.entity;
 
+import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
+import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,12 +23,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class DispatchDetail extends BaseEntity {
-
-    @Column(nullable = false)
-    private Long dispatchScheduleId; // 배차계획id
-
-    @Column(nullable = false)
-    private Long transportOrderId; // 운송실행주문 id
 
     @Column(nullable = true)
     private Long destinationId; // 도착지 id
@@ -63,4 +62,10 @@ public class DispatchDetail extends BaseEntity {
 
     @Column(nullable = true)
     private LocalDateTime loadingCompletionTime; // 상차완료시간
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Dispatch dispatch;
+
+    @OneToOne
+    private TransportOrder transportOrder;
 }
