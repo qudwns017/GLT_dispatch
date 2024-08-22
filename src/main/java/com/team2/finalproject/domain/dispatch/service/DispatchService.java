@@ -8,6 +8,7 @@ import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
+import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
@@ -49,7 +50,7 @@ public class DispatchService {
                 .filter(d -> d.getStatus().name().equals("COMPLETED")).count();
 
         // 검색을 원하는 status
-        DispatchStatus status = request.getStatus();
+        DispatchNumberStatus status = request.getStatus();
 
         // DispatchNumber ID 리스트 추출
         List<Long> dispatchNumberIds = dispatchNumbers.stream()
@@ -81,9 +82,9 @@ public class DispatchService {
 
                     return DispatchSearchResponse.DispatchResult.builder()
                             .progress(progress)
-                            .dispatchCode(dispatchNumber.getDispatchCode())
+                            .dispatchCode(dispatchNumber.getDispatchNumber())
                             .dispatchName(dispatchNumber.getDispatchName())
-                            .startDateTime(dispatchNumber.getLoadStartDateTime())
+                            .startDateTime(dispatchNumber.getLoadingStartTime())
                             .totalOrder(totalOrder)
                             .smNum(smNum)
                             .manager(usersRepository.findNameByIdOrThrow(dispatchNumber.getAdminId()))

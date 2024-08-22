@@ -13,7 +13,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     // 1. 센터 코드를 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.centerId = :centerId " +
-            "AND d.loadStartDateTime " +
+            "AND d.loadingStartTime " +
             "BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterIdAndLoadStartDateTimeBetween(@Param("centerId") Long centerId,
                                                                    @Param("startDateTime") LocalDateTime startDateTime,
@@ -22,7 +22,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     // 2. 센터 코드, 담당자Id를 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.centerId = :centerId AND d.adminId = :adminId " +
-            "AND d.loadStartDateTime " +
+            "AND d.loadingStartTime " +
             "BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterIdAndAdminIdAndLoadStartDateTimeBetween(@Param("centerId") Long centerId,
                                                                              @Param("adminId") Long adminId,
@@ -32,8 +32,8 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     // 3. 센터 코드, 배차 번호를 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.centerId = :centerId " +
-            "AND d.dispatchCode = :dispatchCode " +
-            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+            "AND d.dispatchNumber = :dispatchCode " +
+            "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterIdAndDispatchCodeAndLoadStartDateTimeBetween(@Param("centerId") Long centerId,
                                                                                   @Param("dispatchCode") String dispatchCode,
                                                                                   @Param("startDateTime") LocalDateTime startDateTime,
@@ -42,8 +42,8 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     // 4. 센터 코드, 담당자Id, 배차 번호를 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.centerId = :centerId AND d.adminId = :adminId " +
-            "AND d.dispatchCode = :dispatchCode " +
-            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+            "AND d.dispatchNumber = :dispatchCode " +
+            "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterIdAndAdminIdAndDispatchCodeAndLoadStartDateTimeBetween(@Param("centerId") Long centerId,
                                                                                             @Param("adminId") Long adminId,
                                                                                             @Param("dispatchCode") String dispatchCode,
@@ -54,7 +54,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.centerId = :centerId " +
             "AND d.dispatchName = :dispatchName " +
-            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+            "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterIdAndDispatchNameAndLoadStartDateTimeBetween(@Param("centerId") Long centerId,
                                                                                   @Param("dispatchName") String dispatchName,
                                                                                   @Param("startDateTime") LocalDateTime startDateTime,
@@ -64,7 +64,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.centerId = :centerId AND d.adminId = :adminId " +
             "AND d.dispatchName = :dispatchName " +
-            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+            "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterIdAndAdminIdAndDispatchNameAndLoadStartDateTimeBetween(@Param("centerId") Long centerId,
                                                                                             @Param("adminId") Long adminId,
                                                                                             @Param("dispatchName") String dispatchName,
@@ -74,7 +74,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     // 9. 여러 개의 id, 센터 코드 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.id IN :ids AND d.centerId = :centerId " +
-            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+            "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByIdInAndCenterIdAndLoadStartDateTimeBetween(@Param("ids") List<Long> ids,
                                                                           @Param("centerId") Long centerId,
                                                                           @Param("startDateTime") LocalDateTime startDateTime,
@@ -83,7 +83,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     // 10. 여러 개의 id, 센터 코드, 담당자Id 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
             "WHERE d.id IN :ids AND d.centerId = :centerId AND d.adminId = :adminId " +
-            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+            "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByIdInAndCenterIdAndAdminIdAndLoadStartDateTimeBetween(@Param("ids") List<Long> ids,
                                                                                     @Param("centerId") Long centerId,
                                                                                     @Param("adminId") Long adminId,
