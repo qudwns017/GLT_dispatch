@@ -70,4 +70,23 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
                                                                                             @Param("dispatchName") String dispatchName,
                                                                                             @Param("startDateTime") LocalDateTime startDateTime,
                                                                                             @Param("endDateTime") LocalDateTime endDateTime);
+
+    // 9. 여러 개의 id, 센터 코드 기준으로 조회
+    @Query("SELECT d FROM DispatchNumber d " +
+            "WHERE d.id IN :ids AND d.centerId = :centerId " +
+            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+    List<DispatchNumber> findByIdInAndCenterIdAndLoadStartDateTimeBetween(@Param("ids") List<Long> ids,
+                                                                          @Param("centerId") Long centerId,
+                                                                          @Param("startDateTime") LocalDateTime startDateTime,
+                                                                          @Param("endDateTime") LocalDateTime endDateTime);
+
+    // 10. 여러 개의 id, 센터 코드, 담당자Id 기준으로 조회
+    @Query("SELECT d FROM DispatchNumber d " +
+            "WHERE d.id IN :ids AND d.centerId = :centerId AND d.adminId = :adminId " +
+            "AND d.loadStartDateTime BETWEEN :startDateTime AND :endDateTime")
+    List<DispatchNumber> findByIdInAndCenterIdAndAdminIdAndLoadStartDateTimeBetween(@Param("ids") List<Long> ids,
+                                                                                    @Param("centerId") Long centerId,
+                                                                                    @Param("adminId") Long adminId,
+                                                                                    @Param("startDateTime") LocalDateTime startDateTime,
+                                                                                    @Param("endDateTime") LocalDateTime endDateTime);
 }

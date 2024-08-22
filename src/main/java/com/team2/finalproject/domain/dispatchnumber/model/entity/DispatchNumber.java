@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 public class DispatchNumber extends BaseEntity {
 
     @Column(nullable = false)
-    private Long centerId; // 센터코드
+    private Long centerId; // 센터Id
 
     @Column(nullable = false)
     private Long adminId; // 담당자Id
@@ -40,5 +40,4 @@ public class DispatchNumber extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DispatchStatus status = DispatchStatus.WAITING; // 상태
-
 }
