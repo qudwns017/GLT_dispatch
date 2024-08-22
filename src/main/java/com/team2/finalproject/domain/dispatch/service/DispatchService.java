@@ -105,7 +105,7 @@ public class DispatchService {
     private List<DispatchNumber> searchDispatchNumbers(DispatchSearchRequest request, Long userId, Long centerId,
                                                        LocalDateTime startDateTime, LocalDateTime endDateTime) {
         log.info("검색 옵션: {}", request.getSearchOption());
-        List<DispatchNumber> dispatchNumbers = new ArrayList<>();
+        List<DispatchNumber> dispatchNumbers;
         boolean isManager = request.getIsManager(); // 담당자 여부
         // 검색 옵션에 다른 검색 (검색창 검색)
         if(request.getSearchOption() != null) {

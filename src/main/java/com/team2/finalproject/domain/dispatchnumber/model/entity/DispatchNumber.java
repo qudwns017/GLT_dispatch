@@ -38,6 +38,6 @@ public class DispatchNumber extends BaseEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DispatchNumberStatus status = DispatchNumberStatus.WAITING;; // 상태
+    private DispatchNumberStatus status = DispatchNumberStatus.WAITING; // 상태
 
 }
