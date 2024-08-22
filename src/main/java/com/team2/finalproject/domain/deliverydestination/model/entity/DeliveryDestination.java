@@ -1,8 +1,11 @@
 package com.team2.finalproject.domain.deliverydestination.model.entity;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -12,9 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class DeliveryDestination extends BaseEntity {
-
-    @Column(nullable = false)
-    private Long centerId;
 
     @Column(nullable = false, length = 100)
     private String destinationName; // 배송처명
@@ -49,4 +49,7 @@ public class DeliveryDestination extends BaseEntity {
     @Builder.Default
     @Column(nullable = false)
     private int delayTime = 0; // 작업 추가 소요시간(분)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Center center;
 }

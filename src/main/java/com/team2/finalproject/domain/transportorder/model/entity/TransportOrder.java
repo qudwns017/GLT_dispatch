@@ -1,8 +1,13 @@
 package com.team2.finalproject.domain.transportorder.model.entity;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
@@ -79,11 +84,13 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false)
     private int productCount; // 아이템수량
 
-
-    @Column(nullable = false,length = 4)
-    private String centerId; // 센터 id
-
     @Builder.Default
     @Column(nullable = false)
     private boolean isPending = false; // 보류여부
+
+    @OneToOne(mappedBy = "transportOrder")
+    private DispatchDetail dispatchDetail;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Center center;
 }

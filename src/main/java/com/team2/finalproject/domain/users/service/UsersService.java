@@ -54,7 +54,7 @@ public class UsersService {
 //        }
 
         Users users = Users.builder()
-                .centerId(registerAdminRequest.getCenterId())
+                //.center(centerRepository.findById(registerAdminRequest.getCenterId()).get())
                 .name(registerAdminRequest.getName())
                 .username(registerAdminRequest.getUsername())
                 .encryptedPassword(passwordEncoder.encode(registerAdminRequest.getPassword()))
@@ -85,8 +85,8 @@ public class UsersService {
 //        }
 
         Users users = Users.builder()
-                .centerId(registerDriverRequest.getCenterId())
-                .smId(registerDriverRequest.getSmId())
+                //.center(centerRepository.findById(registerDriverRequest.getCenterId()).get())
+                //.sm(smRepository.findById(registerDriverRequest.getSmId()).get())
                 .name(registerDriverRequest.getName())
                 .username(registerDriverRequest.getUsername())
                 .encryptedPassword(passwordEncoder.encode(registerDriverRequest.getPassword()))
