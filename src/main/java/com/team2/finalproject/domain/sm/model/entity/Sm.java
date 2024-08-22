@@ -1,7 +1,12 @@
 package com.team2.finalproject.domain.sm.model.entity;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
+import com.team2.finalproject.domain.users.model.entity.Users;
+import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -17,9 +22,6 @@ public class Sm extends BaseEntity {
 
     @Column(nullable = false, length = 30)
     private String smName;  // SM명
-
-    @Column(nullable = false, length = 20)
-    private String userId;  // 사용자ID
 
     @Column(nullable = false, length = 20)
     private String logisticsCode;  // 물류코드
@@ -42,7 +44,16 @@ public class Sm extends BaseEntity {
     @Column(nullable = false)
     private Boolean isDriving;  // 상태  주행여부
 
-    @Column(nullable = false)
-    private Long centerId;  // 센터 ID
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Center center;  // 센터 ID
+
+    @OneToOne(mappedBy = "sm")
+    private Users users;
+
+    @OneToOne(mappedBy = "sm")
+    private Vehicle vehicle;
+
+    @OneToMany(mappedBy = "sm")
+    private List<Dispatch> dispatchList;
 
 }

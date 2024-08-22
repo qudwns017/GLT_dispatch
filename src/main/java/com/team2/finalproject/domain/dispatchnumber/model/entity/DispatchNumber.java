@@ -1,12 +1,19 @@
 package com.team2.finalproject.domain.dispatchnumber.model.entity;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
+import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -17,12 +24,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class DispatchNumber extends BaseEntity {
-
-    @Column(nullable = false)
-    private Long centerId; // 센터코드
-
-    @Column(nullable = false)
-    private Long adminId; // 담당자Id
 
     @Column(nullable = false)
     private LocalDateTime loadingStartTime;
@@ -37,5 +38,14 @@ public class DispatchNumber extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DispatchNumberStatus status = DispatchNumberStatus.WAITING;; // 상태
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Users users; // 담당자Id
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Center center; // 센터코드
+
+    @OneToMany(mappedBy = "dispatchNumber")
+    private List<Dispatch> dispatcheList;
 
 }
