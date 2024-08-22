@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class SmNameAndPostalCodeResponse {
+public class SmNameAndZipCodeResponse {
 
-    private boolean postalCodeValid;
+    private boolean zipCodeValid;
 
     private int deliveryDestinationId;
 
