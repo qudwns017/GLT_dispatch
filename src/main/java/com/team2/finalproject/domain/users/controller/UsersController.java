@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UsersController {
+public class UsersController implements SwaggerUsersController{
 
     private final UsersService usersService;
 

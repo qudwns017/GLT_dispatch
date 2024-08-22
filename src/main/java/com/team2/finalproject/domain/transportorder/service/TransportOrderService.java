@@ -2,8 +2,8 @@ package com.team2.finalproject.domain.transportorder.service;
 
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
-import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndPostalCodeRequest;
-import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndPostalCodeResponse;
+import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndZipCodeRequest;
+import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndZipCodeResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,14 +36,18 @@ public class TransportOrderService {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        XSSFCellStyle nameRowStyle = createCellStyle(workbook, IndexedColors.GREY_40_PERCENT, FONT_SIZE_NAME, true, HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
-        XSSFCellStyle requiredRowStyle = createCellStyle(workbook, IndexedColors.GREY_25_PERCENT, FONT_SIZE_REQUIRED, true, HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+        XSSFCellStyle nameRowStyle = createCellStyle(workbook, IndexedColors.GREY_40_PERCENT, FONT_SIZE_NAME, true,
+                HorizontalAlignment.CENTER, VerticalAlignment.CENTER, true);
+        XSSFCellStyle requiredRowStyle = createCellStyle(workbook, IndexedColors.GREY_25_PERCENT, FONT_SIZE_REQUIRED,
+                true, HorizontalAlignment.CENTER, VerticalAlignment.CENTER, true);
         requiredRowStyle.getFont().setColor(IndexedColors.RED.getIndex());
 
-        XSSFCellStyle commentRowStyle = createCellStyle(workbook, IndexedColors.LEMON_CHIFFON, (short) 0, false, null, VerticalAlignment.CENTER);
+        XSSFCellStyle commentRowStyle = createCellStyle(workbook, IndexedColors.LEMON_CHIFFON, (short) 0, false, null,
+                VerticalAlignment.CENTER, true);
         commentRowStyle.setWrapText(true);
 
-        XSSFCellStyle exampleRowStyle = createCellStyle(workbook, null, (short) 0, false, null, VerticalAlignment.CENTER);
+        XSSFCellStyle exampleRowStyle = createCellStyle(workbook, null, (short) 0, false, null,
+                VerticalAlignment.CENTER, true);
         exampleRowStyle.setWrapText(true);
 
         XSSFSheet sheet = workbook.createSheet("운송_주문_양식");
@@ -65,21 +69,23 @@ public class TransportOrderService {
         }
     }
     
-    public List<SmNameAndPostalCodeResponse> validateSmNameAndPostalCodes(List<SmNameAndPostalCodeRequest> requests) {
+    public List<SmNameAndZipCodeResponse> validateSmNameAndZipCodes(List<SmNameAndZipCodeRequest> requests) {
         Map<String, Integer> smNameWithIdMap = smRepository.findAllSmNameWithIdsToMap();
-        Map<String, Integer> postalWithIdMap = deliveryDestinationRepository.findAllPostalCodeWithIdsToMap();
+        Map<String, Integer> zipWithIdMap = deliveryDestinationRepository.findAllZipCodeWithIdsToMap();
 
         return requests.stream()
-                .map(request -> SmNameAndPostalCodeResponse.builder()
-                        .postalCodeValid(postalWithIdMap.containsKey(request.postalCode()))
-                        .deliveryDestinationId(postalWithIdMap.getOrDefault(request.postalCode(), 0))
+                .map(request -> SmNameAndZipCodeResponse.builder()
+                        .zipCodeValid(zipWithIdMap.containsKey(request.zipCode()))
+                        .deliveryDestinationId(zipWithIdMap.getOrDefault(request.zipCode(), 0))
                         .smNameValid(smNameWithIdMap.containsKey(request.smName()))
                         .smId(smNameWithIdMap.getOrDefault(request.smName(), 0))
                         .build())
                 .toList();
     }
 
-    private XSSFCellStyle createCellStyle(XSSFWorkbook workbook, IndexedColors backgroundColor, short fontSize, boolean bold, HorizontalAlignment hAlign, VerticalAlignment vAlign) {
+    private XSSFCellStyle createCellStyle(XSSFWorkbook workbook, IndexedColors backgroundColor, short fontSize,
+                                          boolean bold, HorizontalAlignment hAlign, VerticalAlignment vAlign,
+                                          boolean border) {
         XSSFCellStyle style = workbook.createCellStyle();
         if (backgroundColor != null) {
             style.setFillForegroundColor(backgroundColor.getIndex());
@@ -97,10 +103,15 @@ public class TransportOrderService {
         if (vAlign != null) {
             style.setVerticalAlignment(vAlign);
         }
+        if (border) {
+            style.setBorderRight(BorderStyle.THIN);
+            style.setBorderBottom(BorderStyle.THIN);
+        }
         return style;
     }
 
-    private void createRow(XSSFSheet sheet, int rowIndex, List<TransportOrderExcelHeader> transportOrdersList, XSSFCellStyle style) {
+    private void createRow(XSSFSheet sheet, int rowIndex, List<TransportOrderExcelHeader> transportOrdersList,
+                           XSSFCellStyle style) {
         Row row = sheet.createRow(rowIndex);
         int cellNumber = 0;
         for (TransportOrderExcelHeader header : transportOrdersList) {
