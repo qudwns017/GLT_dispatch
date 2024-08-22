@@ -20,13 +20,13 @@ public class DeliveryDestination extends BaseEntity {
     private String destinationName; // 배송처명
 
     @Column(nullable = false, length = 50)
-    private String basicAddress;  // 기본주소
+    private String address;  // 기본주소
 
     @Column(nullable = false, length = 50)
-    private String detailedAddress;  // 상세주소
+    private String detailAddress;  // 상세주소
 
     @Column(nullable = false, length = 7)
-    private String postalCode;  // 우편번호
+    private String zipCode;  // 우편번호
 
     @Column(nullable = false, length = 30)
     private String managerName;  // 담당자명

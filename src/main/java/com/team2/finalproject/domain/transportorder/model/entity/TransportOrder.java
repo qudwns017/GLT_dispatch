@@ -52,7 +52,7 @@ public class TransportOrder extends BaseEntity {
     private String detailAddress; // 상세 주소
 
     @Column(nullable = false, length = 7)
-    private String postalCode;  // 우편번호
+    private String zipCode;  // 우편번호
 
     @Column(nullable = false)
     private double volume;  // 볼륨

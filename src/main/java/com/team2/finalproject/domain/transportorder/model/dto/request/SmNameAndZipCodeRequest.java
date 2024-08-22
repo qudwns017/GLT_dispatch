@@ -1,6 +1,6 @@
 package com.team2.finalproject.domain.transportorder.model.dto.request;
 
-public record SmNameAndPostalCodeRequest(
-        String postalCode,
+public record SmNameAndZipCodeRequest(
+        String zipCode,
         String smName
 ) {}

@@ -2,8 +2,8 @@ package com.team2.finalproject.domain.transportorder.service;
 
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
-import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndPostalCodeRequest;
-import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndPostalCodeResponse;
+import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndZipCodeRequest;
+import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndZipCodeResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,14 +69,14 @@ public class TransportOrderService {
         }
     }
     
-    public List<SmNameAndPostalCodeResponse> validateSmNameAndPostalCodes(List<SmNameAndPostalCodeRequest> requests) {
+    public List<SmNameAndZipCodeResponse> validateSmNameAndZipCodes(List<SmNameAndZipCodeRequest> requests) {
         Map<String, Integer> smNameWithIdMap = smRepository.findAllSmNameWithIdsToMap();
-        Map<String, Integer> postalWithIdMap = deliveryDestinationRepository.findAllPostalCodeWithIdsToMap();
+        Map<String, Integer> zipWithIdMap = deliveryDestinationRepository.findAllZipCodeWithIdsToMap();
 
         return requests.stream()
-                .map(request -> SmNameAndPostalCodeResponse.builder()
-                        .postalCodeValid(postalWithIdMap.containsKey(request.postalCode()))
-                        .deliveryDestinationId(postalWithIdMap.getOrDefault(request.postalCode(), 0))
+                .map(request -> SmNameAndZipCodeResponse.builder()
+                        .zipCodeValid(zipWithIdMap.containsKey(request.zipCode()))
+                        .deliveryDestinationId(zipWithIdMap.getOrDefault(request.zipCode(), 0))
                         .smNameValid(smNameWithIdMap.containsKey(request.smName()))
                         .smId(smNameWithIdMap.getOrDefault(request.smName(), 0))
                         .build())

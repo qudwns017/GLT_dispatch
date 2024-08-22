@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDestination, Long> {
 
-    @Query("SELECT d.postalCode, d.id FROM DeliveryDestination d")
-    List<Object[]> findAllPostalCodesWithIds();
+    @Query("SELECT d.zipCode, d.id FROM DeliveryDestination d")
+    List<Object[]> findAllZipCodesWithIds();
 
-    default Map<String, Integer> findAllPostalCodeWithIdsToMap() {
-        return findAllPostalCodesWithIds().stream()
+    default Map<String, Integer> findAllZipCodeWithIdsToMap() {
+        return findAllZipCodesWithIds().stream()
                 .collect(Collectors.toMap(
                         row -> (String) row[0],
                         row -> ((Long) row[1]).intValue()
