@@ -29,13 +29,10 @@ public class DeliveryDestination extends BaseEntity {
     private String postalCode;  // 우편번호
 
     @Column(nullable = false, length = 30)
-    private String managerName;
+    private String managerName;  // 담당자명
 
     @Column(nullable = false, length = 20)
-    private String managerPhoneNumber;
-
-    @Column(nullable = false, length = 30)
-    private String businessNumber;  // 사업자번호
+    private String phoneNumber;  // 전화번호
 
     @Column(nullable = false)
     private Double latitude;  // 위도
@@ -45,4 +42,11 @@ public class DeliveryDestination extends BaseEntity {
 
     @Column(nullable = true, length = 10)
     private String restrictedTonCode;    // 진입 불가 톤 코드
+
+    @Column(nullable = true, length = 100)
+    private String comment; // 비고
+
+    @Builder.Default
+    @Column(nullable = false)
+    private int delayTime = 0; // 작업 추가 소요시간(분)
 }

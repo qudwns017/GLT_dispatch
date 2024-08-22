@@ -39,7 +39,7 @@ public class Dispatch extends BaseEntity {
 
     @Builder.Default
     @Column(nullable = false)
-    private int totalOrderCount = 0; // 완료오더수
+    private int completedOrderCount = 0; // 완료오더수
 
     @Column(nullable = false)
     private Long totalDistance;   //총거리

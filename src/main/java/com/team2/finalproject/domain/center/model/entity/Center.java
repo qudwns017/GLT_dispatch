@@ -15,13 +15,16 @@ import lombok.NoArgsConstructor;
 public class Center extends BaseEntity {
 
     @Column(nullable = false, length = 50)
-    private String field;  // 필드
+    private String centerCode;  // 센터코드
 
     @Column(nullable = false, length = 50)
     private String centerName;  // 센터명
 
+    @Column(nullable = false, length = 30)
+    private String managerName;
+
     @Column(nullable = false, length = 7)
-    private String postalCode;  // 우편번호
+    private String zipCode;  // 우편번호
 
     @Column(nullable = false, length = 100)
     private String address;  // 주소
@@ -31,5 +34,8 @@ public class Center extends BaseEntity {
 
     @Column(nullable = false)
     private Double longitude;  // 경도
+
+    @Column(nullable = false, length = 20)
+    private String phoneNumber; //전화번호
 
 }
