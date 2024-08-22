@@ -36,14 +36,18 @@ public class TransportOrderService {
 
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        XSSFCellStyle nameRowStyle = createCellStyle(workbook, IndexedColors.GREY_40_PERCENT, FONT_SIZE_NAME, true, HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
-        XSSFCellStyle requiredRowStyle = createCellStyle(workbook, IndexedColors.GREY_25_PERCENT, FONT_SIZE_REQUIRED, true, HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+        XSSFCellStyle nameRowStyle = createCellStyle(workbook, IndexedColors.GREY_40_PERCENT, FONT_SIZE_NAME, true,
+                HorizontalAlignment.CENTER, VerticalAlignment.CENTER, true);
+        XSSFCellStyle requiredRowStyle = createCellStyle(workbook, IndexedColors.GREY_25_PERCENT, FONT_SIZE_REQUIRED,
+                true, HorizontalAlignment.CENTER, VerticalAlignment.CENTER, true);
         requiredRowStyle.getFont().setColor(IndexedColors.RED.getIndex());
 
-        XSSFCellStyle commentRowStyle = createCellStyle(workbook, IndexedColors.LEMON_CHIFFON, (short) 0, false, null, VerticalAlignment.CENTER);
+        XSSFCellStyle commentRowStyle = createCellStyle(workbook, IndexedColors.LEMON_CHIFFON, (short) 0, false, null,
+                VerticalAlignment.CENTER, true);
         commentRowStyle.setWrapText(true);
 
-        XSSFCellStyle exampleRowStyle = createCellStyle(workbook, null, (short) 0, false, null, VerticalAlignment.CENTER);
+        XSSFCellStyle exampleRowStyle = createCellStyle(workbook, null, (short) 0, false, null,
+                VerticalAlignment.CENTER, true);
         exampleRowStyle.setWrapText(true);
 
         XSSFSheet sheet = workbook.createSheet("운송_주문_양식");
@@ -79,7 +83,9 @@ public class TransportOrderService {
                 .toList();
     }
 
-    private XSSFCellStyle createCellStyle(XSSFWorkbook workbook, IndexedColors backgroundColor, short fontSize, boolean bold, HorizontalAlignment hAlign, VerticalAlignment vAlign) {
+    private XSSFCellStyle createCellStyle(XSSFWorkbook workbook, IndexedColors backgroundColor, short fontSize,
+                                          boolean bold, HorizontalAlignment hAlign, VerticalAlignment vAlign,
+                                          boolean border) {
         XSSFCellStyle style = workbook.createCellStyle();
         if (backgroundColor != null) {
             style.setFillForegroundColor(backgroundColor.getIndex());
@@ -97,10 +103,15 @@ public class TransportOrderService {
         if (vAlign != null) {
             style.setVerticalAlignment(vAlign);
         }
+        if (border) {
+            style.setBorderRight(BorderStyle.THIN);
+            style.setBorderBottom(BorderStyle.THIN);
+        }
         return style;
     }
 
-    private void createRow(XSSFSheet sheet, int rowIndex, List<TransportOrderExcelHeader> transportOrdersList, XSSFCellStyle style) {
+    private void createRow(XSSFSheet sheet, int rowIndex, List<TransportOrderExcelHeader> transportOrdersList,
+                           XSSFCellStyle style) {
         Row row = sheet.createRow(rowIndex);
         int cellNumber = 0;
         for (TransportOrderExcelHeader header : transportOrdersList) {
