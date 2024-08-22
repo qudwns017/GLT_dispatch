@@ -117,7 +117,6 @@ public class UsersService {
 
         return LoginResponse.builder()
                 .name(users.getName())
-                .centerId(users.getCenterId())
                 .build();
     }
 
