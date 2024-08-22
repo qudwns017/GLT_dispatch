@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/dispatch")
-public class DispatchController {
+public class DispatchController implements SwaggerDispatchController{
     private final DispatchService dispatchService;
 
     @GetMapping

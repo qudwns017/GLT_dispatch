@@ -1,9 +1,9 @@
 package com.team2.finalproject.domain.users.controller;
 
-import com.team2.finalproject.domain.users.model.dto.LoginRequest;
-import com.team2.finalproject.domain.users.model.dto.LoginResponse;
-import com.team2.finalproject.domain.users.model.dto.RegisterAdminRequest;
-import com.team2.finalproject.domain.users.model.dto.RegisterDriverRequest;
+import com.team2.finalproject.domain.users.model.dto.request.LoginRequest;
+import com.team2.finalproject.domain.users.model.dto.request.RegisterAdminRequest;
+import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverRequest;
+import com.team2.finalproject.domain.users.model.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
