@@ -176,6 +176,7 @@ public class DispatchService {
                                                  LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
         log.info("기사 검색: {}", request.getSearchKeyword());
         List<Long> dispatchNumberIds = dispatchRepository.findDispatchNumberIdsBySmName(request.getSearchKeyword());
+        log.info("dispatchNumberIds: {}", dispatchNumberIds);
         if (isManager) {
             return dispatchNumberRepository.findByIdInAndCenterIdAndAdminIdAndLoadStartDateTimeBetween(
                     dispatchNumberIds, centerId, userId, startDateTime, endDateTime);
