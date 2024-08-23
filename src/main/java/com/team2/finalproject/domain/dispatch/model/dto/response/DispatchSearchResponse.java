@@ -12,9 +12,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DispatchSearchResponse {
+    @Schema(example = "10", description = "진행중 ")
     private int inProgress;
+
+    @Schema(example = "10", description = "대기 중")
     private int waiting;
+
+    @Schema(example = "10", description = "완료")
     private int completed;
+
+    @Schema(description = "검색 결과 목록")
     private List<DispatchResult> results;
 
     @Getter

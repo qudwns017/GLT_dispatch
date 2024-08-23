@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginRequest {
 
-    @Schema(example = "asdasd123", description = "사용자 ID")
+    @Schema(example = "asdasd123", description = "사용자 ID", requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;
-    @Schema(example = "password", description = "사용자 PW")
+    @Schema(example = "password", description = "사용자 PW", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 }

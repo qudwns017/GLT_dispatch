@@ -14,13 +14,13 @@ public class DispatchSearchRequest {
     @Schema(example = "WAITING", description = "배차 상태", requiredMode = Schema.RequiredMode.REQUIRED)
     private DispatchNumberStatus status;
 
-    @Schema(example = "true", description = "관리자 여부")
+    @Schema(example = "true", description = "관리자 여부", requiredMode = Schema.RequiredMode.REQUIRED)
     private Boolean isManager;
 
-    @Schema(example = "2024-06-01", description = "검색 시작일")
+    @Schema(example = "2024-06-01", description = "검색 시작일", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDate startDate;
 
-    @Schema(example = "2024-08-30T09:00:00", description = "검색 종료일")
+    @Schema(example = "2024-08-30T09:00:00", description = "검색 종료일", requiredMode = Schema.RequiredMode.REQUIRED)
     private LocalDateTime endDateTime;
 
     @Schema(example = "driver", description = "검색 옵션")
