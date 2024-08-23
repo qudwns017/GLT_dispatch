@@ -48,8 +48,14 @@ public class Center extends BaseEntity {
     @Column(nullable = false)
     private Double longitude;  // 경도
 
+    @Column(nullable = true, length = 10)
+    private String restrictedTonCode;    // 진입 불가 톤 코드
+
     @Column(nullable = false, length = 20)
     private String phoneNumber; //전화번호
+
+    @Column(nullable = true, length = 100)
+    private String comment; // 비고
 
     @OneToMany(mappedBy = "center")
     List<DeliveryDestination> deliveryDestinationList;
