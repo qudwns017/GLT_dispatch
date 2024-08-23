@@ -14,13 +14,14 @@ import jakarta.persistence.OneToMany;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class Center extends BaseEntity {
 
     @Column(nullable = false, length = 50)
@@ -30,13 +31,16 @@ public class Center extends BaseEntity {
     private String centerName;  // 센터명
 
     @Column(nullable = false, length = 30)
-    private String managerName;
+    private String adminName; // 담당자명
 
     @Column(nullable = false, length = 7)
     private String zipCode;  // 우편번호
 
     @Column(nullable = false, length = 100)
     private String address;  // 주소
+
+    @Column(nullable = false, length = 50)
+    private String detailAddress;  // 상세주소
 
     @Column(nullable = false)
     private Double latitude;  // 위도
