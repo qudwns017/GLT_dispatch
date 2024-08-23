@@ -34,7 +34,7 @@ public class DispatchService {
         Users users = usersRepository.findByIdOrThrow(userId);
         Center center = users.getCenter();
         LocalDateTime startDateTime = request.getStartDate().atStartOfDay();
-        LocalDateTime endDateTime = request.getEndDate().atTime(LocalTime.MAX);
+        LocalDateTime endDateTime = request.getEndDateTime();
 
         // 검색 기간, 검색 옵션, 담당자 체크 여부에 따른 필터
         List<DispatchNumber> dispatchNumbers =
