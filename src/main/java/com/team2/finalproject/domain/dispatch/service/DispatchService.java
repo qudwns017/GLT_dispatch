@@ -115,11 +115,8 @@ public class DispatchService {
                         startDateTime, endDateTime, isManager);
                 default -> throw new DispatchException(DispatchErrorCode.WRONG_SEARCH_OPTION);
             };
-        }else{
-            dispatchNumbers = searchByDefault(users, center,
-                    startDateTime, endDateTime, isManager);
         }
-        return dispatchNumbers;
+        return searchByDefault(users, center, startDateTime, endDateTime, isManager);
     }
 
     // 배차 코드에 대한 검색
@@ -129,10 +126,9 @@ public class DispatchService {
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndDispatchCodeAndLoadStartDateTimeBetween(
                     center, users, request.getSearchKeyword(), startDateTime, endDateTime);
-        } else {
-            return dispatchNumberRepository.findByCenterAndDispatchCodeAndLoadStartDateTimeBetween(
-                    center, request.getSearchKeyword(), startDateTime, endDateTime);
         }
+        return dispatchNumberRepository.findByCenterAndDispatchCodeAndLoadStartDateTimeBetween(
+                center, request.getSearchKeyword(), startDateTime, endDateTime);
     }
 
     // 배차 명에 대한 검색
@@ -142,10 +138,9 @@ public class DispatchService {
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndDispatchNameAndLoadStartDateTimeBetween(
                     center, users, request.getSearchKeyword(), startDateTime, endDateTime);
-        } else {
-            return dispatchNumberRepository.findByCenterAndDispatchNameAndLoadStartDateTimeBetween(
-                    center, request.getSearchKeyword(), startDateTime, endDateTime);
         }
+        return dispatchNumberRepository.findByCenterAndDispatchNameAndLoadStartDateTimeBetween(
+                center, request.getSearchKeyword(), startDateTime, endDateTime);
     }
 
     // 담당자에 대한 검색
@@ -156,10 +151,9 @@ public class DispatchService {
         // 자신 담당만 보기 & 다른 사람 검색 이면 빈 값 출력
         if (isManager && !users.equals(manager)) {
             return new ArrayList<>();
-        }else {
-            return dispatchNumberRepository.findByCenterAndUsersAndLoadStartDateTimeBetween(
-                    center, manager, startDateTime, endDateTime);
         }
+        return dispatchNumberRepository.findByCenterAndUsersAndLoadStartDateTimeBetween(
+                center, manager, startDateTime, endDateTime);
     }
 
     // 기사에 대한 검색
@@ -169,10 +163,9 @@ public class DispatchService {
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndSmNameAndLoadStartDateTimeBetween(
                     center, users, request.getSearchKeyword(), startDateTime, endDateTime);
-        }else {
-            return dispatchNumberRepository.findByCenterAndSmNameAndLoadStartDateTimeBetween(
-                    center, request.getSearchKeyword(), startDateTime, endDateTime);
         }
+        return dispatchNumberRepository.findByCenterAndSmNameAndLoadStartDateTimeBetween(
+                center, request.getSearchKeyword(), startDateTime, endDateTime);
     }
 
     // 검색이 없는 경우
@@ -182,10 +175,9 @@ public class DispatchService {
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndLoadStartDateTimeBetween(
                     center, users, startDateTime, endDateTime);
-        } else {
-            return dispatchNumberRepository.findByCenterAndLoadStartDateTimeBetween(
-                    center, startDateTime, endDateTime);
         }
+        return dispatchNumberRepository.findByCenterAndLoadStartDateTimeBetween(
+                center, startDateTime, endDateTime);
     }
 
     // 진행률 계산
