@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.team2.finalproject.domain.center.model.dto.response.CenterResponse;
 import com.team2.finalproject.domain.center.model.dto.request.CenterRequest;
 
 @RestController
