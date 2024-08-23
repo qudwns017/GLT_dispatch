@@ -32,8 +32,8 @@ public class DispatchService {
     public DispatchSearchResponse searchDispatches(DispatchSearchRequest request, Long userId) {
         Users users = usersRepository.findByIdOrThrow(userId);
         Center center = users.getCenter();
-        LocalDateTime startDateTime = request.getStartDate().atStartOfDay();
-        LocalDateTime endDateTime = request.getEndDateTime();
+        LocalDateTime startDateTime = request.startDate().atStartOfDay();
+        LocalDateTime endDateTime = request.endDateTime();
 
         // 검색 기간, 검색 옵션, 담당자 체크 여부에 따른 필터
         List<DispatchNumber> dispatchNumbers =
@@ -49,7 +49,7 @@ public class DispatchService {
                 .filter(d -> d.getStatus().name().equals("COMPLETED")).count();
 
         // 검색을 원하는 status
-        DispatchNumberStatus status = request.getStatus();
+        DispatchNumberStatus status = request.status();
 
         // 원하는 status에 해당한는 Map<DispatchNumber, List<Dispatch>>
         Map<DispatchNumber, List<Dispatch>> dispatchMap = dispatchRepository.findDispatchMapByDispatchNumbersAndStatus(dispatchNumbers, status);
@@ -95,13 +95,12 @@ public class DispatchService {
     // 검색 기간, 검색 옵션, 담당자 체크 여부에 따른 필터
     private List<DispatchNumber> searchDispatchNumbers(DispatchSearchRequest request, Users users, Center center,
                                                        LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        log.info("검색 옵션: {}", request.getSearchOption());
-        List<DispatchNumber> dispatchNumbers;
-        boolean isManager = request.getIsManager(); // 담당자 여부
+        log.info("검색 옵션: {}", request.searchOption());
+        boolean isManager = request.isManager(); // 담당자 여부
         // 검색 옵션에 다른 검색 (검색창 검색)
-        if(request.getSearchOption() != null) {
+        if(request.searchOption() != null) {
             // 배차 코드 검색
-            dispatchNumbers = switch (request.getSearchOption()) {
+            return switch (request.searchOption()) {
                 case "dispatchCode" -> searchByDispatchCode(request, users, center,
                         startDateTime, endDateTime, isManager);
                 // 배차 명 검색
@@ -122,32 +121,32 @@ public class DispatchService {
     // 배차 코드에 대한 검색
     private List<DispatchNumber> searchByDispatchCode(DispatchSearchRequest request, Users users, Center center,
                                                       LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
-        log.info("배송 코드 검색: {}", request.getSearchKeyword());
+        log.info("배송 코드 검색: {}", request.searchKeyword());
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndDispatchCodeAndLoadStartDateTimeBetween(
-                    center, users, request.getSearchKeyword(), startDateTime, endDateTime);
+                    center, users, request.searchKeyword(), startDateTime, endDateTime);
         }
         return dispatchNumberRepository.findByCenterAndDispatchCodeAndLoadStartDateTimeBetween(
-                center, request.getSearchKeyword(), startDateTime, endDateTime);
+                center, request.searchKeyword(), startDateTime, endDateTime);
     }
 
     // 배차 명에 대한 검색
     private List<DispatchNumber> searchByDispatchName(DispatchSearchRequest request, Users users, Center center,
                                                       LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
-        log.info("배송 명 검색: {}", request.getSearchKeyword());
+        log.info("배송 명 검색: {}", request.searchKeyword());
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndDispatchNameAndLoadStartDateTimeBetween(
-                    center, users, request.getSearchKeyword(), startDateTime, endDateTime);
+                    center, users, request.searchKeyword(), startDateTime, endDateTime);
         }
         return dispatchNumberRepository.findByCenterAndDispatchNameAndLoadStartDateTimeBetween(
-                center, request.getSearchKeyword(), startDateTime, endDateTime);
+                center, request.searchKeyword(), startDateTime, endDateTime);
     }
 
     // 담당자에 대한 검색
     private List<DispatchNumber> searchByManager(DispatchSearchRequest request, Users users, Center center,
                                                  LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
-        Users manager = usersRepository.findByNameOrNull(request.getSearchKeyword());
-        log.info("담당자 검색: {}", request.getSearchKeyword());
+        Users manager = usersRepository.findByNameOrNull(request.searchKeyword());
+        log.info("담당자 검색: {}", request.searchKeyword());
         // 자신 담당만 보기 & 다른 사람 검색 이면 빈 값 출력
         if (isManager && !users.equals(manager)) {
             return new ArrayList<>();
@@ -159,13 +158,13 @@ public class DispatchService {
     // 기사에 대한 검색
     private List<DispatchNumber> searchByDriverId(DispatchSearchRequest request, Users users, Center center,
                                                  LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
-        log.info("기사 검색: {}", request.getSearchKeyword());
+        log.info("기사 검색: {}", request.searchKeyword());
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndSmNameAndLoadStartDateTimeBetween(
-                    center, users, request.getSearchKeyword(), startDateTime, endDateTime);
+                    center, users, request.searchKeyword(), startDateTime, endDateTime);
         }
         return dispatchNumberRepository.findByCenterAndSmNameAndLoadStartDateTimeBetween(
-                center, request.getSearchKeyword(), startDateTime, endDateTime);
+                center, request.searchKeyword(), startDateTime, endDateTime);
     }
 
     // 검색이 없는 경우

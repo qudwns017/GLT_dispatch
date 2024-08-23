@@ -42,23 +42,23 @@ public class UsersService {
 
     @Transactional
     public void registerAdmin(RegisterAdminRequest registerAdminRequest) {
-        log.info("관리자 회원가입 시도: 센터 코드={}, 이름={}, 아이디={}", registerAdminRequest.getCenterId(), registerAdminRequest.getName(), registerAdminRequest.getUsername());
+        log.info("관리자 회원가입 시도: 센터 코드={}, 이름={}, 아이디={}", registerAdminRequest.centerId(), registerAdminRequest.name(), registerAdminRequest.username());
 
-        if(usersRepository.existsByUsername(registerAdminRequest.getUsername())) {
+        if(usersRepository.existsByUsername(registerAdminRequest.username())) {
             throw new UsersException(UsersErrorCode.DUPLICATE_USERNAME);
         }
 
         // 이후 센터 데이터 추가 시 활성화
-//        if(!centerRepository.existsById(registerAdminRequest.getCenterId())) {
+//        if(!centerRepository.existsById(registerAdminRequest.centerId())) {
 //            throw new CenterException(CenterErrorCode.NOT_FOUND_CENTER);
 //        }
 
         Users users = Users.builder()
-                //.center(centerRepository.findById(registerAdminRequest.getCenterId()).get())
-                .name(registerAdminRequest.getName())
-                .username(registerAdminRequest.getUsername())
-                .encryptedPassword(passwordEncoder.encode(registerAdminRequest.getPassword()))
-                .phoneNumber(registerAdminRequest.getPhoneNumber())
+                //.center(centerRepository.findById(registerAdminRequest.centerId()).get())
+                .name(registerAdminRequest.name())
+                .username(registerAdminRequest.username())
+                .encryptedPassword(passwordEncoder.encode(registerAdminRequest.password()))
+                .phoneNumber(registerAdminRequest.phoneNumber())
                 .role(Role.ADMIN)
                 .build();
         usersRepository.save(users);
@@ -68,29 +68,29 @@ public class UsersService {
 
     @Transactional
     public void registerDriver(RegisterDriverRequest registerDriverRequest) {
-        log.info("기사 회원가입 시도: 센터 코드={}, 이름={}, 아이디={}", registerDriverRequest.getCenterId(), registerDriverRequest.getName(), registerDriverRequest.getUsername());
+        log.info("기사 회원가입 시도: 센터 코드={}, 이름={}, 아이디={}", registerDriverRequest.centerId(), registerDriverRequest.name(), registerDriverRequest.username());
 
-        if(usersRepository.existsByUsername(registerDriverRequest.getUsername())) {
+        if(usersRepository.existsByUsername(registerDriverRequest.username())) {
             throw new UsersException(UsersErrorCode.DUPLICATE_USERNAME);
         }
 
         // 이후 센터 데이터 추가 시 활성화
-//        if(!centerRepository.existsById(registerDriverRequest.getCenterId())) {
+//        if(!centerRepository.existsById(registerDriverRequest.centerId())) {
 //            throw new CenterException(CenterErrorCode.NOT_FOUND_CENTER);
 //        }
 
-        // 이후 SM 데이터 추가 시 활성화
-//        if (!smRepository.existsById(registerDriverRequest.getSmId())) {
+//         이후 SM 데이터 추가 시 활성화
+//        if (!smRepository.existsById(registerDriverRequest.smId())) {
 //            throw new SmException(SmErrorCode.NOT_FOUND_SM);
 //        }
 
         Users users = Users.builder()
-                //.center(centerRepository.findById(registerDriverRequest.getCenterId()).get())
-                //.sm(smRepository.findById(registerDriverRequest.getSmId()).get())
-                .name(registerDriverRequest.getName())
-                .username(registerDriverRequest.getUsername())
-                .encryptedPassword(passwordEncoder.encode(registerDriverRequest.getPassword()))
-                .phoneNumber(registerDriverRequest.getPhoneNumber())
+                //.center(centerRepository.findById(registerDriverRequest.centerId()).get())
+                //.sm(smRepository.findById(registerDriverRequest.smId()).get())
+                .name(registerDriverRequest.name())
+                .username(registerDriverRequest.username())
+                .encryptedPassword(passwordEncoder.encode(registerDriverRequest.password()))
+                .phoneNumber(registerDriverRequest.phoneNumber())
                 .role(Role.DRIVER)
                 .build();
         usersRepository.save(users);
@@ -100,11 +100,11 @@ public class UsersService {
 
     @Transactional
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
-        log.info("사용자 로그인 시도: 아이디={}", loginRequest.getUsername());
+        log.info("사용자 로그인 시도: 아이디={}", loginRequest.username());
 
-        Users users = usersRepository.findByUsernameOrThrow(loginRequest.getUsername());
+        Users users = usersRepository.findByUsernameOrThrow(loginRequest.username());
 
-        if (!passwordEncoder.matches(loginRequest.getPassword(), users.getEncryptedPassword())) {
+        if (!passwordEncoder.matches(loginRequest.password(), users.getEncryptedPassword())) {
             throw new UsersException(UsersErrorCode.PASSWORD_MISMATCH);
         }
 
