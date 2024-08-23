@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +20,7 @@ public class DispatchController implements SwaggerDispatchController{
     private final DispatchService dispatchService;
 
     @GetMapping
-    public ResponseEntity<DispatchSearchResponse> searchDispatches(DispatchSearchRequest request,
+    public ResponseEntity<DispatchSearchResponse> searchDispatches(@ModelAttribute DispatchSearchRequest request,
                                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         DispatchSearchResponse response = dispatchService.searchDispatches(request, userDetails.getId());

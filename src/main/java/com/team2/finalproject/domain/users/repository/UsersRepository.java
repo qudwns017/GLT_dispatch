@@ -35,12 +35,17 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     }
 
     // name을 기준으로 id 조회
-    @Query("SELECT u.id FROM Users u WHERE u.name = :name")
-    Optional<Long> findIdByName(@Param("name") String name);
+    Optional<Users> findByName(String name);
 
     // name을 기준으로 id 조회하고, 존재하지 않을 경우 예외 던지기
-    default Long findIdByNameOrThrow(String name) {
-        return findIdByName(name)
+    default Users findByNameOrThrow(String name) {
+        return findByName(name)
                 .orElseThrow(() -> new UsersException(UsersErrorCode.NOT_FOUND_USER));
+    }
+
+    // name을 기준으로 id 조회하고, 존재하지 않을 경우 null 반환
+    default Users findByNameOrNull(String name) {
+        return findByName(name)
+                .orElse(null);
     }
 }

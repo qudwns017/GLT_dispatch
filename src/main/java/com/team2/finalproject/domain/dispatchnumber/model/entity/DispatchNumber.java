@@ -42,10 +42,10 @@ public class DispatchNumber extends BaseEntity {
     private DispatchNumberStatus status = DispatchNumberStatus.WAITING;; // 상태
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Users users; // 담당자Id
+    private Users users; // 담당자
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Center center; // 센터코드
+    private Center center; // 소속 센터
 
     @OneToMany(mappedBy = "dispatchNumber")
     private List<Dispatch> dispatcheList;
