@@ -1,5 +1,7 @@
 package com.team2.finalproject.domain.deliverydestination.service;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.center.repository.CenterRepository;
 import com.team2.finalproject.domain.deliverydestination.model.dto.request.DeliveryDestinationRequest;
 import com.team2.finalproject.domain.deliverydestination.model.dto.response.DeliveryDestinationResponse;
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class DeliveryDestinationService {
 
     private final DeliveryDestinationRepository deliveryDestinationRepository;
+    private final CenterRepository centerRepository;
 
     public DeliveryDestinationResponse getDeliveryDestination(long deliveryDestinationId) {
         DeliveryDestination deliveryDestinationEntity = deliveryDestinationRepository.findByDeliveryDestinationIdOrThrow(
@@ -20,7 +23,9 @@ public class DeliveryDestinationService {
     }
 
     public DeliveryDestinationResponse addDeliveryDestination(DeliveryDestinationRequest request) {
-        DeliveryDestination deliveryDestination = deliveryDestinationRepository.save(DeliveryDestinationRequest.toEntity(request));
-        return DeliveryDestinationResponse.of(deliveryDestination);
+        Center center = centerRepository.findByCenterByCenterIdOrThrow(request.centerId());
+        DeliveryDestination deliveryDestination = DeliveryDestinationRequest.toEntity(request, center);
+        DeliveryDestination response = deliveryDestinationRepository.save(deliveryDestination);
+        return DeliveryDestinationResponse.of(response);
     }
 }

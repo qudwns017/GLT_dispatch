@@ -54,6 +54,10 @@ public class Center extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String phoneNumber; //전화번호
 
+    @Builder.Default
+    @Column(nullable = false)
+    private int delayTime = 60; // 상차 추가 소요시간(분)
+
     @Column(nullable = true, length = 100)
     private String comment; // 비고
 

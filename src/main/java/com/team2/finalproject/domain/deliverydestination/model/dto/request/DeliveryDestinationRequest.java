@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.deliverydestination.model.dto.request;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -31,20 +32,20 @@ public record DeliveryDestinationRequest(
         @Schema(example = "70", description = "작업추가 소요시간")
         int delayTime) {
 
-    public static DeliveryDestination toEntity(DeliveryDestinationRequest deliveryDestination) {
+    public static DeliveryDestination toEntity(DeliveryDestinationRequest request, Center center) {
         return DeliveryDestination.builder().
-                center(deliveryDestination.centerId()).
-                destinationName(deliveryDestination.destinationName()).
-                address(deliveryDestination.address()).
-                detailAddress(deliveryDestination.detailAddress()).
-                zipCode(deliveryDestination.zipCode()).
-                adminName(deliveryDestination.adminName()).
-                phoneNumber(deliveryDestination.phoneNumber()).
-                latitude(deliveryDestination.latitude()).
-                longitude(deliveryDestination.longitude()).
-                restrictedTonCode(deliveryDestination.restrictedTonCode()).
-                comment(deliveryDestination.comment()).
-                delayTime(deliveryDestination.delayTime()).
+                center(center).
+                destinationName(request.destinationName()).
+                address(request.address()).
+                detailAddress(request.detailAddress()).
+                zipCode(request.zipCode()).
+                adminName(request.adminName()).
+                phoneNumber(request.phoneNumber()).
+                latitude(request.latitude()).
+                longitude(request.longitude()).
+                restrictedTonCode(request.restrictedTonCode()).
+                comment(request.comment()).
+                delayTime(request.delayTime()).
                 build();
     }
 }
