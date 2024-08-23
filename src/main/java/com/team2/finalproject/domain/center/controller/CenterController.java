@@ -19,7 +19,7 @@ public class CenterController implements SwaggerCenterController {
 
     @PostMapping
     public ResponseEntity<?> addCenter(@RequestBody CenterRequest request) {
-        var response = centerService.addCenter(request);
+        CenterResponse response = centerService.addCenter(request);
         return ApiResponse.CREATED(response);
     }
 }
