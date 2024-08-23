@@ -48,6 +48,9 @@ dependencies {
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+
+    // 경로 타입을 설정을 위한 의존성
+    implementation 'org.hibernate.orm:hibernate-spatial:6.2.5.Final'
 }
 
 tasks.named('test') {
