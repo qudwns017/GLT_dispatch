@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.LineString;
 
 
 @Entity
@@ -70,8 +71,8 @@ public class Dispatch extends BaseEntity {
     @Column(nullable = false)
     private DispatchStatus deliveryStatus = DispatchStatus.IN_TRANSIT; // 배차상태
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String path; // 경로
+    @Column(columnDefinition = "geometry(LineString)",nullable = false)
+    private LineString path;
 
     @Column(nullable = false, length = 100)
     private String issue; // 이슈
