@@ -6,8 +6,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,8 +22,6 @@ public class DispatchSearchResponse {
     @Schema(description = "검색 결과 목록")
     private List<DispatchResult> results;
 
-    @Getter
-    @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

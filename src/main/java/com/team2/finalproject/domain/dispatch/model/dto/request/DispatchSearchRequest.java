@@ -2,14 +2,14 @@ package com.team2.finalproject.domain.dispatch.model.dto.request;
 
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
+@Builder
 public class DispatchSearchRequest {
     @Schema(example = "WAITING", description = "배차 상태", requiredMode = Schema.RequiredMode.REQUIRED)
     private DispatchNumberStatus status;
