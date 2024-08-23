@@ -75,8 +75,8 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 7. 센터, 기사명 기준으로 조회
     @Query("SELECT DISTINCT dn FROM DispatchNumber dn " +
-            "JOIN dn.dispatcheList d " +
-            "JOIN d.sm sm " +
+            "JOIN FETCH dn .dispatcheList d " +
+            "JOIN FETCH d .sm sm " +
             "WHERE dn.center = :center " +
             "AND dn.loadingStartTime BETWEEN :startDateTime AND :endDateTime " +
             "AND sm.smName = :smName")
@@ -89,8 +89,8 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 8. 센터, 담당자, 기사명 기준으로 조회
     @Query("SELECT DISTINCT dn FROM DispatchNumber dn " +
-            "JOIN dn.dispatcheList d " +
-            "JOIN d.sm sm " +
+            "JOIN FETCH dn .dispatcheList d " +
+            "JOIN FETCH d .sm sm " +
             "WHERE dn.center = :center " +
             "AND dn.users = :users " +
             "AND dn.loadingStartTime BETWEEN :startDateTime AND :endDateTime " +

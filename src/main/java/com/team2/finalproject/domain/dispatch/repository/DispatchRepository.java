@@ -15,7 +15,7 @@ public interface DispatchRepository extends JpaRepository<Dispatch, Long> {
 
     // 특정 status를 가진 DispatchNumber가 가진 Dispatch 리스트 조회
     @Query("SELECT d FROM Dispatch d " +
-            "JOIN d.dispatchNumber dn " +
+            "JOIN FETCH d.dispatchNumber dn " +
             "WHERE dn IN :dispatchNumbers AND dn.status = :status")
     List<Dispatch> findDispatchesByDispatchNumbersAndStatus(@Param("dispatchNumbers") List<DispatchNumber> dispatchNumbers,
                                                             @Param("status") DispatchNumberStatus status);
