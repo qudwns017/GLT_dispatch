@@ -3,12 +3,11 @@ package com.team2.finalproject.domain.deliverydestination.repository;
 import com.team2.finalproject.domain.deliverydestination.exception.DeliveryDestinationErrorCode;
 import com.team2.finalproject.domain.deliverydestination.exception.DeliveryDestinationException;
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDestination, Long> {
 
@@ -23,8 +22,9 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
                 ));
     }
 
-    default DeliveryDestination findByDeliveryDestinationIdOrThrow(long deliveryDestinationId) {
-        return findById(deliveryDestinationId).orElseThrow(() ->
-                new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION_ID));
+    default DeliveryDestination findByIdWithThrow(Long id){
+        return findById(id).orElseThrow(
+            () -> new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION)
+        );
     }
 }

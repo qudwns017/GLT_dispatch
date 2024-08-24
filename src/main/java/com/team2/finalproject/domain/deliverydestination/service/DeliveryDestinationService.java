@@ -17,8 +17,7 @@ public class DeliveryDestinationService {
     private final CenterRepository centerRepository;
 
     public DeliveryDestinationResponse getDeliveryDestination(long deliveryDestinationId) {
-        DeliveryDestination deliveryDestinationEntity = deliveryDestinationRepository.findByDeliveryDestinationIdOrThrow(
-                deliveryDestinationId);
+        DeliveryDestination deliveryDestinationEntity = deliveryDestinationRepository.findByIdWithThrow(deliveryDestinationId);
         return DeliveryDestinationResponse.of(deliveryDestinationEntity);
     }
 

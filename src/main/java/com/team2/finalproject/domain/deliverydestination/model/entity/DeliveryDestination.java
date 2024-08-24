@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Builder
+@Getter
 public class DeliveryDestination extends BaseEntity {
 
     @Column(nullable = false, length = 100)
