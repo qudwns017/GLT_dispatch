@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.LineString;
 
@@ -24,6 +25,7 @@ import org.locationtech.jts.geom.LineString;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Builder
 public class Dispatch extends BaseEntity {
 
@@ -51,9 +53,6 @@ public class Dispatch extends BaseEntity {
 
     @Column(nullable = false, length = 50)
     private String departurePlaceName; // 출발지명
-
-    @Column(nullable = false)
-    private LocalDateTime departureTime; // 출발시간
 
     @Column(nullable = true)
     private LocalDateTime arrivalTime; // 도착시간   주행 완료 후의 시간

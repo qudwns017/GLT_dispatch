@@ -57,7 +57,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(swagger).permitAll()
                         .requestMatchers("/api/users/**").permitAll()
-                        .requestMatchers("/api/protected/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenService, userDetailsService),
