@@ -1,4 +1,4 @@
-package com.team2.finalproject.domain.deliverydestination.model.dto.response;
+package com.team2.finalproject.domain.dispatchnumber.model.dto.response;
 
 import java.time.LocalTime;
 import java.util.List;

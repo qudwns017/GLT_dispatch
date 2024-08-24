@@ -2,9 +2,9 @@ package com.team2.finalproject.domain.dispatchnumber.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
-import com.team2.finalproject.domain.deliverydestination.model.dto.response.DispatchListResponse;
-import com.team2.finalproject.domain.deliverydestination.model.dto.response.DispatchListResponse.DispatchResponse;
-import com.team2.finalproject.domain.deliverydestination.model.dto.response.DispatchListResponse.Issue;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.DispatchResponse;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.Issue;
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;

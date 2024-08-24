@@ -1,6 +1,6 @@
 package com.team2.finalproject.domain.dispatchnumber.controller;
 
-import com.team2.finalproject.domain.deliverydestination.model.dto.response.DispatchListResponse;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse;
 import com.team2.finalproject.domain.dispatchnumber.service.DispatchNumberService;
 import com.team2.finalproject.global.util.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
