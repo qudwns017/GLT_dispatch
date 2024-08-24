@@ -8,11 +8,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Builder
 public class DeliveryDestination extends BaseEntity {
 
@@ -29,7 +31,7 @@ public class DeliveryDestination extends BaseEntity {
     private String zipCode;  // 우편번호
 
     @Column(nullable = false, length = 30)
-    private String managerName;  // 담당자명
+    private String adminName;  // 담당자명
 
     @Column(nullable = false, length = 20)
     private String phoneNumber;  // 전화번호
