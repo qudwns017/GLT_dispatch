@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -38,6 +39,7 @@ public class DispatchService {
         // 검색 기간, 검색 옵션, 담당자 체크 여부에 따른 필터
         List<DispatchNumber> dispatchNumbers =
                 searchDispatchNumbers(request, users, center, startDateTime, endDateTime);
+        log.info("검색 후 배차(dispatchNumbers) 개수: {}", dispatchNumbers.size());
 
         // 각 상태에 해당하는 개수 구하기
         // Dispatch 내부의 상태와 달라 DispatchNumber 에서 구해야 함
@@ -51,8 +53,17 @@ public class DispatchService {
         // 검색을 원하는 status
         DispatchNumberStatus status = request.status();
 
-        // 원하는 status에 해당한는 Map<DispatchNumber, List<Dispatch>>
-        Map<DispatchNumber, List<Dispatch>> dispatchMap = dispatchRepository.findDispatchMapByDispatchNumbersAndStatus(dispatchNumbers, status);
+        // 원하는 status에 해당하는 DispatchNumber만 필터링
+        List<DispatchNumber> filteredDispatchNumbers = dispatchNumbers.stream()
+                .filter(d -> d.getStatus() == status)
+                .toList();
+
+        log.info("status 필터 후 배차(dispatchNumbers) 개수: {}", filteredDispatchNumbers.size());
+
+        //  Map<DispatchNumber, List<Dispatch>>
+        Map<DispatchNumber, List<Dispatch>> dispatchMap = dispatchRepository.findDispatchMapByDispatchNumbers(filteredDispatchNumbers);
+
+        log.info("dispatchMap: {}", dispatchMap.size());
 
         List<DispatchSearchResponse.DispatchResult> results = new ArrayList<>();
         // 기사 수, 전체 주문 수, 완료 주문 수 구하기
@@ -112,6 +123,8 @@ public class DispatchService {
                 // 기사 검색
                 case "driver" -> searchByDriverId(request, users, center,
                         startDateTime, endDateTime, isManager);
+                // 검색이 없는 경우
+                case "" -> searchByDefault(users, center, startDateTime, endDateTime, isManager);
                 default -> throw new DispatchException(DispatchErrorCode.WRONG_SEARCH_OPTION);
             };
         }

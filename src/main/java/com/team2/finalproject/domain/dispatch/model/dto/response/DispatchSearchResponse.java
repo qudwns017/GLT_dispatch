@@ -23,6 +23,7 @@ public class DispatchSearchResponse {
     @Schema(description = "검색 결과 목록")
     private List<DispatchResult> results;
 
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
