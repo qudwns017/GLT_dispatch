@@ -3,6 +3,7 @@ package com.team2.finalproject.domain.deliverydestination.service;
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
 import com.team2.finalproject.domain.deliverydestination.model.dto.request.DeliveryDestinationRequest;
+import com.team2.finalproject.domain.deliverydestination.model.dto.request.UpdateDeliveryDestinationRequest;
 import com.team2.finalproject.domain.deliverydestination.model.dto.response.DeliveryDestinationResponse;
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
@@ -27,5 +28,11 @@ public class DeliveryDestinationService {
         DeliveryDestination deliveryDestination = DeliveryDestinationRequest.toEntity(request, center);
         DeliveryDestination response = deliveryDestinationRepository.save(deliveryDestination);
         return DeliveryDestinationResponse.of(response);
+    }
+
+    public void updateDeliveryDestination(long deliveryDestinationId, UpdateDeliveryDestinationRequest request) {
+        DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByDeliveryDestinationIdOrThrow(deliveryDestinationId);
+        deliveryDestination.update(request);
+        deliveryDestinationRepository.save(deliveryDestination);
     }
 }

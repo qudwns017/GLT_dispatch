@@ -1,6 +1,7 @@
 package com.team2.finalproject.domain.deliverydestination.model.entity;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.deliverydestination.model.dto.request.UpdateDeliveryDestinationRequest;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,4 +55,16 @@ public class DeliveryDestination extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;
+
+    public void update(UpdateDeliveryDestinationRequest request) {
+        if (request.restrictedTonCode() != null) {
+            this.restrictedTonCode = request.restrictedTonCode();
+        }
+        if (request.comment() != null) {
+            this.comment = request.comment();
+        }
+        if (request.delayTime() != null) {
+            this.delayTime = request.delayTime();
+        }
+    }
 }
