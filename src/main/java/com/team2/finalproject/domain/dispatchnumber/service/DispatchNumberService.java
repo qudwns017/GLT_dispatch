@@ -62,10 +62,6 @@ public class DispatchNumberService {
                     stopover.put("lon", dispatchDetail.getDestinationLongitude());
                     stopoverList.add(stopover);
 
-
-                    System.out.println(dispatchDetail.getDestinationLatitude());
-                    System.out.println(dispatchDetail.getDestinationLongitude());
-
                     if(dispatchDetail.getDispatchDetailStatus() == DispatchDetailStatus.DELIVERY_DELAY){
                         String comment = null;
                         if(dispatchDetail.getDestinationId() !=null){
@@ -89,7 +85,7 @@ public class DispatchNumberService {
                     coordinates.add(coordinate);
                 }
 
-                return DispatchResponse.of(dispatch.getId(), dispatch.getDeliveryStatus().name(), dispatch.getSmName(), dispatch.getCompletedOrderCount(), dispatch.getDeliveryOrderCount(), (int) progressionRate,stopoverList,coordinates );
+                return DispatchResponse.of(dispatch.getId(), dispatch.getDeliveryStatus().getDescription(), dispatch.getSmName(), dispatch.getCompletedOrderCount(), dispatch.getDeliveryOrderCount(), (int) progressionRate,stopoverList,coordinates );
             }).toList();
 
         return DispatchListResponse.of(dispatchNumber.getDispatchNumber(), dispatchNumber.getDispatchName(),(int) totalProgressionRate,totalCompletedOrderCount,totalDeliveryOrderCount,issueList.size(),startStopover,dispatchResponseList,issueList);

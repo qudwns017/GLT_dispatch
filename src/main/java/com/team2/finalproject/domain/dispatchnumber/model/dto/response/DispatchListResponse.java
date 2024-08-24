@@ -76,7 +76,7 @@ public class DispatchListResponse {
     public static class DispatchResponse{
         @Schema(example = "2", description = "배차id")
         private Long dispatchId;
-        @Schema(example = "IN_TRANSIT", description = "배차상태(IN_TRANSIT(주행중), WAITING(주행대기), COMPLETED(주행완료))")
+        @Schema(example = "주행중", description = "배차상태(주행중, 주행대기, 주행완료)")
         private String dispatchStatus;
         @Schema(example = "홍길동", description = "기사명")
         private String smName;
