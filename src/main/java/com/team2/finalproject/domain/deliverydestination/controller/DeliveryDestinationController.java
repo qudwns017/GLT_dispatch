@@ -23,9 +23,9 @@ public class DeliveryDestinationController implements SwaggerDeliveryDestination
     private final DeliveryDestinationService deliveryDestinationService;
     private final CenterService centerService;
 
-    @GetMapping("/{place-id}")
+    @GetMapping("/{placeId}")
     public ResponseEntity<?> getCenterOrDeliveryDestinationInfo(
-            @PathVariable(value = "place-id") long placeId,
+            @PathVariable long placeId,
             @RequestParam(value = "is-center") boolean isCenter) {
 
         if (!isCenter) {
