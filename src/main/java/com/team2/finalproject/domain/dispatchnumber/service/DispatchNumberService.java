@@ -75,7 +75,7 @@ public class DispatchNumberService {
                             dispatchCodeId,
                             dispatch.getId(),
                             dispatch.getSmName(),
-                            dispatchDetail.getTransportOrder().getCustomerAddress(),
+                            dispatchDetail.getTransportOrder().getCustomerAddress(), //TODO 도로명주소 -> 지번주소로 변경
                             dispatchDetail.getDestinationId() != null ? dispatchDetail.getDestinationId() : null,
                             comment);
                         issueList.add(issue);

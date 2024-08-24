@@ -1,5 +1,7 @@
 package com.team2.finalproject.domain.dispatchnumber.model.dto.response;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +12,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DispatchListResponse {
 
+    @Schema(example = "240808C001#1", description = "배차코드")
     private String dispatchCode;
+    @Schema(example = "서울 배차", description = "배차명")
     private String dispatchName;
+    @Schema(example = "80", description = "총 진행률")
     private int totalProgressionRate;
+    @Schema(example = "5", description = "총 완료주문수")
     private int totalCompletedOrderNum;
+    @Schema(example = "13", description = "총 주문수")
     private int totalOrderNum;
+    @Schema(example = "3", description = "이슈 주문수")
     private int issueOrderNum;
     private StartStopover startStopover;
     private List<DispatchResponse> dispatchList;
@@ -39,10 +47,15 @@ public class DispatchListResponse {
     @Getter
     @NoArgsConstructor
     public static class StartStopover{
+        @Schema(example = "1", description = "센터id")
         private Long centerId;
+        @Schema(example = "서울시 강동구 천호동", description = "주소")
         private String address;
+        @Schema(example = "37.5409", description = "위도")
         private Double lat;
+        @Schema(example = "127.1263", description = "경도")
         private Double lon;
+        @Schema(example = "01:00:00", description = "지연시간")
         private LocalTime delayTime;
 
         private StartStopover(Long centerId,String address,Double lat,Double lon,LocalTime delayTime){
@@ -61,13 +74,33 @@ public class DispatchListResponse {
     @Getter
     @NoArgsConstructor
     public static class DispatchResponse{
+        @Schema(example = "2", description = "배차id")
         private Long dispatchId;
+        @Schema(example = "IN_TRANSIT", description = "배차상태(IN_TRANSIT(주행중), WAITING(주행대기), COMPLETED(주행완료))")
         private String dispatchStatus;
+        @Schema(example = "홍길동", description = "기사명")
         private String smName;
+        @Schema(example = "3", description = "완료 주문수")
         private int completedOrderNum;
+        @Schema(example = "10", description = "주문수")
         private int orderNum;
+        @Schema(example = "30", description = "진행률")
         private int progressionRate;
+        @ArraySchema(
+            arraySchema = @Schema(description = "경유지 리스트"),
+            schema = @Schema(
+                example = "{\"lat\": 37.5665, \"lon\": 126.9780}",
+                description = "경유지의 위도와 경도"
+            )
+        )
         private List<Map<String, Double>> stopoverList;
+        @ArraySchema(
+            arraySchema = @Schema(description = "경로 좌표 리스트"),
+            schema = @Schema(
+                example = "{\"lat\": 37.5665, \"lon\": 126.9780}",
+                description = "경로 좌표"
+            )
+        )
         private List<Map<String, Double>> coordinates;
 
         private DispatchResponse(Long dispatchId,String dispatchStatus,String smName, int completedOrderNum,int orderNum,int progressionRate,List<Map<String, Double>> stopoverList,List<Map<String, Double>> coordinates){
@@ -89,15 +122,21 @@ public class DispatchListResponse {
     @Getter
     @NoArgsConstructor
     public static class Issue{
+        @Schema(example = "2", description = "배차코드id")
         private Long dispatchCodeId;
+        @Schema(example = "2", description = "배차id")
         private Long dispatchId;
+        @Schema(example = "홍길동", description = "기사명")
         private String smName;
+        @Schema(example = "서울시 강동구 천호동", description = "주소")
         private String address;
+        @Schema(example = "2", description = "배송처 id(null이면 배송처정보 없음)")
         private Long deliveryDestinationId;
+        @Schema(example = "화물 엘레베이터 대기시간 1시간", description = "배송처 비고")
         private String issue;
 
-        private Issue(Long dispatchCodeIdh,Long dispatchId,String smName,String address,Long deliveryDestinationId,String issue){
-            this.dispatchCodeId = dispatchCodeIdh;
+        private Issue(Long dispatchCodeId,Long dispatchId,String smName,String address,Long deliveryDestinationId,String issue){
+            this.dispatchCodeId = dispatchCodeId;
             this.dispatchId = dispatchId;
             this.smName = smName;
             this.address = address;
@@ -105,8 +144,8 @@ public class DispatchListResponse {
             this.issue = issue;
         }
 
-        public static Issue of(Long dispatchCodeIdh,Long dispatchId,String smName,String address,Long deliveryDestinationId,String issue){
-            return new Issue(dispatchCodeIdh,dispatchId,smName,address,deliveryDestinationId,issue);
+        public static Issue of(Long dispatchCodeId,Long dispatchId,String smName,String address,Long deliveryDestinationId,String issue){
+            return new Issue(dispatchCodeId,dispatchId,smName,address,deliveryDestinationId,issue);
         }
 
     }

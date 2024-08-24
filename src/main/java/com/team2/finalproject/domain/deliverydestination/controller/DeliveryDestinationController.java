@@ -1,6 +1,5 @@
 package com.team2.finalproject.domain.deliverydestination.controller;
 
-import com.team2.finalproject.domain.center.model.dto.request.CenterRequest;
 import com.team2.finalproject.domain.center.service.CenterService;
 import com.team2.finalproject.domain.deliverydestination.model.dto.request.DeliveryDestinationRequest;
 import com.team2.finalproject.domain.deliverydestination.service.DeliveryDestinationService;

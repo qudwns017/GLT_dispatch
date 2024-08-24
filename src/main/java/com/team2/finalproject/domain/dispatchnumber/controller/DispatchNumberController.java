@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/dispatchNumber")
 @RequiredArgsConstructor
-public class DispatchNumberController {
+public class DispatchNumberController implements SwaggerDispatchNumberController{
 
     private final DispatchNumberService dispatchNumberService;
 
     @GetMapping("/{dispatchCodeId}/vehicle-control")
-    private ResponseEntity<DispatchListResponse> getDispatchList(@PathVariable Long dispatchCodeId) {
+    public ResponseEntity<DispatchListResponse> getDispatchList(@PathVariable Long dispatchCodeId) {
         DispatchListResponse response = dispatchNumberService.getDispatchList(dispatchCodeId);
         return ApiResponse.OK(response);
     }
