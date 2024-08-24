@@ -37,7 +37,7 @@ public class DeliveryDestinationController implements SwaggerDeliveryDestination
 
     @PostMapping
     public ResponseEntity<?> addDeliveryDestination(@RequestBody DeliveryDestinationRequest request) {
-        var response = deliveryDestinationService.addDeliveryDestination(request);
+        DeliveryDestinationResponse response = deliveryDestinationService.addDeliveryDestination(request);
         return ApiResponse.CREATED(response);
     }
 
