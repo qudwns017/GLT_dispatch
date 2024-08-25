@@ -45,7 +45,8 @@ public class DispatchNumberService {
             .sum();
         double totalProgressionRate = (double) totalDeliveryOrderCount / totalCompletedOrderCount * 100;
 
-        DispatchListResponse.StartStopover startStopover = getStartStopoverByCenterCode(dispatchList.get(0).getDeparturePlaceCode());
+        Center center = dispatchNumber.getCenter();
+        DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),center.getAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
 
         List<DispatchListResponse.Issue> issueList = new ArrayList<>();
 
@@ -88,10 +89,5 @@ public class DispatchNumberService {
             }).toList();
 
         return DispatchListResponse.of(dispatchNumber.getDispatchNumber(), dispatchNumber.getDispatchName(),(int) totalProgressionRate,totalCompletedOrderCount,totalDeliveryOrderCount,issueList.size(),startStopover,dispatchResponseList,issueList);
-    }
-
-    private DispatchListResponse.StartStopover getStartStopoverByCenterCode(String CenterCode){
-        Center center = centerRepository.findByCenterCodeWithThrow(CenterCode);
-        return DispatchListResponse.StartStopover.of(center.getId(),center.getAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
     }
 }
