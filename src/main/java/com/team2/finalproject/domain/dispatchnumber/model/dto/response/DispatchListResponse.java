@@ -2,7 +2,6 @@ package com.team2.finalproject.domain.dispatchnumber.model.dto.response;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -55,10 +54,10 @@ public class DispatchListResponse {
         private Double lat;
         @Schema(example = "127.1263", description = "경도")
         private Double lon;
-        @Schema(example = "01:00:00", description = "지연시간")
-        private LocalTime delayTime;
+        @Schema(example = "60", description = "지연시간(분)")
+        private int delayTime;
 
-        private StartStopover(Long centerId,String address,Double lat,Double lon,LocalTime delayTime){
+        private StartStopover(Long centerId,String address,Double lat,Double lon,int delayTime){
             this.centerId = centerId;
             this.address = address;
             this.lat = lat;
@@ -66,7 +65,7 @@ public class DispatchListResponse {
             this.delayTime = delayTime;
         }
 
-        public static StartStopover of(Long centerId,String address,Double lat,Double lon,LocalTime delayTime){
+        public static StartStopover of(Long centerId,String address,Double lat,Double lon,int delayTime){
             return new StartStopover(centerId,address,lat,lon,delayTime);
         }
     }

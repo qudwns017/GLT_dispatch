@@ -52,6 +52,9 @@ public class TransportOrder extends BaseEntity {
 
     private String customerPhoneNumber; //고객연락처
 
+    @Column(nullable = false, length = 50)
+    private String roadAddress; // 도로명 주소
+
     @Column(nullable = false,length = 50)
     private String customerAddress; // 주소
 

@@ -2,16 +2,15 @@ package com.team2.finalproject.domain.dispatchnumber.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
-import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse;
-import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.DispatchResponse;
-import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.Issue;
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.DispatchResponse;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.Issue;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +70,7 @@ public class DispatchNumberService {
                             dispatchCodeId,
                             dispatch.getId(),
                             dispatch.getSmName(),
-                            dispatchDetail.getTransportOrder().getCustomerAddress(), //TODO 도로명주소 -> 지번주소로 변경
+                            dispatchDetail.getTransportOrder().getCustomerAddress(),
                             dispatchDetail.getDestinationId() != null ? dispatchDetail.getDestinationId() : null,
                             comment);
                         issueList.add(issue);
@@ -93,6 +92,6 @@ public class DispatchNumberService {
 
     private DispatchListResponse.StartStopover getStartStopoverByCenterCode(String CenterCode){
         Center center = centerRepository.findByCenterCodeWithThrow(CenterCode);
-        return DispatchListResponse.StartStopover.of(center.getId(),center.getAddress(),center.getLatitude(),center.getLongitude(), LocalTime.of(1,0,0));
+        return DispatchListResponse.StartStopover.of(center.getId(),center.getAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
     }
 }
