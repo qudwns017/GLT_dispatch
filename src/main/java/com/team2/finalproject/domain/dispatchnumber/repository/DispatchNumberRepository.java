@@ -77,7 +77,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 7. 센터, 기사명 기준으로 조회
     @Query("SELECT DISTINCT dn FROM DispatchNumber dn " +
-            "JOIN FETCH dn .dispatcheList d " +
+            "JOIN FETCH dn .dispatchList d " +
             "JOIN FETCH d .sm sm " +
             "WHERE dn.center = :center " +
             "AND dn.loadingStartTime BETWEEN :startDateTime AND :endDateTime " +
@@ -91,7 +91,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 8. 센터, 담당자, 기사명 기준으로 조회
     @Query("SELECT DISTINCT dn FROM DispatchNumber dn " +
-            "JOIN FETCH dn .dispatcheList d " +
+            "JOIN FETCH dn .dispatchList d " +
             "JOIN FETCH d .sm sm " +
             "WHERE dn.center = :center " +
             "AND dn.users = :users " +
@@ -105,7 +105,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
-    @Query("select dn from DispatchNumber dn join fetch dn.dispatcheList d where dn.id = :id")
+    @Query("select dn from DispatchNumber dn join fetch dn.dispatchList d where dn.id = :id")
     Optional<DispatchNumber> findByIdWithJoin(Long id);
 
     default DispatchNumber findByIdWithJoinOrThrow(Long id) {
