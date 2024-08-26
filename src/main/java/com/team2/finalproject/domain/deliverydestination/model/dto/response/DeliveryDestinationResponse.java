@@ -2,6 +2,7 @@ package com.team2.finalproject.domain.deliverydestination.model.dto.response;
 
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
@@ -24,12 +25,14 @@ public record DeliveryDestinationResponse(
         double latitude,
         @Schema(example = "127.1724", description = "경도")
         double longitude,
-        @Schema(example = "example", description = "진입불가 톤 코드")
+        @Schema(example = "윙바디 8T", description = "진입불가 톤 코드")
         String restrictedTonCode,
         @Schema(example = "윙바디 진입 불가", description = "비고")
         String comment,
         @Schema(example = "70", description = "작업추가 소요시간")
-        int delayTime
+        int delayTime,
+        @Schema(example = "2024-08-26T14:51:51.980395", description = "최종 수정 일시")
+        LocalDateTime updateAt
 ) {
 
     public static DeliveryDestinationResponse of(DeliveryDestination deliveryDestination) {
@@ -46,6 +49,7 @@ public record DeliveryDestinationResponse(
                 restrictedTonCode(deliveryDestination.getRestrictedTonCode()).
                 comment(deliveryDestination.getComment()).
                 delayTime(deliveryDestination.getDelayTime()).
+                updateAt(deliveryDestination.getUpdateAt()).
                 build();
     }
 }
