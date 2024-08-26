@@ -23,14 +23,15 @@ public class DeliveryDestinationService {
     }
 
     public DeliveryDestinationResponse addDeliveryDestination(DeliveryDestinationRequest request) {
-        Center center = centerRepository.findByCenterByCenterIdOrThrow(request.centerId());
+        Center center = centerRepository.findByIdOrThrow(request.centerId());
         DeliveryDestination deliveryDestination = DeliveryDestinationRequest.toEntity(request, center);
         DeliveryDestination response = deliveryDestinationRepository.save(deliveryDestination);
         return DeliveryDestinationResponse.of(response);
     }
 
     public void updateDeliveryDestination(long deliveryDestinationId, UpdateDeliveryDestinationRequest request) {
-        DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByDeliveryDestinationIdOrThrow(deliveryDestinationId);
+        DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByIdOrThrow(
+                deliveryDestinationId);
         deliveryDestination.update(request);
         deliveryDestinationRepository.save(deliveryDestination);
     }

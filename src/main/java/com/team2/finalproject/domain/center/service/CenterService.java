@@ -14,7 +14,7 @@ public class CenterService {
     private final CenterRepository centerRepository;
 
     public CenterResponse getCenter(long centerId) {
-        Center centerEntity = centerRepository.findByCenterByCenterIdOrThrow(centerId);
+        Center centerEntity = centerRepository.findByIdOrThrow(centerId);
         return CenterResponse.of(centerEntity);
     }
 
