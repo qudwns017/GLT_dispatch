@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 public record UpdateDeliveryDestinationRequest(
-        @Schema(example = "8톤 윙바디", description = "진입불가 톤 코드")
+        @Schema(example = "윙바디 8T", description = "진입불가 톤 코드")
         String restrictedTonCode,
         @Schema(example = "윙바디 진입 불가", description = "비고")
         String comment,
