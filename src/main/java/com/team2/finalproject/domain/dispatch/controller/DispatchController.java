@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.dispatch.controller;
 
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchSearchRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchSearchResponse;
 import com.team2.finalproject.domain.dispatch.service.DispatchService;
@@ -9,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +26,8 @@ public class DispatchController implements SwaggerDispatchController{
     }
 
     @PatchMapping
-    public ResponseEntity<Void> cancelDispatch(@RequestBody List<String > dispatchNumbers) {
-
-        dispatchService.cancelDispatch(dispatchNumbers);
+    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request) {
+        dispatchService.cancelDispatch(request);
         return ApiResponse.OK();
     }
 }

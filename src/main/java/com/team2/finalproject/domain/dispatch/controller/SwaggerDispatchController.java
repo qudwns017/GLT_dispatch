@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.dispatch.controller;
 
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchSearchRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchSearchResponse;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
@@ -11,8 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-
 @Tag(name = "Dispatch", description = "배차")
 public interface SwaggerDispatchController {
     @Operation(summary = "차량관제 탭, 배차 검색", description = "차량관제 탭에서 배차 검색을 합니다.")
@@ -23,6 +22,6 @@ public interface SwaggerDispatchController {
 
     @Operation(summary = "차량관제 탭, 배차 삭제", description = "차량관제 탭에서 배차 삭제를 합니다.")
     ResponseEntity<Void> cancelDispatch(
-            @Parameter(description = "삭제할 배차 번호 목록") @RequestBody List<String> dispatchNumbers
+            @Parameter(description = "배차 취소 요청 정보") @RequestBody DispatchCancelRequest cancelDispatchRequest
     );
 }
