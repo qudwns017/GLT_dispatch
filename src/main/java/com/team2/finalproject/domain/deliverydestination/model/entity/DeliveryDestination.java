@@ -14,15 +14,18 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Builder
+@Getter
 public class DeliveryDestination extends BaseEntity {
 
     @Column(nullable = false, length = 100)
     private String destinationName; // 배송처명
 
     @Column(nullable = false, length = 50)
-    private String address;  // 기본주소
+    private String roadAddress; // 도로명 주소
+
+    @Column(nullable = false, length = 50)
+    private String address;  // 지번 주소
 
     @Column(nullable = false, length = 50)
     private String detailAddress;  // 상세주소

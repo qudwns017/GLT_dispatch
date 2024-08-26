@@ -48,6 +48,6 @@ public class DispatchNumber extends BaseEntity {
     private Center center; // 소속 센터
 
     @OneToMany(mappedBy = "dispatchNumber")
-    private List<Dispatch> dispatcheList;
+    private List<Dispatch> dispatchList;
 
 }

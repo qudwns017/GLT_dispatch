@@ -36,7 +36,7 @@ public record DeliveryDestinationRequest(
         return DeliveryDestination.builder().
                 center(center).
                 destinationName(request.destinationName()).
-                address(request.address()).
+                roadAddress(request.address()).
                 detailAddress(request.detailAddress()).
                 zipCode(request.zipCode()).
                 adminName(request.adminName()).
