@@ -10,10 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 
 @Entity
@@ -89,6 +87,7 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false)
     private int productCount; // 아이템수량
 
+    @Setter
     @Builder.Default
     @Column(nullable = false)
     private boolean isPending = false; // 보류여부

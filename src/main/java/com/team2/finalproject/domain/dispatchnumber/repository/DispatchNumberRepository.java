@@ -106,6 +106,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     );
 
     // 9. dispatchNumber 리스트로 연관 테이블 전체 조회 및 해당 DispatchNumber 리스트 반환
+    // 너무 많은 fetch로 보류
     @Query("SELECT dn FROM DispatchNumber dn " +
             "JOIN FETCH dn.dispatchList d " +
             "JOIN FETCH d.dispatchDetailList dd " +
@@ -113,6 +114,9 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             "JOIN FETCH d.sm " +
             "WHERE dn.dispatchNumber IN :dispatchNumbers")
     List<DispatchNumber> findAllWithDetailsByDispatchNumbers(@Param("dispatchNumbers") List<String> dispatchNumbers);
+
+    // 9-1. dispatchNumber로 DispatchNumberList 조회
+    List<DispatchNumber> findByDispatchNumberIn(List<String> dispatchNumbers);
 
     // 10. 	dispatchNumber로 연관 테이블 전체 삭제
     void deleteByDispatchNumberIn(List<String> dispatchNumbers);

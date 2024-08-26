@@ -3,6 +3,7 @@ package com.team2.finalproject.domain.dispatch.service;
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.dispatch.exception.DispatchErrorCode;
 import com.team2.finalproject.domain.dispatch.exception.DispatchException;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchSearchRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchSearchResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
@@ -12,6 +13,8 @@ import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
+import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
+import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class DispatchService {
     private final DispatchNumberRepository dispatchNumberRepository;
     private final UsersRepository usersRepository;
     private final SmRepository smRepository;
+    private final TransportOrderRepository transportOrderRepository;
 
     @Transactional(readOnly = true)
     public DispatchSearchResponse searchDispatches(DispatchSearchRequest request, Long userId) {
@@ -107,24 +111,14 @@ public class DispatchService {
 
     // 배차 탭에서의 배차 취소
     @Transactional
-    public void cancelDispatch(List<String> dispatchNumbers) {
-        //  관련 엔티티 모두 불러옴
-        List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findAllWithDetailsByDispatchNumbers(dispatchNumbers);
+    public void cancelDispatch(DispatchCancelRequest request) {
 
-        // 기사 주행 중 -> 주행 대기
-        updateSmStatusToNotDriving(dispatchNumbersToCancel);
-
-        // Status 확인
-        DispatchNumberStatus status = dispatchNumbersToCancel.get(0).getStatus();
-
-        if(status == DispatchNumberStatus.IN_TRANSIT){
+        if(request.isInTransit()){
             // 주행 중인 경우
-            cancelInTransitDispatch(dispatchNumbersToCancel);
-        }else if(status == DispatchNumberStatus.WAITING) {
-            // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
-            dispatchNumberRepository.deleteByDispatchNumberIn(dispatchNumbers);
+            cancelInTransitDispatch(request.dispatchNumbers());
         }else{
-            throw new DispatchException(DispatchErrorCode.CANNOT_CANCEL_DISPATCH);
+            // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
+            dispatchNumberRepository.deleteByDispatchNumberIn(request.dispatchNumbers());
         }
     }
 
@@ -226,20 +220,26 @@ public class DispatchService {
     }
 
     // 주행 중인 경우 배차 취소
-    private void cancelInTransitDispatch(List<DispatchNumber> dispatchNumbersToCancel) {
+    private void cancelInTransitDispatch(List<String> dispatchNumbers) {
+        //  관련 엔티티 모두 불러옴
+        List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findByDispatchNumberIn(dispatchNumbers);
+
+        // 기사 주행 중 -> 주행 대기
+        updateSmStatusToNotDriving(dispatchNumbersToCancel);
+
         // DispatchNumber 상태 COMPLETED로 변경
         updateDispatchNumberStatusToCompleted(dispatchNumbersToCancel);
 
-        // 각 Dispatch 처리
+        // 각 Dispatch 처리 (미 배송 상태 취소로 변경, 총 주문 수에서 취소 주문 수 빼기, 운송 주문 보류 처리)
         dispatchNumbersToCancel.stream()
-                .flatMap(dn -> dn.getDispatcheList().stream())
+                .flatMap(dn -> dn.getDispatchList().stream())
                 .forEach(this::processDispatchCancellation);
     }
 
     // 기사 배송 상태 변경
     private void updateSmStatusToNotDriving(List<DispatchNumber> dispatchNumbers) {
         dispatchNumbers.stream()
-                .flatMap(dn -> dn.getDispatcheList().stream())
+                .flatMap(dn -> dn.getDispatchList().stream())
                 .map(Dispatch::getSm)
                 .distinct()
                 .forEach(sm -> {
@@ -256,17 +256,26 @@ public class DispatchService {
         });
     }
 
-    // Dispatch 취소 처리 - 미 배송 상태 취소로 변경, 총 주문 수에서 취소 주문 수 빼기
+    // Dispatch 취소 처리 - 미 배송 상태 취소로 변경, 총 주문 수에서 취소 주문 수 빼기, 운송 주문 보류 처리
     private void processDispatchCancellation(Dispatch dispatch) {
         // 미 배송된 DispatchDetail 개수
         long undeliveredCount = dispatch.getDispatchDetailList().stream()
-                .filter(dd -> dd.getDispatchDetailStatus() != DispatchDetailStatus.UNLOADED)
+                .filter(dd -> dd.getDispatchDetailStatus() != DispatchDetailStatus.WORK_COMPLETED)
                 .count();
 
         // 미 배송된 DispatchDetail의 상태를 CANCELED로 변경
         dispatch.getDispatchDetailList().stream()
-                .filter(dd -> dd.getDispatchDetailStatus() != DispatchDetailStatus.UNLOADED)
-                .forEach(dd -> dd.setDispatchDetailStatus(DispatchDetailStatus.CANCELED));
+                .filter(dd -> dd.getDispatchDetailStatus() != DispatchDetailStatus.WORK_COMPLETED)
+                .forEach(dd -> {
+                    dd.setDispatchDetailStatus(DispatchDetailStatus.CANCELED);
+
+                    // TransportOrder isPending = true로 변경
+                    TransportOrder transportOrder = dd.getTransportOrder();
+                    if (transportOrder != null) {
+                        transportOrder.setPending(true);
+                        transportOrderRepository.save(transportOrder);
+                    }
+                });
 
         // Dispatch 총 주문수에서 미 배송된 수만큼 빼기
         dispatch.setDeliveryOrderCount(dispatch.getDeliveryOrderCount() - (int) undeliveredCount);
