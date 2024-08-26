@@ -5,17 +5,27 @@ import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.global.entity.BaseEntity;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 import java.time.LocalDateTime;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class DispatchDetail extends BaseEntity {
 
     @Column(nullable = true)
@@ -46,12 +56,11 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = false)
     private Long distance; //이동거리
 
-    @Getter
     @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DispatchDetailStatus dispatchDetailStatus = DispatchDetailStatus.PENDING; // 배차상세상태
+    private DispatchDetailStatus dispatchDetailStatus = DispatchDetailStatus.WORK_WAITING; // 배차상세상태
 
     @Column(nullable = true)
     private LocalDateTime transportationStartTime; // 운송시작시간

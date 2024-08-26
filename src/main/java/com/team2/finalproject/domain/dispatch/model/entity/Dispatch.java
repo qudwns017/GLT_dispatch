@@ -18,8 +18,8 @@ import org.locationtech.jts.geom.LineString;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Builder
+@Getter
 public class Dispatch extends BaseEntity {
 
     @Column(nullable = false, length = 30)

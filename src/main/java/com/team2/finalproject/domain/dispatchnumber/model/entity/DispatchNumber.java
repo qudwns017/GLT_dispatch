@@ -9,8 +9,11 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
@@ -42,5 +45,6 @@ public class DispatchNumber extends BaseEntity {
     private Center center; // 소속 센터
 
     @OneToMany(mappedBy = "dispatchNumber", cascade = CascadeType.REMOVE)
-    private List<Dispatch> dispatcheList;
+    private List<Dispatch> dispatchList;
+
 }

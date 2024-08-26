@@ -1,6 +1,7 @@
 package com.team2.finalproject.domain.deliverydestination.model.entity;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.deliverydestination.model.dto.request.UpdateDeliveryDestinationRequest;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,15 +15,18 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Builder
+@Getter
 public class DeliveryDestination extends BaseEntity {
 
     @Column(nullable = false, length = 100)
     private String destinationName; // 배송처명
 
     @Column(nullable = false, length = 50)
-    private String address;  // 기본주소
+    private String roadAddress; // 도로명 주소
+
+    @Column(nullable = false, length = 50)
+    private String address;  // 지번 주소
 
     @Column(nullable = false, length = 50)
     private String detailAddress;  // 상세주소
@@ -54,4 +58,16 @@ public class DeliveryDestination extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;
+
+    public void update(UpdateDeliveryDestinationRequest request) {
+        if (request.restrictedTonCode() != null) {
+            this.restrictedTonCode = request.restrictedTonCode();
+        }
+        if (request.comment() != null) {
+            this.comment = request.comment();
+        }
+        if (request.delayTime() != null) {
+            this.delayTime = request.delayTime();
+        }
+    }
 }
