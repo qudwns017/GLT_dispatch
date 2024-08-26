@@ -22,7 +22,7 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
                 ));
     }
 
-    default DeliveryDestination findByIdWithThrow(Long id){
+    default DeliveryDestination findByIdOrThrow(Long id){
         return findById(id).orElseThrow(
             () -> new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION)
         );

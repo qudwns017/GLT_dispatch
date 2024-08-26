@@ -29,9 +29,9 @@ public class DispatchNumberService {
 
     public DispatchListResponse getDispatchList(Long dispatchCodeId){
 
-        DispatchNumber dispatchNumber = dispatchNumberRepository.findByIdWithJoinAndThrow(dispatchCodeId);
+        DispatchNumber dispatchNumber = dispatchNumberRepository.findByIdWithJoinOrThrow(dispatchCodeId);
 
-        List<Dispatch> dispatchList = dispatchNumber.getDispatcheList();
+        List<Dispatch> dispatchList = dispatchNumber.getDispatchList();
 
         int totalCompletedOrderCount = dispatchList.stream()
             .mapToInt(Dispatch::getCompletedOrderCount) // Dispatch 객체의 getCompletedOrderCount 값을 int로 변환
@@ -88,7 +88,7 @@ public class DispatchNumberService {
             if (dispatchDetail.getDispatchDetailStatus() == DispatchDetailStatus.DELIVERY_DELAY) {
                 String comment = null;
                 if (dispatchDetail.getDestinationId() != null) {
-                    comment = deliveryDestinationRepository.findByIdWithThrow(dispatchDetail.getDestinationId()).getComment();
+                    comment = deliveryDestinationRepository.findByIdOrThrow(dispatchDetail.getDestinationId()).getComment();
                 }
                 DispatchListResponse.Issue issue = DispatchListResponse.Issue.of(
                     dispatchCodeId,

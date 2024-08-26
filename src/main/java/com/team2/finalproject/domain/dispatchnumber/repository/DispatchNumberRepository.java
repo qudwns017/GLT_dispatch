@@ -108,7 +108,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     @Query("select dn from DispatchNumber dn join fetch dn.dispatcheList d where dn.id = :id")
     Optional<DispatchNumber> findByIdWithJoin(Long id);
 
-    default DispatchNumber findByIdWithJoinAndThrow(Long id) {
+    default DispatchNumber findByIdWithJoinOrThrow(Long id) {
         return findByIdWithJoin(id).orElseThrow(() -> new DispatchNumberException(DispatchNumberErrorCode.NOT_FOUND_DISPATCH_NUMBER));
     }
 }
