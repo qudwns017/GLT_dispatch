@@ -8,10 +8,9 @@ import com.team2.finalproject.global.util.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +24,12 @@ public class DispatchController implements SwaggerDispatchController{
 
         DispatchSearchResponse response = dispatchService.searchDispatches(request, userDetails.getId());
         return ApiResponse.OK(response);
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> cancelDispatch(@RequestBody List<String > dispatchNumbers) {
+
+        dispatchService.cancelDispatch(dispatchNumbers);
+        return ApiResponse.OK();
     }
 }

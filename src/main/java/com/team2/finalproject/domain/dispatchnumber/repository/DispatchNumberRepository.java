@@ -102,4 +102,16 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime
     );
+
+    // 9. dispatchNumber 리스트로 연관 테이블 전체 조회 및 해당 DispatchNumber 리스트 반환
+    @Query("SELECT dn FROM DispatchNumber dn " +
+            "JOIN FETCH dn.dispatcheList d " +
+            "JOIN FETCH d.dispatchDetailList dd " +
+            "JOIN FETCH dd.transportOrder " +
+            "JOIN FETCH d.sm " +
+            "WHERE dn.dispatchNumber IN :dispatchNumbers")
+    List<DispatchNumber> findAllWithDetailsByDispatchNumbers(@Param("dispatchNumbers") List<String> dispatchNumbers);
+
+    // 10. 	dispatchNumber로 연관 테이블 전체 삭제
+    void deleteByDispatchNumberIn(List<String> dispatchNumbers);
 }

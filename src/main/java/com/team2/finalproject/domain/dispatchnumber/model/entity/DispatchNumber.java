@@ -5,19 +5,12 @@ import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.global.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 
 @Entity
@@ -36,6 +29,7 @@ public class DispatchNumber extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String dispatchName; // 배차명
 
+    @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -47,7 +41,6 @@ public class DispatchNumber extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center; // 소속 센터
 
-    @OneToMany(mappedBy = "dispatchNumber")
+    @OneToMany(mappedBy = "dispatchNumber", cascade = CascadeType.REMOVE)
     private List<Dispatch> dispatcheList;
-
 }

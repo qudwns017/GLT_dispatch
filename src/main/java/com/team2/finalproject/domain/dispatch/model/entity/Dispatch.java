@@ -5,20 +5,13 @@ import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.global.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 import org.locationtech.jts.geom.LineString;
 
 
@@ -35,6 +28,7 @@ public class Dispatch extends BaseEntity {
     @Column(nullable = false)
     private int destinationCount; // 도착지수
 
+    @Setter
     @Column(nullable = false)
     private int deliveryOrderCount; // 운송오더수
 
@@ -83,8 +77,6 @@ public class Dispatch extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Sm sm;
 
-    @OneToMany(mappedBy = "dispatch")
+    @OneToMany(mappedBy = "dispatch", cascade = CascadeType.REMOVE)
     private List<DispatchDetail> dispatchDetailList;
-
-
 }

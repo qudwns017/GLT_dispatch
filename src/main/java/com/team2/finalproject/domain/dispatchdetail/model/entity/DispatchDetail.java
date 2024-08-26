@@ -5,17 +5,11 @@ import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.global.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 
 @Entity
@@ -52,6 +46,8 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = false)
     private Long distance; //이동거리
 
+    @Getter
+    @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -66,6 +62,6 @@ public class DispatchDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Dispatch dispatch;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private TransportOrder transportOrder;
 }
