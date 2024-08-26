@@ -1,14 +1,16 @@
 package com.team2.finalproject.domain.dispatchnumber.repository;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberErrorCode;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberException;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.users.model.entity.Users;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, Long> {
 
@@ -102,4 +104,11 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime
     );
+
+    @Query("select dn from DispatchNumber dn join fetch dn.dispatcheList d where dn.id = :id")
+    Optional<DispatchNumber> findByIdWithJoin(Long id);
+
+    default DispatchNumber findByIdWithJoinOrThrow(Long id) {
+        return findByIdWithJoin(id).orElseThrow(() -> new DispatchNumberException(DispatchNumberErrorCode.NOT_FOUND_DISPATCH_NUMBER));
+    }
 }

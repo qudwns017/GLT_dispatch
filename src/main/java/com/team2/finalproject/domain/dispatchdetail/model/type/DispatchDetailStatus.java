@@ -6,10 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum DispatchDetailStatus {
-    PENDING("운송대기"),
-    STARTED("운송시작"),
-    LOADED("상차완료"),
-    UNLOADED("하차완료");
+    MOVING("이동 중"),
+    WORK_COMPLETED("작업완료"),
+    WORK_WAITING("작업대기"),
+    WORK_START("작업시작"),
+    DELIVERY_DELAY("배송지연");
 
     private final String description;  // 상태에 대한 설명
 }
