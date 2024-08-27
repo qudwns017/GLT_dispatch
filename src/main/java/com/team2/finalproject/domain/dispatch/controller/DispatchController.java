@@ -7,6 +7,7 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateR
 import com.team2.finalproject.domain.dispatch.service.DispatchService;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +34,7 @@ public class DispatchController implements SwaggerDispatchController{
     }
 
     @PutMapping
-    public ResponseEntity<DispatchUpdateResponse> updateDispatch(@RequestBody DispatchUpdateRequest request){
+    public ResponseEntity<DispatchUpdateResponse> updateDispatch(@RequestBody @Valid DispatchUpdateRequest request){
         DispatchUpdateResponse response = dispatchService.updateDispatch(request);
         return ApiResponse.OK(response);
     }
