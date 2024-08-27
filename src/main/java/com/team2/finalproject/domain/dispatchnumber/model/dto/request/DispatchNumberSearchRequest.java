@@ -1,4 +1,4 @@
-package com.team2.finalproject.domain.dispatch.model.dto.request;
+package com.team2.finalproject.domain.dispatchnumber.model.dto.request;
 
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record DispatchSearchRequest(
+public record DispatchNumberSearchRequest(
         @Schema(example = "WAITING", description = "배차 상태", requiredMode = Schema.RequiredMode.REQUIRED)
         DispatchNumberStatus status,
 
