@@ -12,10 +12,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 
@@ -54,6 +56,7 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = false)
     private Long distance; //이동거리
 
+    @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -68,6 +71,6 @@ public class DispatchDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Dispatch dispatch;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private TransportOrder transportOrder;
 }

@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.center.model.entity;
 
+import com.team2.finalproject.domain.center.model.dto.request.UpdateCenterRequest;
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
@@ -82,4 +83,15 @@ public class Center extends BaseEntity {
     @OneToMany(mappedBy = "center")
     List<TransportOrder> transportOrderList;
 
+    public void update(UpdateCenterRequest request) {
+        if (request.restrictedTonCode() != null) {
+            this.restrictedTonCode = request.restrictedTonCode();
+        }
+        if (request.comment() != null) {
+            this.comment = request.comment();
+        }
+        if (request.delayTime() != null) {
+            this.delayTime = request.delayTime();
+        }
+    }
 }

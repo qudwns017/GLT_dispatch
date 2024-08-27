@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.dispatch.controller;
 
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchSearchRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchSearchResponse;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,12 @@ public class DispatchController implements SwaggerDispatchController{
 
         DispatchSearchResponse response = dispatchService.searchDispatches(request, userDetails.getId());
         return ApiResponse.OK(response);
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request) {
+        dispatchService.cancelDispatch(request);
+        return ApiResponse.OK();
     }
 
     @PutMapping
