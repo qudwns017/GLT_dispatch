@@ -8,6 +8,6 @@ public record DispatchCancelRequest(
         @Schema(example = "true", description = "배차 상태가 주행 중인지 여부", requiredMode = Schema.RequiredMode.REQUIRED)
         Boolean isInTransit,
 
-        @Schema(example = "[\"DN001\", \"DN002\"]", description = "배차 번호 목록", requiredMode = Schema.RequiredMode.REQUIRED)
-        List<String> dispatchNumbers
+        @Schema(example = "[\"1\", \"2\"]", description = "배차 번호 id 목록", requiredMode = Schema.RequiredMode.REQUIRED)
+        List<Long> dispatchNumberIds
 ) {}

@@ -93,7 +93,7 @@ public class DispatchService {
             }
 
             results.add(DispatchSearchResponse.DispatchResult.builder()
-                    .dispatchId(dispatchNumber.getId())
+                    .dispatchNumberId(dispatchNumber.getId())
                     .progress(progress)
                     .dispatchCode(dispatchNumber.getDispatchNumber())
                     .dispatchName(dispatchNumber.getDispatchName())
@@ -119,10 +119,10 @@ public class DispatchService {
 
         if(request.isInTransit()){
             // 주행 중인 경우
-            cancelInTransitDispatch(request.dispatchNumbers());
+            cancelInTransitDispatch(request.dispatchNumberIds());
         }else{
             // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
-            dispatchNumberRepository.deleteByDispatchNumberIn(request.dispatchNumbers());
+            dispatchNumberRepository.deleteByIdIn(request.dispatchNumberIds());
         }
     }
 
@@ -224,9 +224,9 @@ public class DispatchService {
     }
 
     // 주행 중인 경우 배차 취소
-    private void cancelInTransitDispatch(List<String> dispatchNumbers) {
-        //  dispatchNumbers에 해당하는 배차 코드를 지닌 DispatchNumber 리스트 조회
-        List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findByDispatchNumberIn(dispatchNumbers);
+    private void cancelInTransitDispatch(List<Long> dispatchNumberIds) {
+        //  dispatchNumberIds에 해당하는 배차 코드를 지닌 DispatchNumber 리스트 조회
+        List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findByIdIn(dispatchNumberIds);
 
         // 기사 주행 중 -> 주행 대기
         updateSmStatusToNotDriving(dispatchNumbersToCancel);

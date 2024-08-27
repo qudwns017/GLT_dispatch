@@ -105,11 +105,11 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
-    // 9. dispatchNumber로 DispatchNumberList 조회
-    List<DispatchNumber> findByDispatchNumberIn(List<String> dispatchNumbers);
+    // 9. id 리스트로 DispatchNumber 리스트 조회
+    List<DispatchNumber> findByIdIn(List<Long> ids);
 
-    // 10. 	dispatchNumber로 연관 테이블 전체 삭제
-    void deleteByDispatchNumberIn(List<String> dispatchNumbers);
+    // 10. 	id 리스트로 연관 테이블 전체 삭제
+    void deleteByIdIn(List<Long> ids);
 
     @Query("select dn from DispatchNumber dn join fetch dn.dispatchList d where dn.id = :id")
     Optional<DispatchNumber> findByIdWithJoin(Long id);
