@@ -7,8 +7,10 @@ import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRe
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchSearchRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchSearchResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
+import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
+import com.team2.finalproject.domain.dispatchdetail.repository.DispatchDetailRepository;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
@@ -34,6 +36,7 @@ public class DispatchService {
     private final UsersRepository usersRepository;
     private final SmRepository smRepository;
     private final TransportOrderRepository transportOrderRepository;
+    private final DispatchDetailRepository dispatchDetailRepository;
 
     @Transactional(readOnly = true)
     public DispatchSearchResponse searchDispatches(DispatchSearchRequest request, Long userId) {
@@ -230,7 +233,7 @@ public class DispatchService {
         // DispatchNumber 상태 COMPLETED로 변경
         updateDispatchNumberStatusToCompleted(dispatchNumbersToCancel);
 
-        // 각 Dispatch 처리 (미 배송 상태 취소로 변경, 총 주문 수에서 취소 주문 수 빼기, 운송 주문 보류 처리)
+        // 각 Dispatch 처리 (내부의 DispatchDetail, TransportOrder 포함)
         dispatchNumbersToCancel.stream()
                 .flatMap(dn -> dn.getDispatchList().stream())
                 .forEach(this::processDispatchCancellation);
@@ -256,8 +259,12 @@ public class DispatchService {
         });
     }
 
-    // Dispatch 취소 처리 - 미 배송 상태 취소로 변경, 총 주문 수에서 취소 주문 수 빼기, 운송 주문 보류 처리
+    // Dispatch 취소 처리
+    // Dispatch 상태 COMPLETED로 변경, 미 배송 상태 취소로 변경, 총 주문 수에서 취소 주문 수 빼기, 운송 주문 보류 처리
     private void processDispatchCancellation(Dispatch dispatch) {
+        // Dispatch 상태 COMPLETED로 변경
+        dispatch.setDeliveryStatus(DispatchStatus.COMPLETED);
+
         // 미 배송된 DispatchDetail 개수
         long undeliveredCount = dispatch.getDispatchDetailList().stream()
                 .filter(dd -> dd.getDispatchDetailStatus() != DispatchDetailStatus.WORK_COMPLETED)
@@ -268,6 +275,7 @@ public class DispatchService {
                 .filter(dd -> dd.getDispatchDetailStatus() != DispatchDetailStatus.WORK_COMPLETED)
                 .forEach(dd -> {
                     dd.setDispatchDetailStatus(DispatchDetailStatus.CANCELED);
+                    dispatchDetailRepository.save(dd); // DispatchDetail 업데이트
 
                     // TransportOrder isPending = true로 변경
                     TransportOrder transportOrder = dd.getTransportOrder();
@@ -281,6 +289,6 @@ public class DispatchService {
         dispatch.setDeliveryOrderCount(dispatch.getDeliveryOrderCount() - (int) undeliveredCount);
 
         // Dispatch 엔티티 업데이트
-        dispatchNumberRepository.save(dispatch.getDispatchNumber());
+        dispatchRepository.save(dispatch);
     }
 }

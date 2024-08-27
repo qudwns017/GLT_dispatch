@@ -60,6 +60,7 @@ public class Dispatch extends BaseEntity {
     @Column(nullable = false)
     private int loadingRate; // 적재율
 
+    @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
