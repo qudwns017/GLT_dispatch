@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.dispatch.model.entity;
 
+import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
@@ -80,4 +81,8 @@ public class Dispatch extends BaseEntity {
 
     @OneToMany(mappedBy = "dispatch", cascade = CascadeType.REMOVE)
     private List<DispatchDetail> dispatchDetailList;
+
+    public void update(IssueRequest request) {
+            this.issue = request.issue();
+    }
 }
