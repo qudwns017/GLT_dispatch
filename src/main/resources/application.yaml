@@ -31,3 +31,7 @@ redis:
   password: ${REDIS_PASSWORD}
 
 
+optimization-api:
+  uri: ${OPTIMIZATION_API_URI}
+
+

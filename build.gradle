@@ -51,6 +51,8 @@ dependencies {
 
     // 경로 타입을 설정을 위한 의존성
     implementation 'org.hibernate.orm:hibernate-spatial:6.2.5.Final'
+    //WebClient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {

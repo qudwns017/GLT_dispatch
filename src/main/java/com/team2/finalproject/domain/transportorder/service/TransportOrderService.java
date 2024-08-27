@@ -116,9 +116,9 @@ public class TransportOrderService {
         int cellNumber = 0;
         for (TransportOrderExcelHeader header : transportOrdersList) {
             Cell cell = row.createCell(cellNumber++);
-            if (rowIndex == 0) {
                 cell.setCellValue(header.name());
-            } else if (rowIndex == 1) {
+                if (rowIndex == 0) {
+                } else if (rowIndex == 1) {
                 cell.setCellValue(header.required());
             } else if (rowIndex == 2) {
                 cell.setCellValue(header.comment());
