@@ -93,6 +93,7 @@ public class DispatchService {
             }
 
             results.add(DispatchSearchResponse.DispatchResult.builder()
+                    .dispatchId(dispatchNumber.getId())
                     .progress(progress)
                     .dispatchCode(dispatchNumber.getDispatchNumber())
                     .dispatchName(dispatchNumber.getDispatchName())
@@ -224,7 +225,7 @@ public class DispatchService {
 
     // 주행 중인 경우 배차 취소
     private void cancelInTransitDispatch(List<String> dispatchNumbers) {
-        //  관련 엔티티 모두 불러옴
+        //  dispatchNumbers에 해당하는 배차 코드를 지닌 DispatchNumber 리스트 조회
         List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findByDispatchNumberIn(dispatchNumbers);
 
         // 기사 주행 중 -> 주행 대기
