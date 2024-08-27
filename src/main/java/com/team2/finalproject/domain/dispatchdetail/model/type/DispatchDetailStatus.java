@@ -10,7 +10,8 @@ public enum DispatchDetailStatus {
     WORK_COMPLETED("작업완료"),
     WORK_WAITING("작업대기"),
     WORK_START("작업시작"),
-    DELIVERY_DELAY("배송지연");
+    DELIVERY_DELAY("배송지연"),
+    CANCELED("취소");
 
     private final String description;  // 상태에 대한 설명
 }

@@ -28,6 +28,9 @@ public class DispatchSearchResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DispatchResult {
+        @Schema(example = "1", description = "배차id")
+        private Long dispatchNumberId;
+
         @Schema(example = "50", description = "배차 진행률")
         private int progress;
 

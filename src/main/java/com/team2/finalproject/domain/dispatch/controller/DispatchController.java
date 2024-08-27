@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.dispatch.controller;
 
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchSearchRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchSearchResponse;
 import com.team2.finalproject.domain.dispatch.service.DispatchService;
@@ -8,10 +9,7 @@ import com.team2.finalproject.global.util.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +23,11 @@ public class DispatchController implements SwaggerDispatchController{
 
         DispatchSearchResponse response = dispatchService.searchDispatches(request, userDetails.getId());
         return ApiResponse.OK(response);
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request) {
+        dispatchService.cancelDispatch(request);
+        return ApiResponse.OK();
     }
 }
