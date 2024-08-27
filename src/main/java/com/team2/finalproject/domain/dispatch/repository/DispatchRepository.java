@@ -1,5 +1,7 @@
 package com.team2.finalproject.domain.dispatch.repository;
 
+import com.team2.finalproject.domain.dispatch.exception.DispatchErrorCode;
+import com.team2.finalproject.domain.dispatch.exception.DispatchException;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,5 +22,10 @@ public interface DispatchRepository extends JpaRepository<Dispatch, Long> {
         List<Dispatch> dispatches = findByDispatchNumbersIn(dispatchNumbers);
         return dispatches.stream()
                 .collect(Collectors.groupingBy(Dispatch::getDispatchNumber));
+    }
+
+    default Dispatch findByIdOrThrow(long dispatchId) {
+        return findById(dispatchId).orElseThrow(() ->
+                new DispatchException(DispatchErrorCode.NOT_FOUND_DISPATCH));
     }
 }
