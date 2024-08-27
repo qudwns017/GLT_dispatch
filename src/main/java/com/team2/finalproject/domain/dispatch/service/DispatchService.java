@@ -1,6 +1,7 @@
 package com.team2.finalproject.domain.dispatch.service;
 
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
@@ -109,6 +110,12 @@ public class DispatchService {
         dispatch.setDeliveryOrderCount(dispatch.getDeliveryOrderCount() - (int) undeliveredCount);
 
         // Dispatch 엔티티 업데이트
+        dispatchRepository.save(dispatch);
+    }
+
+    public void updateIssue(long dispatchId, IssueRequest request) {
+        Dispatch dispatch = dispatchRepository.findByIdOrThrow(dispatchId);
+        dispatch.update(request);
         dispatchRepository.save(dispatch);
     }
 }
