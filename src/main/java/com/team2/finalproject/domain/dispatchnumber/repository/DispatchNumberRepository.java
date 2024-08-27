@@ -105,7 +105,6 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
-    @Query("select dn from DispatchNumber dn join fetch dn.dispatchList d where dn.id = :id")
     // 9. id 리스트로 DispatchNumber 리스트 조회
     List<DispatchNumber> findByIdIn(List<Long> ids);
 
