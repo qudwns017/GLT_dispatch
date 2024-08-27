@@ -1,11 +1,10 @@
 package com.team2.finalproject.domain.dispatch.service;
 
-import com.team2.finalproject.domain.center.model.entity.Center;
-import com.team2.finalproject.domain.dispatch.exception.DispatchErrorCode;
-import com.team2.finalproject.domain.dispatch.exception.DispatchException;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
-import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchSearchRequest;
-import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchSearchResponse;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest.Order;
+import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
@@ -17,15 +16,16 @@ import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRep
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
-import com.team2.finalproject.domain.users.model.entity.Users;
-import com.team2.finalproject.domain.users.repository.UsersRepository;
+import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
+import com.team2.finalproject.global.util.optimization.OptimizationRequest;
+import com.team2.finalproject.global.util.optimization.OptimizationResponse;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.*;
 
 @Service
 @Slf4j
@@ -52,7 +52,7 @@ public class DispatchService {
 
         OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
 
-        DispatchUpdateResponse.StartStopover startStopover = StartStopover.of(
+        DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
             optimizationResponse.startStopover().address(),
             optimizationResponse.startStopover().lat(),
             optimizationResponse.startStopover().lon(),

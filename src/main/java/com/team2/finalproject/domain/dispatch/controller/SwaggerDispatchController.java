@@ -1,6 +1,9 @@
 package com.team2.finalproject.domain.dispatch.controller;
 
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse;
+import com.team2.finalproject.global.exception.response.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,5 +30,5 @@ public interface SwaggerDispatchController {
         @ApiResponse(responseCode = "500", description = "서버 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     ResponseEntity<DispatchUpdateResponse> updateDispatch(
-        @Parameter(description = "배차 변경 요청 정보") @RequestBody @Valid DispatchUpdateRequest request);
+        @Parameter(description = "배차 변경 요청 정보") @RequestBody DispatchUpdateRequest request);
 }
