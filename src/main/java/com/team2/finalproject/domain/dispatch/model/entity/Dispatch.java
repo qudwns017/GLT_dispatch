@@ -69,7 +69,7 @@ public class Dispatch extends BaseEntity {
     @Column(columnDefinition = "geometry(LineString)",nullable = false)
     private LineString path;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 300)
     private String issue; // 이슈
 
     @ManyToOne(fetch = FetchType.LAZY)
