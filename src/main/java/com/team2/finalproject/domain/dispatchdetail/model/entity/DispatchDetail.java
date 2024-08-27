@@ -71,6 +71,6 @@ public class DispatchDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Dispatch dispatch;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private TransportOrder transportOrder;
 }
