@@ -1,45 +1,51 @@
 package com.team2.finalproject.domain.dispatchdetail.model.dto.response;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
+import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
+import com.team2.finalproject.domain.vehicledetail.model.type.VehicleType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DispatchDetailResponse {
 
     @Schema(example = "1", description = "기사 명")
-    private Long smName;
+    private String smName;
 
     @Schema(example = "010-1234-5678", description = "기사 전화번호")
     private String smPhoneNumber;
 
     @Schema(example = "80", description = "용적률")
-    private Double floorAreaRatio;
+    private int floorAreaRatio;
 
     @Schema(example = "WING_BODY", description = "차종")
-    private String vehicleType;
+    private VehicleType vehicleType;
 
     @Schema(example = "5", description = "차량 톤")
     private Double vehicleTon;
 
     @Schema(example = "75", description = "진행률")
-    private Double progressionRate;
+    private int progressionRate;
 
     @Schema(example = "10", description = "완료주문")
-    private Integer completedOrderCount;
+    private int completedOrderCount;
 
     @Schema(example = "20", description = "주문 수")
-    private Integer deliveryOrderCount;
+    private int deliveryOrderCount;
 
-    @Schema(example = "120", description = "주행시간")
-    private Integer totalTime;
+    @Schema(example = "2:00:00", description = "주행시간")
+    private LocalTime totalTime;
 
     @Schema(example = "No issues", description = "이슈 및 메모")
     private String issue;
@@ -48,6 +54,7 @@ public class DispatchDetailResponse {
 
     private List<DispatchDetail> dispatchDetailList;
 
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -65,6 +72,7 @@ public class DispatchDetailResponse {
         private Double lon;
     }
 
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -73,7 +81,7 @@ public class DispatchDetailResponse {
         private Long dispatchDetailId;
 
         @Schema(example = "TRANSPORTATION_START", description = "현재 배송 상태")
-        private String dispatchDetailStatus;
+        private DispatchDetailStatus dispatchDetailStatus;
 
         @Schema(example = "2024-08-27T09:00:00", description = "작업 시작 시간")
         private LocalDateTime operationStartTime;
@@ -110,5 +118,14 @@ public class DispatchDetailResponse {
 
         @Schema(example = "127.1116", description = "경도")
         private Double lon;
+    }
+
+    public static DispatchDetailResponse .StartStopover of (Center center) {
+        return StartStopover.builder()
+                .centerId(center.getId())
+                .centerName(center.getCenterName())
+                .lat(center.getLatitude())
+                .lon(center.getLongitude())
+                .build();
     }
 }
