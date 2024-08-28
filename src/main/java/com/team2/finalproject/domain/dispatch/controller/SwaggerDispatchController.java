@@ -25,7 +25,7 @@ public interface SwaggerDispatchController {
     @Operation(summary = "배차 변경", description = "배차 탭에서 배차 변경을 합니다. (DispatchUpdateRequest, DispatchUpdateResponse)")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "배차 변경 성공", content = @Content(schema = @Schema(implementation = DispatchUpdateResponse.class))),
-        @ApiResponse(responseCode = "401", description = "bad request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "400", description = "bad request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "401", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "서버 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
