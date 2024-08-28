@@ -3,11 +3,10 @@ package com.team2.finalproject.global.util.optimization;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class OptimizationRequest {
 
