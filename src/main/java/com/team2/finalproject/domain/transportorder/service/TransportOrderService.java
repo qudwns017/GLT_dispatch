@@ -1,22 +1,32 @@
 package com.team2.finalproject.domain.transportorder.service;
 
+import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndZipCodeRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndZipCodeResponse;
+import com.team2.finalproject.domain.transportorder.model.dto.response.TransportOrderResponse;
+import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
+import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -25,6 +35,7 @@ public class TransportOrderService {
   
     private final SmRepository smRepository;
     private final DeliveryDestinationRepository deliveryDestinationRepository;
+    private final TransportOrderRepository transportOrderRepository;
 
     private static final short FONT_SIZE_NAME = 14;
     private static final short FONT_SIZE_REQUIRED = 12;
@@ -134,6 +145,17 @@ public class TransportOrderService {
             sheet.autoSizeColumn(i);
             sheet.setColumnWidth(i, sheet.getColumnWidth(i) + COLUMN_PADDING);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public TransportOrderResponse getTransportOrderById(Long transportOrderId,Long destinationId) {
+        TransportOrder transportOrder = transportOrderRepository.findOrderWithDispatchDetailByIdOrThrow(transportOrderId);
+
+        if (destinationId != null){
+            DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByIdOrThrow(destinationId);
+            return TransportOrderResponse.of(transportOrder,deliveryDestination.getAdminName(),deliveryDestination.getPhoneNumber(),destinationId);
+        }
+        return TransportOrderResponse.of(transportOrder);
     }
 }
 
