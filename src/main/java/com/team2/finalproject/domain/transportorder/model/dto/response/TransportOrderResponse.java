@@ -29,7 +29,7 @@ public class TransportOrderResponse {
     private int productCount;
     @Schema(example = "80.5", description = "볼륨")
     private double volume;
-    @Schema(example = "80.1", description = "즁량")
+    @Schema(example = "80.1", description = "중량")
     private double weight;
     @Schema(example = "유관순", description = "담당자명")
     private String managerName;
@@ -52,18 +52,6 @@ public class TransportOrderResponse {
         this.managerName = managerName;
         this.phoneNumber = phoneNumber;
         this.deliveryDestinationCode = deliveryDestinationCode;
-    }
-    private TransportOrderResponse(String transportOrderNumber,String deliveryType,LocalDate requestedWorkDate, LocalTime requestedArrivalTime,LocalTime estimatedWorkTime, String smName,String productName, int productCount, double volume, double weight){
-        this.transportOrderNumber = transportOrderNumber;
-        this.deliveryType = deliveryType;
-        this.requestedWorkDate = requestedWorkDate;
-        this.requestedArrivalTime = requestedArrivalTime;
-        this.estimatedWorkTime = estimatedWorkTime;
-        this.smName = smName;
-        this.productName = productName;
-        this.productCount = productCount;
-        this.volume = volume;
-        this.weight = weight;
     }
 
     public static TransportOrderResponse of(TransportOrder transportOrder,String managerName,String phoneNumber, Long deliveryDestinationCode){
@@ -94,7 +82,10 @@ public class TransportOrderResponse {
             transportOrder.getProductName(),
             transportOrder.getProductCount(),
             transportOrder.getVolume(),
-            transportOrder.getWeight()
+            transportOrder.getWeight(),
+            null,
+            null,
+            null
         );
     }
 }
