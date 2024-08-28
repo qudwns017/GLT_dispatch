@@ -8,6 +8,7 @@ import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
@@ -15,11 +16,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class Vehicle extends BaseEntity {
 
     @Column(nullable = false)
     private String vehicleNumber;  // 차량 번호
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private VehicleType vehicleType; // 차종
 

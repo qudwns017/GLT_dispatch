@@ -75,9 +75,6 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = true)
     private LocalTime estimatedWorkTime = LocalTime.of(0,1);  // 예상작업시간
 
-    @Column(nullable = false, length = 20)
-    private String deliveryDestinationCode; // 배송처코드
-
     @Column(nullable = false, length = 100)
     private String productName; // 상품명
 
