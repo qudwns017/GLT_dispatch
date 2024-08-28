@@ -85,4 +85,12 @@ public class Dispatch extends BaseEntity {
     public void update(IssueRequest request) {
             this.issue = request.issue();
     }
+
+    public void minusOrderCount(int minusOrderCount) {
+        if(deliveryOrderCount - minusOrderCount < 0){
+            this.deliveryOrderCount = 0;
+        }else{
+            this.deliveryOrderCount -= minusOrderCount;
+        }
+    }
 }
