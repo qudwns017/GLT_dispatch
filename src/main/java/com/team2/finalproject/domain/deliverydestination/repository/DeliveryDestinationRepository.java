@@ -5,9 +5,11 @@ import com.team2.finalproject.domain.deliverydestination.exception.DeliveryDesti
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDestination, Long> {
 
@@ -26,5 +28,12 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
         return findById(id).orElseThrow(
             () -> new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION)
         );
+    }
+
+    @Query("SELECT d.comment FROM DeliveryDestination d WHERE d.id = :id")
+    Optional<String> findCommentById(@Param("id") Long id);
+
+    default String findCommentByIdOrThrow(Long id) {
+        return findCommentById(id).orElseThrow(() -> new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION));
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum DispatchErrorCode implements ErrorCode {
     WRONG_SEARCH_OPTION(HttpStatus.BAD_REQUEST, "wrong search option"),
+    NOT_FOUND_DISPATCH(HttpStatus.NOT_FOUND, "not found dispatch")
     ;
 
     private final HttpStatus httpStatus;

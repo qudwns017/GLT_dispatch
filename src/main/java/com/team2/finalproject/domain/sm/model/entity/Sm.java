@@ -7,10 +7,8 @@ import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,6 +17,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class Sm extends BaseEntity {
 
     @Column(nullable = false, length = 30)
