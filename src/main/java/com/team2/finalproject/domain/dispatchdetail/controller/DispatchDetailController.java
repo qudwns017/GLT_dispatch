@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/dispatch-detail")
 public class DispatchDetailController implements SwaggerDispatchDetailController{
-    DispatchDetailService dispatchDetailService;
+    final DispatchDetailService dispatchDetailService;
 
     @GetMapping("/{dispatchId}/vehicle-control")
     public ResponseEntity<DispatchDetailResponse> getDispatchDetail(@PathVariable Long dispatchId) {
