@@ -1,14 +1,16 @@
 package com.team2.finalproject.domain.dispatchnumber.repository;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberErrorCode;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberException;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.users.model.entity.Users;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, Long> {
 
@@ -75,7 +77,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 7. 센터, 기사명 기준으로 조회
     @Query("SELECT DISTINCT dn FROM DispatchNumber dn " +
-            "JOIN FETCH dn .dispatcheList d " +
+            "JOIN FETCH dn.dispatchList d " +
             "JOIN FETCH d .sm sm " +
             "WHERE dn.center = :center " +
             "AND dn.loadingStartTime BETWEEN :startDateTime AND :endDateTime " +
@@ -89,7 +91,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 8. 센터, 담당자, 기사명 기준으로 조회
     @Query("SELECT DISTINCT dn FROM DispatchNumber dn " +
-            "JOIN FETCH dn .dispatcheList d " +
+            "JOIN FETCH dn.dispatchList d " +
             "JOIN FETCH d .sm sm " +
             "WHERE dn.center = :center " +
             "AND dn.users = :users " +
@@ -103,5 +105,20 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
+<<<<<<< HEAD
     int countByCenterAndLoadingStartTimeBefore(Center center, LocalDateTime loadingStartTime);
+=======
+    // 9. id 리스트로 DispatchNumber 리스트 조회
+    List<DispatchNumber> findByIdIn(List<Long> ids);
+
+    // 10. 	id 리스트로 연관 테이블 전체 삭제
+    void deleteByIdIn(List<Long> ids);
+
+    @Query("select dn from DispatchNumber dn join fetch dn.dispatchList d where dn.id = :id")
+    Optional<DispatchNumber> findByIdWithJoin(Long id);
+
+    default DispatchNumber findByIdWithJoinOrThrow(Long id) {
+        return findByIdWithJoin(id).orElseThrow(() -> new DispatchNumberException(DispatchNumberErrorCode.NOT_FOUND_DISPATCH_NUMBER));
+    }
+>>>>>>> f98b20e96e0a3e53255818b6d7a36bccc9ff27fa
 }

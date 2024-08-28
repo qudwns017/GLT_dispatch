@@ -4,6 +4,7 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchRespons
 import com.team2.finalproject.domain.transportorder.model.dto.request.TransportOrderRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.request.ValidationListRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndZipCodeResponse;
+import com.team2.finalproject.domain.transportorder.model.dto.response.TransportOrderResponse;
 import com.team2.finalproject.domain.transportorder.service.TransportOrderService;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.response.ApiResponse;
@@ -52,5 +53,15 @@ public class TransportOrderController implements SwaggerTransportOrderController
         List<SmNameAndZipCodeResponse> results = transportOrderService.validateSmNameAndZipCodes(request.requests());
 
         return ApiResponse.OK(results);
-    }    
+    }
+
+    @GetMapping("/{transportOrderId}")
+    public ResponseEntity<TransportOrderResponse> getTransportOrderById(
+        @PathVariable Long transportOrderId,
+        @RequestParam(required = false) Long destinationId
+        ) {
+        TransportOrderResponse transportOrderResponse = transportOrderService.getTransportOrderById(transportOrderId, destinationId);
+
+        return ApiResponse.OK(transportOrderResponse);
+    }
 }

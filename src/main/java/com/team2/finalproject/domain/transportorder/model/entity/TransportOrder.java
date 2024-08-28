@@ -10,15 +10,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class TransportOrder extends BaseEntity {
 
     @Column(nullable = false, length = 10)
@@ -50,6 +50,9 @@ public class TransportOrder extends BaseEntity {
 
     private String customerPhoneNumber; //고객연락처
 
+    @Column(nullable = false, length = 50)
+    private String roadAddress; // 도로명 주소
+
     @Column(nullable = false,length = 50)
     private String customerAddress; // 주소
 
@@ -72,9 +75,6 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = true)
     private LocalTime estimatedWorkTime = LocalTime.of(0,1);  // 예상작업시간
 
-    @Column(nullable = false, length = 20)
-    private String deliveryDestinationCode; // 배송처코드
-
     @Column(nullable = false, length = 100)
     private String productName; // 상품명
 
@@ -84,6 +84,7 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false)
     private int productCount; // 아이템수량
 
+    @Setter
     @Builder.Default
     @Column(nullable = false)
     private boolean isPending = false; // 보류여부

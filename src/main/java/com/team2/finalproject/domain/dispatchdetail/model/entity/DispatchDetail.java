@@ -12,9 +12,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 
@@ -22,6 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class DispatchDetail extends BaseEntity {
 
     @Column(nullable = true)
@@ -52,10 +56,11 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = false)
     private Long distance; //이동거리
 
+    @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DispatchDetailStatus dispatchDetailStatus = DispatchDetailStatus.PENDING; // 배차상세상태
+    private DispatchDetailStatus dispatchDetailStatus = DispatchDetailStatus.WORK_WAITING; // 배차상세상태
 
     @Column(nullable = true)
     private LocalDateTime transportationStartTime; // 운송시작시간
@@ -66,6 +71,6 @@ public class DispatchDetail extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Dispatch dispatch;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private TransportOrder transportOrder;
 }

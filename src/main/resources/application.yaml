@@ -35,3 +35,7 @@ kakao:
     key: ${KAKAO_API_KEY}
 
 
+optimization-api:
+  uri: ${OPTIMIZATION_API_URI}
+
+
