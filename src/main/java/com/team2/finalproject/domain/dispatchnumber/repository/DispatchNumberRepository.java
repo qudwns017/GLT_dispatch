@@ -5,12 +5,13 @@ import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberErro
 import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberException;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.users.model.entity.Users;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, Long> {
 
@@ -105,9 +106,6 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
-<<<<<<< HEAD
-    int countByCenterAndLoadingStartTimeBefore(Center center, LocalDateTime loadingStartTime);
-=======
     // 9. id 리스트로 DispatchNumber 리스트 조회
     List<DispatchNumber> findByIdIn(List<Long> ids);
 
@@ -120,5 +118,6 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
     default DispatchNumber findByIdWithJoinOrThrow(Long id) {
         return findByIdWithJoin(id).orElseThrow(() -> new DispatchNumberException(DispatchNumberErrorCode.NOT_FOUND_DISPATCH_NUMBER));
     }
->>>>>>> f98b20e96e0a3e53255818b6d7a36bccc9ff27fa
+
+    int countByCenterAndLoadingStartTimeBefore(Center center, LocalDateTime loadingStartTime);
 }
