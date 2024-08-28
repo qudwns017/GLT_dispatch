@@ -1,7 +1,10 @@
 package com.team2.finalproject.domain.dispatch.service;
 
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest.Order;
 import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
@@ -13,12 +16,16 @@ import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRep
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
+import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
+import com.team2.finalproject.global.util.optimization.OptimizationRequest;
+import com.team2.finalproject.global.util.optimization.OptimizationResponse;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Service
 @Slf4j
@@ -29,6 +36,61 @@ public class DispatchService {
     private final SmRepository smRepository;
     private final TransportOrderRepository transportOrderRepository;
     private final DispatchDetailRepository dispatchDetailRepository;
+
+    private final OptimizationApiUtil optimizationApiUtil;
+
+    @Transactional(readOnly = true)
+    public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request) {
+        List<DispatchUpdateRequest.Order> orders = request.orderList();
+
+        Order startOrder = orders.get(0);
+        orders.remove(0);
+
+        OptimizationRequest.Stopover startStopoverRequest = OptimizationRequest.Stopover.of(startOrder.address(),startOrder.lat(), startOrder.lon(), LocalTime.of(startOrder.expectedServiceDuration()/60,startOrder.expectedServiceDuration()%60,0));
+        List<OptimizationRequest.Stopover> stopoverList = orders.stream()
+                .map((order)-> OptimizationRequest.Stopover.of(order.address(),order.lat(), order.lon(), LocalTime.of(order.expectedServiceDuration()/60,order.expectedServiceDuration()%60,0))).toList();
+
+        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
+
+        DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
+            optimizationResponse.startStopover().address(),
+            optimizationResponse.startStopover().lat(),
+            optimizationResponse.startStopover().lon(),
+            optimizationResponse.startStopover().delayTime().getHour() * 60
+                + optimizationResponse.startStopover().delayTime().getMinute(),
+            optimizationResponse.startTime(),
+            optimizationResponse.resultStopoverList().get(0).startTime()
+        );
+
+        List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList  = dispatchDetailResponseList(resultStopoverList);
+
+        return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000 ,optimizationResponse.totalTime(),startStopover,dispatchDetailResponseList,optimizationResponse.coordinates());
+    }
+
+    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(List<OptimizationResponse.ResultStopover> resultStopoverList){
+
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList  = new ArrayList<>();
+
+        for(int i = 0; i < resultStopoverList.size(); i++){
+            DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
+                resultStopoverList.get(i).address(),
+                resultStopoverList.get(i).timeFromPrevious() / 60000, // ms -> 분
+                resultStopoverList.get(i).endTime(),
+                i+1 != resultStopoverList.size() ? resultStopoverList.get(i+1).startTime() : resultStopoverList.get(i).endTime()
+                    .plusHours(resultStopoverList.get(i).delayTime().getHour())
+                    .plusMinutes(resultStopoverList.get(i).delayTime().getMinute())
+                    .plusSeconds(resultStopoverList.get(i).delayTime().getSecond()),
+                resultStopoverList.get(i).delayTime().getHour() * 60
+                    + resultStopoverList.get(i).delayTime().getMinute(),
+                resultStopoverList.get(i).lat(),
+                resultStopoverList.get(i).lon(),
+                resultStopoverList.get(i).distance()
+            );
+            dispatchDetailResponseList.add(dispatchDetailResponse);
+        }
+        return dispatchDetailResponseList;
+    }
 
     // 배차 탭에서의 배차 취소
     @Transactional
