@@ -36,7 +36,7 @@ public record DeliveryDestinationResponse(
         return DeliveryDestinationResponse.builder().
                 centerId(deliveryDestination.getCenter().getId()).
                 destinationName(deliveryDestination.getDestinationName()).
-                address(deliveryDestination.getAddress()).
+                address(deliveryDestination.getRoadAddress()).
                 detailAddress(deliveryDestination.getDetailAddress()).
                 zipCode(deliveryDestination.getZipCode()).
                 adminName(deliveryDestination.getAdminName()).

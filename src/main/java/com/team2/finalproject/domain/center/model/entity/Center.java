@@ -11,11 +11,12 @@ import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -37,7 +38,10 @@ public class Center extends BaseEntity {
     private String zipCode;  // 우편번호
 
     @Column(nullable = false, length = 100)
-    private String address;  // 주소
+    private String roadAddress;  // 도로명주소
+
+    @Column(nullable = false, length = 100)
+    private String customerAddress;  // 주소
 
     @Column(nullable = false, length = 50)
     private String detailAddress;  // 상세주소

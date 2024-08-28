@@ -102,4 +102,6 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime
     );
+
+    int countByCenterAndLoadingStartTimeBefore(Center center, LocalDateTime loadingStartTime);
 }

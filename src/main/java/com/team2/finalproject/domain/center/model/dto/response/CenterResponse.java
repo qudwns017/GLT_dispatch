@@ -36,7 +36,7 @@ public record CenterResponse(
         return CenterResponse.builder().
                 centerCode(center.getCenterCode()).
                 centerName(center.getCenterName()).
-                address(center.getAddress()).
+                address(center.getRoadAddress()).
                 detailAddress(center.getDetailAddress()).
                 zipCode(center.getZipCode()).
                 adminName(center.getAdminName()).

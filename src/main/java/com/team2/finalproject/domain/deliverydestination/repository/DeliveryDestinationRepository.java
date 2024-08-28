@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDestination, Long> {
@@ -27,4 +28,11 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
         return findById(deliveryDestinationId).orElseThrow(() ->
                 new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION_ID));
     }
+
+    Optional<DeliveryDestination> findByRoadAddressAndDetailAddress(String roadAddress, String detailAddress);
+
+    default DeliveryDestination findByFullAddress(String roadAddress, String detailAddress) {
+        return findByRoadAddressAndDetailAddress(roadAddress, detailAddress).orElse(null);
+    }
+
 }
