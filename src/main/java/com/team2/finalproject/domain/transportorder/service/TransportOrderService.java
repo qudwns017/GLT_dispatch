@@ -1,9 +1,7 @@
 package com.team2.finalproject.domain.transportorder.service;
 
-
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
-
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.dispatch.model.dto.response.CourseDetailResponse;
@@ -16,7 +14,9 @@ import com.team2.finalproject.domain.transportorder.model.dto.request.OrderReque
 import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndZipCodeRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.request.TransportOrderRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndZipCodeResponse;
-
+import com.team2.finalproject.domain.transportorder.model.dto.response.TransportOrderResponse;
+import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
+import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.domain.vehicle.repository.VehicleRepository;
@@ -25,31 +25,16 @@ import com.team2.finalproject.global.service.OptimizationService;
 import com.team2.finalproject.global.util.request.OptimizationRequest;
 import com.team2.finalproject.global.util.request.Stopover;
 import com.team2.finalproject.global.util.response.AddressInfo;
-
-import com.team2.finalproject.domain.transportorder.model.dto.response.TransportOrderResponse;
-import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
-import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
-
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -71,9 +56,10 @@ public class TransportOrderService {
     private final SmRepository smRepository;
     private final UsersRepository usersRepository;
     private final VehicleRepository vehicleRepository;
-    private final TransportOrderRepository transportOrderRepository;
     private final KakaoApiService kakaoApiService;
     private final OptimizationService optimizationService;
+    private final TransportOrderRepository transportOrderRepository;
+
 
     private static final short FONT_SIZE_NAME = 14;
     private static final short FONT_SIZE_REQUIRED = 12;

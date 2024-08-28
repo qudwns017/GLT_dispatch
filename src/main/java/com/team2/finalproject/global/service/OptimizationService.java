@@ -17,7 +17,7 @@ import com.team2.finalproject.global.util.Util;
 import com.team2.finalproject.global.util.request.OptimizationRequest;
 import com.team2.finalproject.global.util.response.OptimizationResponse;
 import com.team2.finalproject.global.util.response.ResultStopover;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,22 +28,28 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class OptimizationService {
 
-    private final WebClient.Builder webClientBuilder;
     private final DeliveryDestinationRepository deliveryDestinationRepository;
     private final SmRepository smRepository;
     private final VehicleRepository vehicleRepository;
     private final VehicleDetailRepository vehicleDetailRepository;
 
-    public List<CourseResponse> callOptimizationApi(TransportOrderRequest request, List<OptimizationRequest> optimizationRequests, List<Long> smIdOrder, Map<String, String[]> addressMapping) {
-        WebClient webClient = webClientBuilder.build();
-        String apiUrl = "http://43.201.58.61:8080/api/Optimization";
+    private final WebClient webClient;
 
+    public OptimizationService(DeliveryDestinationRepository deliveryDestinationRepository, SmRepository smRepository, VehicleRepository vehicleRepository, VehicleDetailRepository vehicleDetailRepository, @Value("${optimization-api.uri}")String uri){
+        this.deliveryDestinationRepository = deliveryDestinationRepository;
+        this.smRepository = smRepository;
+        this.vehicleRepository = vehicleRepository;
+        this.vehicleDetailRepository = vehicleDetailRepository;
+        this.webClient = WebClient.builder().baseUrl(uri).build();
+    }
+
+    public List<CourseResponse> callOptimizationApi(TransportOrderRequest request, List<OptimizationRequest> optimizationRequests, List<Long> smIdOrder, Map<String, String[]> addressMapping) {
         // 최적화 API 호출
         List<OptimizationResponse> responses = webClient.post()
-                .uri(apiUrl)
+                .uri("/api/Optimization")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(optimizationRequests)
                 .retrieve()
