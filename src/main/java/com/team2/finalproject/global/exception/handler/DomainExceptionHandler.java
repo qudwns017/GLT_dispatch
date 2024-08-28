@@ -15,7 +15,7 @@ public class DomainExceptionHandler {
 
     @ExceptionHandler(HttpStatusCodeException.class)
     public ResponseEntity<ErrorResponse> exception(HttpStatusCodeException exception) {
-        log.warn("", exception);
+        log.error("", exception);
         return ResponseEntity
                 .status(exception.getStatusCode())
                 .body(new ErrorResponse(exception.getStatusText(), exception.getMessage()));

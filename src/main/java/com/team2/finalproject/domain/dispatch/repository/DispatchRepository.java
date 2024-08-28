@@ -25,6 +25,11 @@ public interface DispatchRepository extends JpaRepository<Dispatch, Long> {
                 .collect(Collectors.groupingBy(Dispatch::getDispatchNumber));
     }
 
+    default Dispatch findByIdOrThrow(long dispatchId) {
+        return findById(dispatchId).orElseThrow(() ->
+                new DispatchException(DispatchErrorCode.NOT_FOUND_DISPATCH));
+    }
+
     // id로 Dispatch 조회할 때,
     // Sm과 Users, Vehicle, VehicleDetail
     // DispatchDetailList와 TransportOrder 같이 조회

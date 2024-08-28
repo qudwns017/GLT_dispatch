@@ -1,4 +1,4 @@
-package com.team2.finalproject.domain.dispatch.model.dto.response;
+package com.team2.finalproject.domain.dispatchnumber.model.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DispatchSearchResponse {
+public class DispatchNumberSearchResponse {
     @Schema(example = "10", description = "진행중 ")
     private int inProgress;
 

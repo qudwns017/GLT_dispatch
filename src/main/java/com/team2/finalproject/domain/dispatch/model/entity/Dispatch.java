@@ -1,5 +1,6 @@
 package com.team2.finalproject.domain.dispatch.model.entity;
 
+import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
@@ -69,7 +70,7 @@ public class Dispatch extends BaseEntity {
     @Column(columnDefinition = "geometry(LineString)",nullable = false)
     private LineString path;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 300)
     private String issue; // 이슈
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -80,4 +81,8 @@ public class Dispatch extends BaseEntity {
 
     @OneToMany(mappedBy = "dispatch", cascade = CascadeType.REMOVE)
     private List<DispatchDetail> dispatchDetailList;
+
+    public void update(IssueRequest request) {
+            this.issue = request.issue();
+    }
 }
