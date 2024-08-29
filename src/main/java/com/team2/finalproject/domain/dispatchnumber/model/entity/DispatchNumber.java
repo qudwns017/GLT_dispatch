@@ -47,4 +47,8 @@ public class DispatchNumber extends BaseEntity {
     @OneToMany(mappedBy = "dispatchNumber", cascade = CascadeType.REMOVE)
     private List<Dispatch> dispatchList;
 
+    public void complete(){
+        this.status = DispatchNumberStatus.COMPLETED;
+    }
+
 }
