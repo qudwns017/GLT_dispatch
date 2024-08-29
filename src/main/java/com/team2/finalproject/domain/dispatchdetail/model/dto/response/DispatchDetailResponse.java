@@ -5,19 +5,23 @@ import java.time.LocalTime;
 import java.util.List;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
+import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
+import com.team2.finalproject.domain.sm.model.entity.Sm;
+import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
+import com.team2.finalproject.domain.users.model.entity.Users;
+import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
+import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
 import com.team2.finalproject.domain.vehicledetail.model.type.VehicleType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class DispatchDetailResponse {
 
     @Schema(example = "1", description = "기사 명")
@@ -120,12 +124,72 @@ public class DispatchDetailResponse {
         private Double lon;
     }
 
-    public static DispatchDetailResponse .StartStopover of (Center center) {
+    public static DispatchDetailResponse.StartStopover getStartStopover (Center center) {
         return StartStopover.builder()
                 .centerId(center.getId())
                 .centerName(center.getCenterName())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
                 .build();
+    }
+
+    public static DispatchDetailResponse.DispatchDetail getDispatchDetail(
+            com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail dispatchDetail,
+             TransportOrder transportOrder, String comment) {
+
+        return DispatchDetailResponse.DispatchDetail.builder()
+                .dispatchDetailId(dispatchDetail.getId())
+                .dispatchDetailStatus(getDispatchDetailStatus(dispatchDetail))
+                .operationStartTime(dispatchDetail.getOperationStartTime())
+                .operationEndTime(dispatchDetail.getOperationEndTime())
+                .expectationOperationStartTime(dispatchDetail.getExpectationOperationStartTime())
+                .expectationOperationEndTime(dispatchDetail.getExpectationOperationEndTime())
+                .ett(dispatchDetail.getEtt())
+                .destinationType(dispatchDetail.getDestinationType())
+                .destinationId(dispatchDetail.getDestinationId())
+                .destinationComment(comment)
+                .address(transportOrder.getCustomerAddress())
+                .transportOrderId(transportOrder.getId())
+                .lat(dispatchDetail.getDestinationLatitude())
+                .lon(dispatchDetail.getDestinationLongitude())
+                .build();
+    }
+
+    public static DispatchDetailResponse of(
+            Dispatch dispatch, Sm sm, Users users, Vehicle vehicle, VehicleDetail vehicleDetail,
+            DispatchDetailResponse.StartStopover startStopover,
+            List<DispatchDetailResponse.DispatchDetail> dispatchDetailList) {
+
+        return DispatchDetailResponse.builder()
+                .smName(sm.getSmName())
+                .smPhoneNumber(users.getPhoneNumber())
+                .floorAreaRatio(dispatch.getLoadingRate())
+                .vehicleType(vehicle.getVehicleType())
+                .vehicleTon(vehicleDetail.getVehicleTon())
+                .progressionRate(calcProgress(dispatch.getDeliveryOrderCount(), dispatch.getCompletedOrderCount()))
+                .completedOrderCount(dispatch.getCompletedOrderCount())
+                .deliveryOrderCount(dispatch.getDeliveryOrderCount())
+                .totalTime(dispatch.getTotalTime())
+                .issue(dispatch.getIssue())
+                .startStopover(startStopover)
+                .dispatchDetailList(dispatchDetailList)
+                .build();
+    }
+
+    private static DispatchDetailStatus getDispatchDetailStatus
+            (com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail dispatchDetail) {
+        if(dispatchDetail.isResting()) {
+            return DispatchDetailStatus.RESTING;
+        }else {
+            return dispatchDetail.getDispatchDetailStatus();
+        }
+    }
+
+    // 진행률 계산
+    private static int calcProgress(int totalOrder, int completedOrder) {
+        if (totalOrder == 0) {
+            return 0;
+        }
+        return (int) Math.round((double) completedOrder / totalOrder * 100);
     }
 }
