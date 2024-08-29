@@ -96,4 +96,8 @@ public class Dispatch extends BaseEntity {
             this.deliveryOrderCount -= minusOrderCount;
         }
     }
+
+    public void complete(){
+        this.deliveryStatus = DispatchStatus.COMPLETED;
+    }
 }
