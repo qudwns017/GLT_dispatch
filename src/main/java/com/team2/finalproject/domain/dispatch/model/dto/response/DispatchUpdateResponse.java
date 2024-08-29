@@ -50,23 +50,20 @@ public class DispatchUpdateResponse {
         private Double lon;
         @Schema(example = "60", description = "지연시간(분)")
         private int delayTime;
-        @Schema(example = "2023-06-15T09:00:00", description = "예상작업시작시간")
-        private LocalDateTime expectationOperationStartTime;
-        @Schema(example = "2023-06-15T10:00:00", description = "예상작업종료시간")
-        private LocalDateTime expectationOperationEndTime;
+        @Schema(example = "2023-06-15T09:00:00", description = "운송 시작 시간")
+        private LocalDateTime departureTime;
 
-        private StartStopover(String address,Double lat,Double lon,int delayTime,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime){
+        private StartStopover(String address,Double lat,Double lon,int delayTime, LocalDateTime departureTime){
             this.address = address;
             this.lat = lat;
             this.lon = lon;
             this.delayTime = delayTime;
-            this.expectationOperationStartTime = expectationOperationStartTime;
-            this.expectationOperationEndTime = expectationOperationEndTime;
+            this.departureTime = departureTime;
 
         }
 
-        public static DispatchUpdateResponse.StartStopover of(String address,Double lat,Double lon,int delayTime,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime){
-            return new DispatchUpdateResponse.StartStopover(address,lat,lon,delayTime,expectationOperationStartTime,expectationOperationEndTime);
+        public static DispatchUpdateResponse.StartStopover of(String address,Double lat,Double lon,int delayTime,LocalDateTime departureTime){
+            return new DispatchUpdateResponse.StartStopover(address,lat,lon,delayTime,departureTime);
         }
     }
 
