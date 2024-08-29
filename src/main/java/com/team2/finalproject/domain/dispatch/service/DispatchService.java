@@ -58,7 +58,6 @@ public class DispatchService {
             optimizationResponse.startStopover().lon(),
             optimizationResponse.startStopover().delayTime().getHour() * 60
                 + optimizationResponse.startStopover().delayTime().getMinute(),
-            optimizationResponse.startTime(),
             optimizationResponse.resultStopoverList().get(0).startTime()
         );
 
