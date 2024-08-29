@@ -4,31 +4,26 @@ import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.dispatch.exception.DispatchErrorCode;
 import com.team2.finalproject.domain.dispatch.exception.DispatchException;
-import com.team2.finalproject.domain.dispatchnumber.model.dto.request.DispatchNumberSearchRequest;
-import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchNumberSearchResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.request.DispatchNumberSearchRequest;
 import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse;
 import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.DispatchResponse;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchNumberSearchResponse;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -56,7 +51,7 @@ public class DispatchNumberService {
         double totalProgressionRate = (double) totalDeliveryOrderCount / totalCompletedOrderCount * 100;
 
         Center center = dispatchNumber.getCenter();
-        DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),center.getAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
+        DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),center.getCustomerAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
 
         List<DispatchListResponse.Issue> issueList = new ArrayList<>();
 

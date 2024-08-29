@@ -3,24 +3,28 @@ package com.team2.finalproject.domain.vehicle.model.entity;
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
+import com.team2.finalproject.domain.vehicledetail.model.type.VehicleType;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Builder
 public class Vehicle extends BaseEntity {
 
     @Column(nullable = false)
     private String vehicleNumber;  // 차량 번호
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String vehicleType; // 차종
+    private VehicleType vehicleType; // 차종
 
     @Column(nullable = false)
     private boolean ownershipType; // 지입/용차 (True for 지입, False for 용차)
