@@ -66,7 +66,7 @@ public class DispatchDetail extends BaseEntity {
     private DispatchDetailStatus dispatchDetailStatus = DispatchDetailStatus.WORK_WAITING; // 배차상세상태
 
     @Column(nullable = false)
-    private boolean isWaiting;
+    private boolean isResting; // 휴식 여부
 
     @Column(nullable = true)
     private LocalDateTime transportationStartTime; // 운송시작시간

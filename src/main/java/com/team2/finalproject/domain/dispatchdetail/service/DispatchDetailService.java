@@ -8,6 +8,7 @@ import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
 import com.team2.finalproject.domain.dispatchdetail.model.dto.response.DispatchDetailResponse;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
+import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.users.model.entity.Users;
@@ -77,7 +78,7 @@ public class DispatchDetailService {
 
         return DispatchDetailResponse.DispatchDetail.builder()
                 .dispatchDetailId(dispatchDetail.getId())
-                .dispatchDetailStatus(dispatchDetail.getDispatchDetailStatus())
+                .dispatchDetailStatus(getDispatchDetailStatus(dispatchDetail))
                 .operationStartTime(dispatchDetail.getOperationStartTime())
                 .operationEndTime(dispatchDetail.getOperationEndTime())
                 .expectationOperationStartTime(dispatchDetail.getExpectationOperationStartTime())
@@ -91,6 +92,14 @@ public class DispatchDetailService {
                 .lat(dispatchDetail.getDestinationLatitude())
                 .lon(dispatchDetail.getDestinationLongitude())
                 .build();
+    }
+
+    private DispatchDetailStatus getDispatchDetailStatus(DispatchDetail dispatchDetail) {
+        if(dispatchDetail.isResting()) {
+            return DispatchDetailStatus.RESTING;
+        }else {
+            return dispatchDetail.getDispatchDetailStatus();
+        }
     }
 
     private String getComment(DispatchDetail dispatchDetail) {
