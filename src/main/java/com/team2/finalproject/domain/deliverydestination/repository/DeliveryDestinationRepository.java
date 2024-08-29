@@ -5,6 +5,7 @@ import com.team2.finalproject.domain.deliverydestination.exception.DeliveryDesti
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,11 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
             () -> new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION)
         );
     }
+
+    Optional<DeliveryDestination> findByRoadAddressAndDetailAddress(String roadAddress, String detailAddress);
+
+    default DeliveryDestination findByFullAddress(String roadAddress, String detailAddress) {
+        return findByRoadAddressAndDetailAddress(roadAddress, detailAddress).orElse(null);
+    }
+
 }

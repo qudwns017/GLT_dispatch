@@ -36,7 +36,7 @@ public record CenterRequest(
         return Center.builder().
                 centerCode(request.centerCode()).
                 centerName(request.centerName()).
-                address(request.address()).
+                roadAddress(request.address()).
                 detailAddress(request.detailAddress()).
                 zipCode(request.zipCode()).
                 adminName(request.adminName()).
