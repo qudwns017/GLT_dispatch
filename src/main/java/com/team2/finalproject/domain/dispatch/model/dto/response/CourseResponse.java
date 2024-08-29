@@ -45,7 +45,7 @@ public class CourseResponse {
         private String deliveryType;  // 배송유형 ("지입", "용차", "택배")
         private long smId;  // 기사 ID
         private String smName;  // 기사 이름
-        private String shipmentNum;  // 운송장 번호
+        private String shipmentNumber;  // 운송장 번호
         private String clientOrderKey;  // 업체 주문 번호
         private String orderType;  // 주문 유형 ("배송", "수거")
         private LocalDate receivedDate;  // 주문 접수일 (YYYYMMDD)

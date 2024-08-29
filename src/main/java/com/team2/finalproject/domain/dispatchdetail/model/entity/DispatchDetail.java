@@ -54,7 +54,7 @@ public class DispatchDetail extends BaseEntity {
     private LocalDateTime operationEndTime; // 작업종료시간
 
     @Column(nullable = false)
-    private Long distance; //이동거리
+    private double distance; //이동거리
 
     @Column(nullable = false)
     private int ett; // 예상 이동 시간

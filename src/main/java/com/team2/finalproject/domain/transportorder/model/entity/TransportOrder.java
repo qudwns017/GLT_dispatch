@@ -28,7 +28,7 @@ public class TransportOrder extends BaseEntity {
     private String smName; // sm명
 
     @Column(nullable = false,length = 100)
-    private String transportOrderNumber; // 운송장번호
+    private String shipmentNumber; // 운송장번호
 
     @Column(nullable = true,length = 100)
     private String orderNumber; // 업체주문번호

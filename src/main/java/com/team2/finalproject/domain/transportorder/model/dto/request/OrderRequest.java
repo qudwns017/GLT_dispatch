@@ -7,7 +7,7 @@ public record OrderRequest(
         String deliveryType, // 배송유형 "지입","용차","택배"
         Long smId, // 기사 ID
         String smName, // 기사 이름
-        String shipmentNum, // 운송장 번호
+        String shipmentNumber, // 운송장 번호
         String clientOrderKey, // 업체 주문 번호
         String orderType, // 주문유형 "배송","수거"
         LocalDate receivedDate, // 주문 접수일

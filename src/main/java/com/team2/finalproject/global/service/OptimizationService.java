@@ -154,7 +154,7 @@ public class OptimizationService {
                 .deliveryType(order.deliveryType())
                 .smId(order.smId())
                 .smName(order.smName())
-                .shipmentNum(order.shipmentNum())
+                .shipmentNumber(order.shipmentNumber())
                 .clientOrderKey(order.clientOrderKey())
                 .orderType(order.orderType())
                 .receivedDate(order.receivedDate())

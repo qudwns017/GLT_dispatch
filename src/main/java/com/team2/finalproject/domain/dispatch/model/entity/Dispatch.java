@@ -38,7 +38,7 @@ public class Dispatch extends BaseEntity {
     private int completedOrderCount = 0; // 완료오더수
 
     @Column(nullable = false)
-    private Long totalDistance;   //총거리
+    private double totalDistance;   //총거리
 
     @Column(nullable = false)
     private LocalTime totalTime; // 총 소요시간
@@ -56,13 +56,13 @@ public class Dispatch extends BaseEntity {
     private LocalDateTime arrivalTime; // 도착시간   주행 완료 후의 시간
 
     @Column(nullable = false)
-    private int totalWeight; // 총 중량
+    private double totalWeight; // 총 중량
 
     @Column(nullable = false)
-    private int totalVolume; // 총 볼륨
+    private double totalVolume; // 총 볼륨
 
     @Column(nullable = false)
-    private int loadingRate; // 적재율
+    private double loadingRate; // 적재율
 
     @Setter
     @Builder.Default

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class TransportOrderResponse {
 
     @Schema(example = "20240808274985", description = "운송장 번호")
-    private String transportOrderNumber;
+    private String shipmentNumber;
     @Schema(example = "지입", description = "배송 유형")
     private String deliveryType;
     @Schema(example = "2024-08-19", description = "작업희망일")
@@ -38,8 +38,8 @@ public class TransportOrderResponse {
     @Schema(example = "4", description = "배송처 코드")
     private Long deliveryDestinationCode;
 
-    private TransportOrderResponse(String transportOrderNumber,String deliveryType,LocalDate requestedWorkDate, LocalTime requestedArrivalTime,LocalTime estimatedWorkTime, String smName,String productName, int productCount, double volume, double weight, String managerName,String phoneNumber, Long deliveryDestinationCode){
-        this.transportOrderNumber = transportOrderNumber;
+    private TransportOrderResponse(String shipmentNumber,String deliveryType,LocalDate requestedWorkDate, LocalTime requestedArrivalTime,LocalTime estimatedWorkTime, String smName,String productName, int productCount, double volume, double weight, String managerName,String phoneNumber, Long deliveryDestinationCode){
+        this.shipmentNumber = shipmentNumber;
         this.deliveryType = deliveryType;
         this.requestedWorkDate = requestedWorkDate;
         this.requestedArrivalTime = requestedArrivalTime;
@@ -56,7 +56,7 @@ public class TransportOrderResponse {
 
     public static TransportOrderResponse of(TransportOrder transportOrder,String managerName,String phoneNumber, Long deliveryDestinationCode){
         return new TransportOrderResponse(
-            transportOrder.getTransportOrderNumber(),
+            transportOrder.getShipmentNumber(),
             transportOrder.getDeliveryType(),
             transportOrder.getRequestedWorkDate(),
             transportOrder.getRequestedArrivalTime(),
@@ -73,7 +73,7 @@ public class TransportOrderResponse {
     }
     public static TransportOrderResponse of(TransportOrder transportOrder){
         return new TransportOrderResponse(
-            transportOrder.getTransportOrderNumber(),
+            transportOrder.getShipmentNumber(),
             transportOrder.getDeliveryType(),
             transportOrder.getRequestedWorkDate(),
             transportOrder.getRequestedArrivalTime(),
