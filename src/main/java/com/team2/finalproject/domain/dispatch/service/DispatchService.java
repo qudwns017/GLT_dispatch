@@ -1,6 +1,10 @@
 package com.team2.finalproject.domain.dispatch.service;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList.DispatchDetailList;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest.Order;
 import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
@@ -8,14 +12,19 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateR
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
+import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.dispatchdetail.repository.DispatchDetailRepository;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
+import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
+import com.team2.finalproject.domain.users.model.entity.Users;
+import com.team2.finalproject.domain.users.repository.UsersRepository;
+import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
 import com.team2.finalproject.global.util.optimization.OptimizationResponse;
@@ -36,6 +45,7 @@ public class DispatchService {
     private final SmRepository smRepository;
     private final TransportOrderRepository transportOrderRepository;
     private final DispatchDetailRepository dispatchDetailRepository;
+    private final UsersRepository usersRepository;
 
     private final OptimizationApiUtil optimizationApiUtil;
 
@@ -46,11 +56,16 @@ public class DispatchService {
         Order startOrder = orders.get(0);
         orders.remove(0);
 
-        OptimizationRequest.Stopover startStopoverRequest = OptimizationRequest.Stopover.of(startOrder.address(),startOrder.lat(), startOrder.lon(), LocalTime.of(startOrder.expectedServiceDuration()/60,startOrder.expectedServiceDuration()%60,0));
+        OptimizationRequest.Stopover startStopoverRequest = OptimizationRequest.Stopover.of(startOrder.address(),
+                startOrder.lat(), startOrder.lon(),
+                LocalTime.of(startOrder.expectedServiceDuration() / 60, startOrder.expectedServiceDuration() % 60, 0));
         List<OptimizationRequest.Stopover> stopoverList = orders.stream()
-                .map((order)-> OptimizationRequest.Stopover.of(order.address(),order.lat(), order.lon(), LocalTime.of(order.expectedServiceDuration()/60,order.expectedServiceDuration()%60,0))).toList();
+                .map((order) -> OptimizationRequest.Stopover.of(order.address(), order.lat(), order.lon(),
+                        LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
+                .toList();
 
-        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
+        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(
+                OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
 
         DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
             optimizationResponse.startStopover().address(),
@@ -62,29 +77,81 @@ public class DispatchService {
         );
 
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
-        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList  = dispatchDetailResponseList(resultStopoverList);
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(
+                resultStopoverList);
 
-        return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000 ,optimizationResponse.totalTime(),startStopover,dispatchDetailResponseList,optimizationResponse.coordinates());
+        return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
+                startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
     }
 
-    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(List<OptimizationResponse.ResultStopover> resultStopoverList){
+    @Transactional
+    public void confirmDispatch(DispatchConfirmRequest request, UserDetailsImpl userDetails) {
+        List<Dispatch> pendingDispatchList = new ArrayList<>();
+        List<DispatchDetail> pendingDispatchDetailList = new ArrayList<>();
+        List<TransportOrder> pendingTransportOrderList = new ArrayList<>();
 
-        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList  = new ArrayList<>();
+        Users usersEntity = usersRepository.findByIdOrThrow(userDetails.getId());
+        Center centerEntity = usersEntity.getCenter();
+        DispatchNumber dispatchNumberEntity = DispatchConfirmRequest.toDispatchNumberEntity(request, usersEntity,
+                centerEntity);
 
-        for(int i = 0; i < resultStopoverList.size(); i++){
+        for (DispatchList dispatch : request.dispatchList()) {
+            Sm smEntity = smRepository.findByIdOrThrow(dispatch.smId());
+            double totalVolume = 0;
+            double totalWeight = 0;
+            double totalDistance = 0;
+            int totalTime = 0;
+
+            Dispatch dispatchEntity = DispatchConfirmRequest.toDispatchEntity(
+                    request, dispatchNumberEntity, smEntity, centerEntity,
+                    totalVolume, totalWeight, totalDistance, totalTime
+            );
+
+            pendingDispatchList.add(dispatchEntity);
+
+            for (DispatchDetailList dispatchDetail : dispatch.dispatchDetailList()) {
+                TransportOrder transportOrderEntity = DispatchConfirmRequest.toTransportOrderEntity(
+                        dispatchDetail, centerEntity
+                );
+
+                totalVolume += dispatchDetail.volume();
+                totalWeight += dispatchDetail.weight();
+                totalDistance += dispatchDetail.distance();
+                totalTime += dispatchDetail.ett();
+
+                pendingDispatchDetailList.add(DispatchConfirmRequest.toDispatchDetailEntity(
+                        dispatchDetail, dispatchEntity, transportOrderEntity
+                ));
+                pendingTransportOrderList.add(transportOrderEntity);
+            }
+        }
+
+        dispatchNumberRepository.save(dispatchNumberEntity);
+        dispatchRepository.saveAll(pendingDispatchList);
+        dispatchDetailRepository.saveAll(pendingDispatchDetailList);
+        transportOrderRepository.saveAll(pendingTransportOrderList);
+    }
+
+    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(
+            List<OptimizationResponse.ResultStopover> resultStopoverList) {
+
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = new ArrayList<>();
+
+        for (int i = 0; i < resultStopoverList.size(); i++) {
             DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
-                resultStopoverList.get(i).address(),
-                resultStopoverList.get(i).timeFromPrevious() / 60000, // ms -> 분
-                resultStopoverList.get(i).endTime(),
-                i+1 != resultStopoverList.size() ? resultStopoverList.get(i+1).startTime() : resultStopoverList.get(i).endTime()
-                    .plusHours(resultStopoverList.get(i).delayTime().getHour())
-                    .plusMinutes(resultStopoverList.get(i).delayTime().getMinute())
-                    .plusSeconds(resultStopoverList.get(i).delayTime().getSecond()),
-                resultStopoverList.get(i).delayTime().getHour() * 60
-                    + resultStopoverList.get(i).delayTime().getMinute(),
-                resultStopoverList.get(i).lat(),
-                resultStopoverList.get(i).lon(),
-                resultStopoverList.get(i).distance()
+                    resultStopoverList.get(i).address(),
+                    resultStopoverList.get(i).timeFromPrevious() / 60000, // ms -> 분
+                    resultStopoverList.get(i).endTime(),
+                    i + 1 != resultStopoverList.size() ? resultStopoverList.get(i + 1).startTime()
+                            : resultStopoverList.get(i).endTime()
+                                    .plusHours(resultStopoverList.get(i).delayTime().getHour())
+                                    .plusMinutes(resultStopoverList.get(i).delayTime().getMinute())
+                                    .plusSeconds(resultStopoverList.get(i).delayTime().getSecond()),
+                    resultStopoverList.get(i).delayTime().getHour() * 60
+                            + resultStopoverList.get(i).delayTime().getMinute(),
+                    resultStopoverList.get(i).lat(),
+                    resultStopoverList.get(i).lon(),
+                    resultStopoverList.get(i).distance()
             );
             dispatchDetailResponseList.add(dispatchDetailResponse);
         }
@@ -95,10 +162,10 @@ public class DispatchService {
     @Transactional
     public void cancelDispatch(DispatchCancelRequest request) {
 
-        if(request.isInTransit()){
+        if (request.isInTransit()) {
             // 주행 중인 경우
             cancelInTransitDispatch(request.dispatchNumberIds());
-        }else{
+        } else {
             // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
             dispatchNumberRepository.deleteByIdIn(request.dispatchNumberIds());
         }
