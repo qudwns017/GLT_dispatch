@@ -42,7 +42,7 @@ public class DispatchDetailService {
 
         // startStopover
         Center center = centerRepository.findByCenterCodeOrThrow(dispatch.getDeparturePlaceCode());
-        DispatchDetailResponse.StartStopover startStopover = DispatchDetailResponse.getStartStopover(center);
+        DispatchDetailResponse.StartStopover startStopover = DispatchDetailResponse.getStartStopover(center, dispatch.getDepartureTime());
 
         // dispatchDetailList
         List<DispatchDetailResponse.DispatchDetail> dispatchDetailList = dispatchDetails.stream()

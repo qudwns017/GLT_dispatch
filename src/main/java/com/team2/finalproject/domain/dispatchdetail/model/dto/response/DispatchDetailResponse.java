@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
-import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
@@ -74,6 +73,9 @@ public class DispatchDetailResponse {
 
         @Schema(example = "127.1116", description = "경도")
         private Double lon;
+
+        @Schema(example = "12:00:00", description = "운송 시작 시간")
+        private LocalDateTime departureTime;
     }
 
     @Getter
@@ -124,12 +126,13 @@ public class DispatchDetailResponse {
         private Double lon;
     }
 
-    public static DispatchDetailResponse.StartStopover getStartStopover (Center center) {
+    public static DispatchDetailResponse.StartStopover getStartStopover (Center center, LocalDateTime departureTime) {
         return StartStopover.builder()
                 .centerId(center.getId())
                 .centerName(center.getCenterName())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
+                .departureTime(departureTime)
                 .build();
     }
 
