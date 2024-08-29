@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Getter
+@Builder
 public class Vehicle extends BaseEntity {
 
     @Column(nullable = false)

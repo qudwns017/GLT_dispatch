@@ -30,6 +30,13 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
         );
     }
 
+    Optional<DeliveryDestination> findByRoadAddressAndDetailAddress(String roadAddress, String detailAddress);
+
+    default DeliveryDestination findByFullAddress(String roadAddress, String detailAddress) {
+        return findByRoadAddressAndDetailAddress(roadAddress, detailAddress).orElse(null);
+    }
+
+
     @Query("SELECT d.comment FROM DeliveryDestination d WHERE d.id = :id")
     Optional<String> findCommentById(@Param("id") Long id);
 

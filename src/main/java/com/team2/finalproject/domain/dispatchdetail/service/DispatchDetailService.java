@@ -16,6 +16,7 @@ import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,8 +29,8 @@ public class DispatchDetailService {
     private final CenterRepository centerRepository;
     private final DeliveryDestinationRepository deliveryDestinationRepository;
 
+    @Transactional(readOnly = true)
     public DispatchDetailResponse getDispatchDetail(Long dispatchId) {
-        //
         Dispatch dispatch = dispatchRepository.findByIdWithDetailsOrThrow(dispatchId);
 
         Sm sm = dispatch.getSm();

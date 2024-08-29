@@ -5,12 +5,12 @@ import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.domain.vehicledetail.model.type.VehicleType;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
-
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
