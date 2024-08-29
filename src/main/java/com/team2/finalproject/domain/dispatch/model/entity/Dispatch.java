@@ -49,6 +49,9 @@ public class Dispatch extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String departurePlaceName; // 출발지명
 
+    @Column(nullable = false)
+    private LocalDateTime departureTime; // 출발 시간   상차 완료 후의 시간, 초기 값은 예상 시간
+
     @Column(nullable = true)
     private LocalDateTime arrivalTime; // 도착시간   주행 완료 후의 시간
 
