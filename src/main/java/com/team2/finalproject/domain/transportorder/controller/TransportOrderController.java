@@ -9,21 +9,14 @@ import com.team2.finalproject.domain.transportorder.service.TransportOrderServic
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/transport-order")
@@ -35,7 +28,7 @@ public class TransportOrderController implements SwaggerTransportOrderController
     @PostMapping
     public ResponseEntity<DispatchResponse> TransportOrderToDispatch(
             @RequestBody TransportOrderRequest request, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        DispatchResponse dispatchResponse = transportOrderService.processTransportOrder(request, userDetails.getId());
+        DispatchResponse dispatchResponse = transportOrderService.processTransportOrder(request, userDetails.getUsers());
         return ApiResponse.OK(dispatchResponse);
     }
 

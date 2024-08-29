@@ -4,7 +4,6 @@ import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
-import com.team2.finalproject.domain.dispatch.model.dto.response.CourseDetailResponse;
 import com.team2.finalproject.domain.dispatch.model.dto.response.CourseResponse;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchResponse;
 import com.team2.finalproject.domain.dispatch.model.dto.response.StartStopoverResponse;
@@ -17,7 +16,7 @@ import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAnd
 import com.team2.finalproject.domain.transportorder.model.dto.response.TransportOrderResponse;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
-import com.team2.finalproject.domain.users.repository.UsersRepository;
+import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.domain.vehicle.repository.VehicleRepository;
 import com.team2.finalproject.global.service.KakaoApiService;
@@ -49,12 +48,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class TransportOrderService {
-
     private final CenterRepository centerRepository;
     private final DeliveryDestinationRepository deliveryDestinationRepository;
     private final DispatchNumberRepository dispatchNumberRepository;
     private final SmRepository smRepository;
-    private final UsersRepository usersRepository;
     private final VehicleRepository vehicleRepository;
     private final KakaoApiService kakaoApiService;
     private final OptimizationService optimizationService;
@@ -67,123 +64,34 @@ public class TransportOrderService {
     private static final int COLUMN_PADDING = 8192;
 
     @Transactional
-    public DispatchResponse processTransportOrder(TransportOrderRequest request, Long userId) {
-        // Center 조회
-        Long centerId = usersRepository.findById(userId).orElseThrow().getCenter().getId();
-        Center center = centerRepository.findById(centerId).orElseThrow();
+    public DispatchResponse processTransportOrder(TransportOrderRequest request, Users user) {
+        // Center 조회 및 시작 경유지 생성
+        Center center = getCenterByUser(user);
+        Stopover startStopover = createStartStopover(center);
 
-        Stopover startStopover = Stopover.builder()
-                .address(center.getRoadAddress() + " " + center.getDetailAddress())
-                .lat(center.getLatitude())
-                .lon(center.getLongitude())
-                .delayTime(LocalTime.of(center.getDelayTime()/60,center.getDelayTime()%60,0))
-                .build();
-
-        // 지번 주소와 도로명 주소 간의 매핑을 위한 맵 생성
+        // 지번 주소와 도로명 주소 간의 매핑을 위한 맵 생성(도로명 주소로 로직을 모두 계산하고 마지막에 해당 지번 주소 출력을 위한 맵)
         Map<String, String[]> addressMapping = new HashMap<>();
 
-        // smId와 해당 stopoverList를 매핑
-        Map<Long, List<Stopover>> stopoversGroupedBySmId = request.orderReuquestList().stream()
-                .collect(Collectors.groupingBy(
-                        OrderRequest::smId,
-                        Collectors.mapping(order -> {
-                            // 도로명 주소로 입력받았으므로 도로명 주소로 있는지 조회
-                            DeliveryDestination destination = deliveryDestinationRepository
-                                    .findByFullAddress(order.address(), order.detailAddress());
+        // smId와 해당 stopoverList를 매핑(기사별로 경로를 최적화하기 위함)
+        Map<Long, List<Stopover>> stopoversGroupedBySmId = groupStopoversBySmId(request, addressMapping);
 
-                            if (destination != null) {
-                                String roadAddress = destination.getRoadAddress() + " " + destination.getDetailAddress();
-                                String[] addressArray = {destination.getCustomerAddress(), destination.getDetailAddress()};
-                                addressMapping.put(roadAddress, addressArray);
-
-                                return new Stopover(
-                                        destination.getRoadAddress() + " " + destination.getDetailAddress(),
-                                        destination.getLatitude(),
-                                        destination.getLongitude(),
-                                        LocalTime.of((destination.getDelayTime() + order.expectedServiceDuration()) / 60, (destination.getDelayTime() + order.expectedServiceDuration()) % 60, 0)
-                                );
-                            }
-
-                            AddressInfo addressInfo = kakaoApiService.getAddressInfoFromKakaoAPI(order.address() + " " + order.detailAddress());
-
-                            String roadAddress = order.address() + " " + order.detailAddress();
-                            String[] addressArray = {addressInfo.getCustomerAddress(), order.detailAddress()};
-
-                            // 맵에 지번 주소와 도로명 주소 매핑 추가
-                            addressMapping.put(roadAddress, addressArray);
-                            return new Stopover(
-                                    order.address() + " " + order.detailAddress(),
-                                    addressInfo.getLat(),
-                                    addressInfo.getLon(),
-                                    LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)
-                            );
-                        }, Collectors.toList())));
-
-        // smId 순서를 저장
+        // smId 순서 저장(추후 특정 기사의 주문만 필터링하는데에 쓰임)
         List<Long> smIdOrder = new ArrayList<>(stopoversGroupedBySmId.keySet());
 
-        // 각 smId에 대해 OptimizationRequest 생성
-        List<OptimizationRequest> optimizationRequests = smIdOrder.stream()
-                .map(smId -> new OptimizationRequest(
-                        request.loadingStartTime(),
-                        startStopover,
-                        stopoversGroupedBySmId.get(smId)
-                ))
-                .collect(Collectors.toList());
+        // 최적화 요청 생성 및 경로 최적화
+        List<OptimizationRequest> optimizationRequests =
+                createOptimizationRequests(request, startStopover, stopoversGroupedBySmId);
+        List<CourseResponse> courses = optimizationService.
+                callOptimizationApi(request, optimizationRequests, smIdOrder, addressMapping);
 
-        // 경로 최적화 API 호출 및 처리
-        List<CourseResponse> courses = optimizationService.callOptimizationApi(request, optimizationRequests, smIdOrder, addressMapping);
-
-        // 총 용적률 계산
-        double totalVolume = 0;
-        double totalWeight = 0;
-        double maxLoadVolumeSum = 0;
-        double maxLoadWeightSum = 0;
-
-        for (CourseResponse course : courses) {
-            for (CourseDetailResponse detail : course.getCourseDetailResponseList()) {
-                totalVolume += detail.getVolume();
-                totalWeight += detail.getWeight();
-            }
-
-            Vehicle vehicle = vehicleRepository.findBySm_Id(course.getCourseDetailResponseList().get(0).getSmId());
-            maxLoadVolumeSum += vehicle.getMaxLoadVolume();
-            maxLoadWeightSum += vehicle.getMaxLoadWeight();
-        }
-
-        int totalFloorAreaRatio = 0;
-        String deliveryType = request.orderReuquestList().get(0).deliveryType();
-
-        if ("지입".equals(deliveryType)) {
-            totalFloorAreaRatio = (int)((totalWeight / maxLoadWeightSum) * 100);
-        } else if ("택배".equals(deliveryType)) {
-            totalFloorAreaRatio = (int)((totalVolume / maxLoadVolumeSum) * 100);
-        }
+        // 용적률 계산
+        int totalFloorAreaRatio = calculateTotalFloorAreaRatio(request, courses);
 
         // 시작경유지 응답 생성
-        StartStopoverResponse startStopoverResponse = StartStopoverResponse.builder()
-                .centerId(centerId)
-                .fullAddress(center.getCustomerAddress() + " " + center.getDetailAddress())
-                .lat(center.getLatitude())
-                .lon(center.getLongitude())
-                .expectedServiceDuration(LocalTime.of(center.getDelayTime()/60,center.getDelayTime()%60,0))
-                .build();
+        StartStopoverResponse startStopoverResponse = createStartStopoverResponse(center);
 
-        // 최종 DispatchResponse를 반환
-        return DispatchResponse.builder()
-                .dispatchCode(generateDispatchCode(request, center))  // 배차코드 = 배차번호
-                .dispatchName(request.dispatchName())  // 배차명
-                .totalOrder(courses.stream()
-                        .mapToInt(CourseResponse::getOrderNum).sum())  // 총 주문 수
-                .totalErrorNum((int) courses.stream()
-                        .filter(CourseResponse::isErrorYn).count())  // 오류주문 수
-                .totalTime(courses.stream()
-                        .mapToInt(CourseResponse::getTotalTime).sum())  // 총 예상시간
-                .totalFloorAreaRatio(totalFloorAreaRatio)  // 총 용적률
-                .loadingStartTime(request.loadingStartTime())  // 상차 시작 시간
-                .startStopoverResponse(startStopoverResponse)  // 시작경유지 정보
-                .course(courses)  // 경로별 리스트
-                .build();
+        // 최종 DispatchResponse 반환
+        return createDispatchResponse(request, center, courses, totalFloorAreaRatio, startStopoverResponse);
     }
 
     public void downloadOrderFormExcel(HttpServletResponse response) {
@@ -238,6 +146,137 @@ public class TransportOrderService {
                 .toList();
     }
 
+    private Center getCenterByUser(Users user) {
+        Long centerId = user.getCenter().getId();
+        return centerRepository.findById(centerId).orElseThrow();
+    }
+
+    private Stopover createStartStopover(Center center) {
+        return Stopover.builder()
+                .address(center.getRoadAddress() + " " + center.getDetailAddress())
+                .lat(center.getLatitude())
+                .lon(center.getLongitude())
+                .delayTime(LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0))
+                .build();
+    }
+
+    private Map<Long, List<Stopover>> groupStopoversBySmId(TransportOrderRequest request,
+                                                           Map<String, String[]> addressMapping) {
+        return request.orderReuquestList().stream()
+                .collect(Collectors.groupingBy(
+                        OrderRequest::smId,
+                        Collectors.mapping(order -> createStopover(order, addressMapping), Collectors.toList())
+                ));
+    }
+
+    private Stopover createStopover(OrderRequest order, Map<String, String[]> addressMapping) {
+        DeliveryDestination destination = deliveryDestinationRepository
+                .findByFullAddress(order.address(), order.detailAddress());
+        if (destination != null) {
+            return mapExistingDestinationToStopover(destination, order.expectedServiceDuration(), addressMapping);
+        }
+        return mapNewAddressToStopover(order, addressMapping);
+    }
+
+    private Stopover mapExistingDestinationToStopover(DeliveryDestination destination, int expectedServiceDuration,
+                                                      Map<String, String[]> addressMapping) {
+        String roadAddress = destination.getRoadAddress() + " " + destination.getDetailAddress();
+        String[] addressArray = {destination.getCustomerAddress(), destination.getDetailAddress()};
+        addressMapping.put(roadAddress, addressArray);
+
+        return new Stopover(
+                roadAddress,
+                destination.getLatitude(),
+                destination.getLongitude(),
+                LocalTime.of((destination.getDelayTime() + expectedServiceDuration) / 60,
+                        (destination.getDelayTime() + expectedServiceDuration) % 60, 0)
+        );
+    }
+
+    private Stopover mapNewAddressToStopover(OrderRequest order, Map<String, String[]> addressMapping) {
+        AddressInfo addressInfo = kakaoApiService
+                .getAddressInfoFromKakaoAPI(order.address() + " " + order.detailAddress());
+
+        String roadAddress = order.address() + " " + order.detailAddress();
+        String[] addressArray = {addressInfo.getCustomerAddress(), order.detailAddress()};
+        addressMapping.put(roadAddress, addressArray);
+
+        return new Stopover(
+                roadAddress,
+                addressInfo.getLat(),
+                addressInfo.getLon(),
+                LocalTime.of(order.expectedServiceDuration() / 60,
+                        order.expectedServiceDuration() % 60, 0)
+        );
+    }
+
+    private List<OptimizationRequest> createOptimizationRequests(TransportOrderRequest request,
+                                                                 Stopover startStopover,
+                                                                 Map<Long, List<Stopover>> stopoversGroupedBySmId) {
+        return stopoversGroupedBySmId.values().stream()
+                .map(stopovers -> new OptimizationRequest(
+                        request.loadingStartTime(),
+                        startStopover,
+                        stopovers
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+    private int calculateTotalFloorAreaRatio(TransportOrderRequest request, List<CourseResponse> courses) {
+        double totalVolume = 0;
+        double totalWeight = 0;
+        double maxLoadVolumeSum = 0;
+        double maxLoadWeightSum = 0;
+
+        for (CourseResponse course : courses) {
+            for (CourseResponse.CourseDetailResponse detail : course.getCourseDetailResponseList()) {
+                totalVolume += detail.getVolume();
+                totalWeight += detail.getWeight();
+            }
+
+            Vehicle vehicle = vehicleRepository.findBySm_Id(course.getCourseDetailResponseList().get(0).getSmId());
+            maxLoadVolumeSum += vehicle.getMaxLoadVolume();
+            maxLoadWeightSum += vehicle.getMaxLoadWeight();
+        }
+
+        String deliveryType = request.orderReuquestList().get(0).deliveryType();
+        if ("지입".equals(deliveryType)) {
+            return (int) ((totalWeight / maxLoadWeightSum) * 100);
+        } else if ("택배".equals(deliveryType)) {
+            return (int) ((totalVolume / maxLoadVolumeSum) * 100);
+        }
+
+        return 0;
+    }
+
+    private StartStopoverResponse createStartStopoverResponse(Center center) {
+        return StartStopoverResponse.builder()
+                .centerId(center.getId())
+                .fullAddress(center.getCustomerAddress() + " " + center.getDetailAddress())
+                .lat(center.getLatitude())
+                .lon(center.getLongitude())
+                .expectedServiceDuration(LocalTime.of(center.getDelayTime() / 60,
+                        center.getDelayTime() % 60, 0))
+                .build();
+    }
+
+    private DispatchResponse createDispatchResponse(TransportOrderRequest request, Center center,
+                                                    List<CourseResponse> courses, int totalFloorAreaRatio,
+                                                    StartStopoverResponse startStopoverResponse) {
+        return DispatchResponse.builder()
+                .dispatchCode(generateDispatchCode(request, center))
+                .dispatchName(request.dispatchName())
+                .totalOrder(courses.stream().mapToInt(CourseResponse::getOrderNum).sum())
+                .totalErrorNum((int) courses.stream().filter(CourseResponse::isErrorYn).count())
+                .totalTime(courses.stream().mapToInt(CourseResponse::getTotalTime).sum())
+                .totalFloorAreaRatio(totalFloorAreaRatio)
+                .loadingStartTime(request.loadingStartTime())
+                .startStopoverResponse(startStopoverResponse)
+                .course(courses)
+                .build();
+    }
+
     private String generateDispatchCode(TransportOrderRequest request, Center center) {
         // 상차 시작 일시를 포맷팅
         String formattedDate = request.loadingStartTime().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -245,8 +284,8 @@ public class TransportOrderService {
         // 센터 코드 가져오기
         String centerCode = center.getCenterCode();
 
-        // 센터에 해당하는 상차 시작 일시(시간 포함) 이전의 배차 개수 조회
-        int dispatchCount = dispatchNumberRepository.countByCenterAndLoadingStartTimeBefore(center, request.loadingStartTime());
+        // 센터에 해당하는 당일 날짜의 배차 개수 조회
+        int dispatchCount = dispatchNumberRepository.countByCenterAndLoadingStartTimeOnDate(center, request.loadingStartTime());
 
         // 배차 번호 생성: 개수 + 1
         String dispatchNumber = String.valueOf(dispatchCount + 1);

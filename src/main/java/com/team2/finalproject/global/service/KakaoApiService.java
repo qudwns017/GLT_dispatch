@@ -9,22 +9,20 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class KakaoApiService {
 
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
 
-    @Value("${kakao.api.key}")
-    private String kakaoApiKey;
-
-    public KakaoApiService(WebClient.Builder webClientBuilder) {
-        this.webClientBuilder = webClientBuilder;
+    public KakaoApiService(@Value("${kakao.api.key}") String kakaoApiKey) {
+        this.webClient = WebClient.builder()
+                .baseUrl("https://dapi.kakao.com/v2/local/search/address.json")
+                .defaultHeader("Authorization", "KakaoAK " + kakaoApiKey)
+                .build();
     }
 
     public AddressInfo getAddressInfoFromKakaoAPI(String fullAddress) {
-        WebClient webClient = webClientBuilder.build();
-        String apiUrl = "https://dapi.kakao.com/v2/local/search/address.json?query=" + fullAddress;
-
         JsonNode response = webClient.get()
-                .uri(apiUrl)
-                .header("Authorization", "KakaoAK " + kakaoApiKey)
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("query", fullAddress)
+                        .build())
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .block();
@@ -34,7 +32,8 @@ public class KakaoApiService {
             JsonNode addressNode = document.get("address");
 
             // 지번 주소가 있는 경우, 지번 주소를 사용
-            String customerAddress = addressNode != null ? addressNode.get("address_name").asText() : document.get("address_name").asText();
+            String customerAddress = addressNode != null ?
+                    addressNode.get("address_name").asText() : document.get("address_name").asText();
             double latitude = document.get("y").asDouble();  // 위도
             double longitude = document.get("x").asDouble();  // 경도
 

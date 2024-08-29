@@ -3,7 +3,7 @@ package com.team2.finalproject.global.util;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class Util {
+public class TransportOrderUtil {
 
     public static LocalDateTime addDelayTime(LocalDateTime baseTime, LocalTime delayTime) {
         return baseTime.plusHours(delayTime.getHour())

@@ -1,7 +1,5 @@
 package com.team2.finalproject.domain.transportorder.model.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -14,10 +12,7 @@ public record OrderRequest(
         String orderType, // 주문유형 "배송","수거"
         LocalDate receivedDate, // 주문 접수일
         LocalDate serviceRequestDate, // 작업 희망일
-
-        @Schema(type = "string")
         LocalTime serviceRequestTime, // 희망 도착 시간
-
         String clientName, // 고객명
         String contact, // 고객 연락처
         String address, // 주소

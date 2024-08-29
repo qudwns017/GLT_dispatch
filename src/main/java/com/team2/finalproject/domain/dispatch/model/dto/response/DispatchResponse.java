@@ -1,6 +1,5 @@
 package com.team2.finalproject.domain.dispatch.model.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,10 +19,7 @@ public class DispatchResponse {
     private int totalErrorNum; // 오류주문 수
     private int totalTime;  // 총 예상시간
     private int totalFloorAreaRatio; // 총 용적률
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime loadingStartTime; // 상차 시작 시간
-
     private StartStopoverResponse startStopoverResponse;  // 시작경유지
     private List<CourseResponse> course;  // 경로별 리스트
 }

@@ -5,12 +5,14 @@ import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberErro
 import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberException;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.users.model.entity.Users;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 
 public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, Long> {
 
@@ -118,5 +120,12 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
         return findByIdWithJoin(id).orElseThrow(() -> new DispatchNumberException(DispatchNumberErrorCode.NOT_FOUND_DISPATCH_NUMBER));
     }
 
-    int countByCenterAndLoadingStartTimeBefore(Center center, LocalDateTime loadingStartTime);
+    default int countByCenterAndLoadingStartTimeOnDate(Center center, LocalDateTime loadingStartTime) {
+        LocalDateTime startOfDay = loadingStartTime.toLocalDate().atStartOfDay(); // 해당 날짜의 시작 시간
+        LocalDateTime endOfDay = loadingStartTime.toLocalDate().atTime(LocalTime.MAX); // 해당 날짜의 끝 시간
+
+        return countByCenterAndLoadingStartTimeBetween(center, startOfDay, endOfDay);
+    }
+
+    int countByCenterAndLoadingStartTimeBetween(Center center, LocalDateTime startOfDay, LocalDateTime endOfDay);
 }
