@@ -51,14 +51,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     if (isAccessTokenExpiringSoon(accessToken) && cookieRefreshToken.equals(redisRefreshToken)) {
                         log.info("JWT 토큰 재발급 필요");
                         refreshToken(response, username);
-                        tokenService.addToBlacklist(accessToken);
+                        invalidateToken(accessToken, cookieRefreshToken);
                     } else {
                         setAuthentication(username);
                     }
                 } else if(tokenStatus == TokenStatus.EXPIRED && cookieRefreshToken.equals(redisRefreshToken)) {
                     log.info("JWT 토큰 재발급 필요(만료)");
                     refreshToken(response, username);
-                    tokenService.addToBlacklist(accessToken);
+                    invalidateToken(accessToken, cookieRefreshToken);
                 } else if (tokenStatus == TokenStatus.INVALID) {
                     throw new SecurityException(SecurityErrorCode.INVALID_TOKEN);
                 }
@@ -82,6 +82,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String newAccessToken = jwtProvider.generateToken(username, TokenType.ACCESS);
         jwtProvider.addTokenCookie(response, newAccessToken, TokenType.ACCESS);
         log.info("Access 토큰 재발급: username={}, NewAccessToken={}", username, newAccessToken);
+
+        String newRefreshToken = jwtProvider.generateToken(username, TokenType.REFRESH);
+        tokenService.saveRefreshToken(username, newRefreshToken);
+        jwtProvider.addTokenCookie(response, newRefreshToken, TokenType.REFRESH);
+        log.info("Refresh 토큰 재발급: username={}, NewRefreshToken={}", username, newRefreshToken);
+
         setAuthentication(username);
     }
 
@@ -92,5 +98,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("Authentication 설정: {}", username);
+    }
+
+    private void invalidateToken(String accessToken, String refreshToken){
+        tokenService.addToBlacklist(accessToken);
+        tokenService.deleteRefreshToken(refreshToken);
     }
 }
