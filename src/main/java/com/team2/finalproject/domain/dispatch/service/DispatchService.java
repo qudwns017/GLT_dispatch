@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,15 +99,25 @@ public class DispatchService {
         DispatchNumber savedDispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
 
         for (DispatchList dispatch : request.dispatchList()) {
-            Sm smEntity = smRepository.findByIdOrThrow(dispatch.smId());
             double totalVolume = 0;
             double totalWeight = 0;
             double totalDistance = 0;
             int totalTime = 0;
 
+            Sm smEntity = smRepository.findByIdOrThrow(dispatch.smId());
+
+            GeometryFactory geometryFactory = new GeometryFactory();
+            List<Coordinate> coordinates = new ArrayList<>();
+
+            for (com.team2.finalproject.global.util.response.Coordinate coordinate : dispatch.coordinates()) {
+                coordinates.add(new Coordinate(coordinate.getLat(), coordinate.getLon()));
+            }
+
+            LineString path = geometryFactory.createLineString(coordinates.toArray(new Coordinate[0]));
+
             Dispatch dispatchEntity = DispatchConfirmRequest.toDispatchEntity(
                     request, savedDispatchNumber, smEntity, centerEntity,
-                    totalVolume, totalWeight, totalDistance, totalTime
+                    totalVolume, totalWeight, totalDistance, totalTime, path
             );
 
             Dispatch savedDispatch = dispatchRepository.save(dispatchEntity);
