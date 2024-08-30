@@ -1,6 +1,10 @@
-package com.team2.finalproject.domain.users.service;
+package com.team2.finalproject.global.security.service;
 
+import com.team2.finalproject.domain.center.exception.CenterErrorCode;
+import com.team2.finalproject.domain.center.exception.CenterException;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
+import com.team2.finalproject.domain.sm.exception.SmErrorCode;
+import com.team2.finalproject.domain.sm.exception.SmException;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.users.exception.UsersErrorCode;
 import com.team2.finalproject.domain.users.exception.UsersException;
@@ -31,7 +35,7 @@ import java.util.Objects;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UsersService {
+public class SecurityService {
 
     private final UsersRepository usersRepository;
     private final CenterRepository centerRepository;
@@ -48,13 +52,12 @@ public class UsersService {
             throw new UsersException(UsersErrorCode.DUPLICATE_USERNAME);
         }
 
-        // 이후 센터 데이터 추가 시 활성화
-//        if(!centerRepository.existsById(registerAdminRequest.centerId())) {
-//            throw new CenterException(CenterErrorCode.NOT_FOUND_CENTER);
-//        }
+        if(!centerRepository.existsById(registerAdminRequest.centerId())) {
+            throw new CenterException(CenterErrorCode.NOT_FOUND_CENTER);
+        }
 
         Users users = Users.builder()
-                //.center(centerRepository.findById(registerAdminRequest.centerId()).get())
+                .center(centerRepository.findById(registerAdminRequest.centerId()).get())
                 .name(registerAdminRequest.name())
                 .username(registerAdminRequest.username())
                 .encryptedPassword(passwordEncoder.encode(registerAdminRequest.password()))
@@ -74,19 +77,17 @@ public class UsersService {
             throw new UsersException(UsersErrorCode.DUPLICATE_USERNAME);
         }
 
-        // 이후 센터 데이터 추가 시 활성화
-//        if(!centerRepository.existsById(registerDriverRequest.centerId())) {
-//            throw new CenterException(CenterErrorCode.NOT_FOUND_CENTER);
-//        }
+        if(!centerRepository.existsById(registerDriverRequest.centerId())) {
+            throw new CenterException(CenterErrorCode.NOT_FOUND_CENTER);
+        }
 
-//         이후 SM 데이터 추가 시 활성화
-//        if (!smRepository.existsById(registerDriverRequest.smId())) {
-//            throw new SmException(SmErrorCode.NOT_FOUND_SM);
-//        }
+        if (!smRepository.existsById(registerDriverRequest.smId())) {
+            throw new SmException(SmErrorCode.NOT_FOUND_SM);
+        }
 
         Users users = Users.builder()
-                //.center(centerRepository.findById(registerDriverRequest.centerId()).get())
-                //.sm(smRepository.findById(registerDriverRequest.smId()).get())
+                .center(centerRepository.findById(registerDriverRequest.centerId()).get())
+                .sm(smRepository.findById(registerDriverRequest.smId()).get())
                 .name(registerDriverRequest.name())
                 .username(registerDriverRequest.username())
                 .encryptedPassword(passwordEncoder.encode(registerDriverRequest.password()))

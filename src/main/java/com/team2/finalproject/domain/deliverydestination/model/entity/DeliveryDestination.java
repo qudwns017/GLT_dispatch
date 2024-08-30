@@ -26,7 +26,7 @@ public class DeliveryDestination extends BaseEntity {
     private String roadAddress;  // 도로명주소
 
     @Column(nullable = false, length = 50)
-    private String customerAddress;  // 기본주소
+    private String lotNumberAddress;  // 지번 주소
 
     @Column(nullable = false, length = 50)
     private String detailAddress;  // 상세주소
@@ -35,7 +35,7 @@ public class DeliveryDestination extends BaseEntity {
     private String zipCode;  // 우편번호
 
     @Column(nullable = false, length = 30)
-    private String adminName;  // 담당자명
+    private String managerName;  // 담당자명
 
     @Column(nullable = false, length = 20)
     private String phoneNumber;  // 전화번호

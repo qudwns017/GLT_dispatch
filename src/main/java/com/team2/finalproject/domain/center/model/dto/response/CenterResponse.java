@@ -42,7 +42,7 @@ public record CenterResponse(
                 address(center.getRoadAddress()).
                 detailAddress(center.getDetailAddress()).
                 zipCode(center.getZipCode()).
-                adminName(center.getAdminName()).
+                adminName(center.getManagerName()).
                 phoneNumber(center.getPhoneNumber()).
                 latitude(center.getLatitude()).
                 longitude(center.getLongitude()).

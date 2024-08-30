@@ -51,7 +51,7 @@ public class DispatchNumberService {
         double totalProgressionRate = (double) totalDeliveryOrderCount / totalCompletedOrderCount * 100;
 
         Center center = dispatchNumber.getCenter();
-        DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),center.getCustomerAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
+        DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),center.getLotNumberAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
 
         List<DispatchListResponse.Issue> issueList = new ArrayList<>();
 
@@ -144,7 +144,7 @@ public class DispatchNumberService {
                     dispatchCodeId,
                     dispatch.getId(),
                     dispatch.getSmName(),
-                    dispatchDetail.getTransportOrder().getCustomerAddress(),
+                    dispatchDetail.getTransportOrder().getLotNumberAddress(),
                     dispatchDetail.getDestinationId(),
                     comment
                 );
@@ -278,7 +278,7 @@ public class DispatchNumberService {
                     .startDateTime(dispatchNumber.getLoadingStartTime())
                     .totalOrder(totalOrder)
                     .smNum(smNum)
-                    .manager(dispatchNumber.getUsers().getName())
+                    .manager(dispatchNumber.getManager().getName())
                     .build());
         }
         return results;

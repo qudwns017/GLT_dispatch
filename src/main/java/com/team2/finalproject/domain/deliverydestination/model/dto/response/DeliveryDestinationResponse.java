@@ -42,7 +42,7 @@ public record DeliveryDestinationResponse(
                 address(deliveryDestination.getRoadAddress()).
                 detailAddress(deliveryDestination.getDetailAddress()).
                 zipCode(deliveryDestination.getZipCode()).
-                adminName(deliveryDestination.getAdminName()).
+                adminName(deliveryDestination.getManagerName()).
                 phoneNumber(deliveryDestination.getPhoneNumber()).
                 latitude(deliveryDestination.getLatitude()).
                 longitude(deliveryDestination.getLongitude()).

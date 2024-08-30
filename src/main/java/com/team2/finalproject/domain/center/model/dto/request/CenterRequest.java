@@ -39,7 +39,7 @@ public record CenterRequest(
                 roadAddress(request.address()).
                 detailAddress(request.detailAddress()).
                 zipCode(request.zipCode()).
-                adminName(request.adminName()).
+                managerName(request.adminName()).
                 phoneNumber(request.phoneNumber()).
                 latitude(request.latitude()).
                 longitude(request.longitude()).
