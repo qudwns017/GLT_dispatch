@@ -68,12 +68,12 @@ public class DispatchService {
                 OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
 
         DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
-            optimizationResponse.startStopover().address(),
-            optimizationResponse.startStopover().lat(),
-            optimizationResponse.startStopover().lon(),
-            optimizationResponse.startStopover().delayTime().getHour() * 60
-                + optimizationResponse.startStopover().delayTime().getMinute(),
-            optimizationResponse.resultStopoverList().get(0).startTime()
+                optimizationResponse.startStopover().address(),
+                optimizationResponse.startStopover().lat(),
+                optimizationResponse.startStopover().lon(),
+                optimizationResponse.startStopover().delayTime().getHour() * 60
+                        + optimizationResponse.startStopover().delayTime().getMinute(),
+                optimizationResponse.resultStopoverList().get(0).startTime()
         );
 
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
@@ -86,14 +86,14 @@ public class DispatchService {
 
     @Transactional
     public void confirmDispatch(DispatchConfirmRequest request, UserDetailsImpl userDetails) {
-        List<Dispatch> pendingDispatchList = new ArrayList<>();
+        List<Dispatch> updateDispatchList = new ArrayList<>();
         List<DispatchDetail> pendingDispatchDetailList = new ArrayList<>();
-        List<TransportOrder> pendingTransportOrderList = new ArrayList<>();
 
         Users usersEntity = usersRepository.findByIdOrThrow(userDetails.getId());
         Center centerEntity = usersEntity.getCenter();
         DispatchNumber dispatchNumberEntity = DispatchConfirmRequest.toDispatchNumberEntity(request, usersEntity,
                 centerEntity);
+        DispatchNumber savedDispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
 
         for (DispatchList dispatch : request.dispatchList()) {
             Sm smEntity = smRepository.findByIdOrThrow(dispatch.smId());
@@ -103,16 +103,17 @@ public class DispatchService {
             int totalTime = 0;
 
             Dispatch dispatchEntity = DispatchConfirmRequest.toDispatchEntity(
-                    request, dispatchNumberEntity, smEntity, centerEntity,
+                    request, savedDispatchNumber, smEntity, centerEntity,
                     totalVolume, totalWeight, totalDistance, totalTime
             );
 
-            pendingDispatchList.add(dispatchEntity);
+            Dispatch savedDispatch = dispatchRepository.save(dispatchEntity);
 
             for (DispatchDetailList dispatchDetail : dispatch.dispatchDetailList()) {
-                TransportOrder transportOrderEntity = DispatchConfirmRequest.toTransportOrderEntity(
-                        dispatchDetail, centerEntity
-                );
+                TransportOrder savedTransportOrderEntity = transportOrderRepository.save(
+                        DispatchConfirmRequest.toTransportOrderEntity(
+                                dispatchDetail, centerEntity
+                        ));
 
                 totalVolume += dispatchDetail.volume();
                 totalWeight += dispatchDetail.weight();
@@ -120,16 +121,15 @@ public class DispatchService {
                 totalTime += dispatchDetail.ett();
 
                 pendingDispatchDetailList.add(DispatchConfirmRequest.toDispatchDetailEntity(
-                        dispatchDetail, dispatchEntity, transportOrderEntity
+                        dispatchDetail, savedDispatch, savedTransportOrderEntity
                 ));
-                pendingTransportOrderList.add(transportOrderEntity);
             }
+            savedDispatch.update(totalVolume, totalWeight, totalDistance, totalTime);
+            updateDispatchList.add(savedDispatch);
         }
 
-        dispatchNumberRepository.save(dispatchNumberEntity);
-        dispatchRepository.saveAll(pendingDispatchList);
+        dispatchRepository.saveAll(updateDispatchList);
         dispatchDetailRepository.saveAll(pendingDispatchDetailList);
-        transportOrderRepository.saveAll(pendingTransportOrderList);
     }
 
     private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(
