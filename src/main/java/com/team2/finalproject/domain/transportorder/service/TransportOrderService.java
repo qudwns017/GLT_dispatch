@@ -10,9 +10,9 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.StartStopoverRe
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.dto.request.OrderRequest;
-import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameAndZipCodeRequest;
+import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.request.TransportOrderRequest;
-import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndZipCodeResponse;
+import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndSmIdResponse;
 import com.team2.finalproject.domain.transportorder.model.dto.response.TransportOrderResponse;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
@@ -21,6 +21,7 @@ import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.domain.vehicle.repository.VehicleRepository;
 import com.team2.finalproject.global.service.KakaoApiService;
 import com.team2.finalproject.global.service.OptimizationService;
+import com.team2.finalproject.global.util.TransportOrderUtil;
 import com.team2.finalproject.global.util.request.OptimizationRequest;
 import com.team2.finalproject.global.util.request.Stopover;
 import com.team2.finalproject.global.util.response.AddressInfo;
@@ -38,8 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -72,23 +73,23 @@ public class TransportOrderService {
         // 지번 주소와 도로명 주소 간의 매핑을 위한 맵 생성(도로명 주소로 로직을 모두 계산하고 마지막에 해당 지번 주소 출력을 위한 맵)
         Map<String, String[]> addressMapping = new HashMap<>();
 
-        // smId와 해당 stopoverList를 매핑(기사별로 경로를 최적화하기 위함)
-        Map<Long, List<Stopover>> stopoversGroupedBySmId = groupStopoversBySmId(request, addressMapping);
+        // 주문을 smId별로 분류하고, 각 주소를 키값으로 주문 매핑(최적화 후 응답받은 경유지들과 매칭 예정)
+        Map<Long, Map<String, List<OrderRequest>>> mapOrderAndAddressBySmId = MapOrderAndAddressBySmId(request);
 
-        // smId 순서 저장(추후 특정 기사의 주문만 필터링하는데에 쓰임)
-        List<Long> smIdOrder = new ArrayList<>(stopoversGroupedBySmId.keySet());
+        // 주문의 주소에 해당하는 stopover 제작 및 stopover를 smId별로 분류하여 매핑(기사별로 경로를 최적화하기 위함)
+        Map<Long, List<Stopover>> stopoversGroupedBySmId = groupStopoversBySmId(request, addressMapping);
 
         // 최적화 요청 생성 및 경로 최적화
         List<OptimizationRequest> optimizationRequests =
                 createOptimizationRequests(request, startStopover, stopoversGroupedBySmId);
         List<CourseResponse> courses = optimizationService.
-                callOptimizationApi(request, optimizationRequests, smIdOrder, addressMapping);
+                callOptimizationApi(optimizationRequests, mapOrderAndAddressBySmId, addressMapping);
 
         // 용적률 계산
         int totalFloorAreaRatio = calculateTotalFloorAreaRatio(request, courses);
 
-        // 시작경유지 응답 생성
-        StartStopoverResponse startStopoverResponse = createStartStopoverResponse(center);
+        // 출발지 응답 생성
+        StartStopoverResponse startStopoverResponse = createStartStopoverResponse(request, center);
 
         // 최종 DispatchResponse 반환
         return createDispatchResponse(request, center, courses, totalFloorAreaRatio, startStopoverResponse);
@@ -131,18 +132,19 @@ public class TransportOrderService {
             log.error(e.getMessage());
         }
     }
-    
-    public List<SmNameAndZipCodeResponse> validateSmNameAndZipCodes(List<SmNameAndZipCodeRequest> requests) {
-        Map<String, Integer> smNameWithIdMap = smRepository.findAllSmNameWithIdsToMap();
-        Map<String, Integer> zipWithIdMap = deliveryDestinationRepository.findAllZipCodeWithIdsToMap();
 
+    public List<SmNameAndSmIdResponse> validateSmNames(List<SmNameRequest> requests) {
         return requests.stream()
-                .map(request -> SmNameAndZipCodeResponse.builder()
-                        .zipCodeValid(zipWithIdMap.containsKey(request.zipCode()))
-                        .deliveryDestinationId(zipWithIdMap.getOrDefault(request.zipCode(), 0))
-                        .smNameValid(smNameWithIdMap.containsKey(request.smName()))
-                        .smId(smNameWithIdMap.getOrDefault(request.smName(), 0))
-                        .build())
+                .map(request -> {
+                    Long smId = smRepository.findSmIdBySmName(request.smName());
+                    boolean isValid = smId != null;
+                    int resultSmId = isValid ? smId.intValue() : 0;
+
+                    return SmNameAndSmIdResponse.builder()
+                            .smNameValid(isValid)
+                            .smId(resultSmId)
+                            .build();
+                })
                 .toList();
     }
 
@@ -160,11 +162,25 @@ public class TransportOrderService {
                 .build();
     }
 
+    private Map<Long, Map<String, List<OrderRequest>>> MapOrderAndAddressBySmId(TransportOrderRequest request) {
+        return request.orderReuquestList().stream()
+                .collect(Collectors.groupingBy(
+                        OrderRequest::smId,
+                        LinkedHashMap::new, // smId 순서를 유지하기 위해 LinkedHashMap 사용
+                        Collectors.groupingBy(
+                                order -> order.address() + " " + order.detailAddress(),
+                                LinkedHashMap::new, // 주소 순서를 유지하기 위해 LinkedHashMap 사용
+                                Collectors.toList()
+                        )
+                ));
+    }
+
     private Map<Long, List<Stopover>> groupStopoversBySmId(TransportOrderRequest request,
                                                            Map<String, String[]> addressMapping) {
         return request.orderReuquestList().stream()
                 .collect(Collectors.groupingBy(
                         OrderRequest::smId,
+                        LinkedHashMap::new,  // 순서 유지를 위해 LinkedHashMap 사용
                         Collectors.mapping(order -> createStopover(order, addressMapping), Collectors.toList())
                 ));
     }
@@ -250,7 +266,7 @@ public class TransportOrderService {
         return 0;
     }
 
-    private StartStopoverResponse createStartStopoverResponse(Center center) {
+    private StartStopoverResponse createStartStopoverResponse(TransportOrderRequest request, Center center) {
         return StartStopoverResponse.builder()
                 .centerId(center.getId())
                 .fullAddress(center.getLotNumberAddress() + " " + center.getDetailAddress())
@@ -258,6 +274,8 @@ public class TransportOrderService {
                 .lon(center.getLongitude())
                 .expectedServiceDuration(LocalTime.of(center.getDelayTime() / 60,
                         center.getDelayTime() % 60, 0))
+                .departureTime(TransportOrderUtil.addDelayTime(request.loadingStartTime(),
+                        LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0)))
                 .build();
     }
 

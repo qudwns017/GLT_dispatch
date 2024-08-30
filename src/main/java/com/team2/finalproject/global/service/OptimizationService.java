@@ -6,7 +6,6 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.CourseResponse;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.dto.request.OrderRequest;
-import com.team2.finalproject.domain.transportorder.model.dto.request.TransportOrderRequest;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.domain.vehicle.repository.VehicleRepository;
 import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class OptimizationService {
@@ -46,9 +44,9 @@ public class OptimizationService {
         this.webClient = WebClient.builder().baseUrl(uri).build();
     }
 
-    public List<CourseResponse> callOptimizationApi(TransportOrderRequest request,
-                                                    List<OptimizationRequest> optimizationRequests,
-                                                    List<Long> smIdOrder, Map<String, String[]> addressMapping) {
+    public List<CourseResponse> callOptimizationApi(List<OptimizationRequest> optimizationRequests,
+                                                    Map<Long, Map<String, List<OrderRequest>>> mapOrderAndAddressBySmId,
+                                                    Map<String, String[]> addressMapping) {
         // 최적화 API 호출
         List<OptimizationResponse> responses = webClient.post()
                 .uri("/api/Optimization")
@@ -63,10 +61,13 @@ public class OptimizationService {
             throw new RuntimeException("Failed to optimize route");
         }
 
+        List<Long> keys = new ArrayList<>(mapOrderAndAddressBySmId.keySet());
         List<CourseResponse> courses = new ArrayList<>();
         for (int i = 0; i < responses.size(); i++) {
             // 하나의 경로 응답 생성
-            CourseResponse courseResponse = createCourseResponse(request, smIdOrder.get(i), responses.get(i), addressMapping);
+            Long key = keys.get(i);
+            CourseResponse courseResponse =
+                    createCourseResponse(mapOrderAndAddressBySmId.get(key), responses.get(i), addressMapping);
             courses.add(courseResponse);
         }
 
@@ -74,16 +75,14 @@ public class OptimizationService {
     }
 
     // 하나의 경로에 대한 작업
-    private CourseResponse createCourseResponse(TransportOrderRequest request, Long smId,
+    private CourseResponse createCourseResponse(Map<String, List<OrderRequest>> mapOrderAndAddress,
                                                 OptimizationResponse response, Map<String, String[]> addressMapping) {
-        Sm sm = smRepository.findByIdOrThrow(smId);
+        Sm sm = smRepository.findByIdOrThrow(mapOrderAndAddress.get(mapOrderAndAddress.keySet().iterator().next()).get(0).smId());
         Vehicle vehicle = vehicleRepository.findBySm(sm);
         VehicleDetail vehicleDetail = vehicleDetailRepository.findByVehicle(vehicle);
 
-        // smId를 필터링하여 해당 기사의 주문 리스트 받아오기
-        Map<String, List<OrderRequest>> orderRequestMap = mapOrdersWithAddresses(request, smId);
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList =
-                createCourseDetailResponseList(response.getResultStopoverList(), orderRequestMap, vehicleDetail, addressMapping);
+                createCourseDetailResponseList(response.getResultStopoverList(), mapOrderAndAddress, vehicleDetail, addressMapping);
 
         int floorAreaRatio = calculateFloorAreaRatio(vehicle, courseDetailResponseList);
         List<CourseResponse.CoordinatesResponse> coordinatesResponseList = mapCoordinates(response);
@@ -91,31 +90,20 @@ public class OptimizationService {
         return buildCourseResponse(sm, vehicleDetail, response, floorAreaRatio, courseDetailResponseList, coordinatesResponseList);
     }
 
-    private Map<String, List<OrderRequest>> mapOrdersWithAddresses(TransportOrderRequest request, Long smId) {
-        return request.orderReuquestList().stream()
-                .filter(order -> order.smId().equals(smId))
-                .collect(Collectors.groupingBy(order -> order.address() + " " + order.detailAddress()));
-    }
-
     private List<CourseResponse.CourseDetailResponse> createCourseDetailResponseList(List<ResultStopover> stopovers,
                                                                                      Map<String, List<OrderRequest>> orderRequestMap,
                                                                                      VehicleDetail vehicleDetail,
                                                                                      Map<String, String[]> addressMapping) {
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList = new ArrayList<>();
-        boolean errorYn = false;
 
         for (ResultStopover stopover : stopovers) {
-            // 앞서 만든 특정 기사의 주문 리스트에서 도로명 주소가 매칭되는 주문 불러오기
+            // 앞서 만든 특정 기사의 (주소, 주문) 맵에서 도로명 주소가 매칭되는 주문 불러오기
             OrderRequest matchingOrder = findMatchingOrder(orderRequestMap, stopover.getAddress());
             DeliveryDestination destination = findDestination(stopover);
 
             // 배송처(경유지)별로 진입 불가 톤코드를 검사
             boolean isRestricted = checkRestrictedTonCode(vehicleDetail.getVehicleCode(),
                     destination != null ? destination.getRestrictedTonCode() : null);
-
-            if (isRestricted) {
-                errorYn = true;
-            }
 
             courseDetailResponseList.add(createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, addressMapping));
         }
