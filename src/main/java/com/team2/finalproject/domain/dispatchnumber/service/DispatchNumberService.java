@@ -10,7 +10,7 @@ import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.dispatchnumber.model.dto.request.DispatchNumberSearchRequest;
 import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse;
-import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.DispatchResponse;
+import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchListResponse.DispatchSimpleResponse;
 import com.team2.finalproject.domain.dispatchnumber.model.dto.response.DispatchNumberSearchResponse;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
@@ -55,7 +55,7 @@ public class DispatchNumberService {
 
         List<DispatchListResponse.Issue> issueList = new ArrayList<>();
 
-        List<DispatchListResponse.DispatchResponse> dispatchResponseList = dispatchList.stream()
+        List<DispatchSimpleResponse> dispatchResponseList = dispatchList.stream()
             .map((dispatch) -> {
                 double progressionRate = (double) dispatch.getDeliveryOrderCount() / dispatch.getCompletedOrderCount() * 100;
 
@@ -64,7 +64,7 @@ public class DispatchNumberService {
 
                 issueList.addAll(getIssueListOfDispatch(dispatch, dispatchCodeId));
 
-                return DispatchResponse.of(dispatch.getId(), dispatch.getDeliveryStatus().getDescription(), dispatch.getSmName(), dispatch.getCompletedOrderCount(), dispatch.getDeliveryOrderCount(), (int) progressionRate,stopoverList,coordinates );
+                return DispatchSimpleResponse.of(dispatch.getId(), dispatch.getDeliveryStatus().getDescription(), dispatch.getSmName(), dispatch.getCompletedOrderCount(), dispatch.getDeliveryOrderCount(), (int) progressionRate,stopoverList,coordinates );
             }).toList();
 
         return DispatchListResponse.of(dispatchNumber.getDispatchNumber(), dispatchNumber.getDispatchName(),(int) totalProgressionRate,totalCompletedOrderCount,totalDeliveryOrderCount,issueList.size(),startStopover,dispatchResponseList,issueList);
