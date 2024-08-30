@@ -80,7 +80,7 @@ public record DispatchConfirmRequest(
                 .dispatchName(request.dispatchName())
                 .loadingStartTime(request.loadingStartTime())
                 .status(DispatchNumberStatus.WAITING)
-                .users(users)
+                .manager(users)
                 .center(center)
                 .build();
     }
@@ -157,7 +157,7 @@ public record DispatchConfirmRequest(
                 .customerName(list.clientName())
                 .customerNotes(list.note())
                 .customerPhoneNumber(list.phoneNumber())
-                .customerAddress(list.address())
+                .lotNumberAddress(list.address())
                 .zipCode(list.zipcode())
                 .roadAddress(list.roadAddress())
                 .detailAddress(list.detailAddress())
