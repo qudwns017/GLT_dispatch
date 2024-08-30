@@ -70,7 +70,7 @@ public class Dispatch extends BaseEntity {
     @Column(nullable = false)
     private DispatchStatus deliveryStatus = DispatchStatus.IN_TRANSIT; // 배차상태
 
-    @Column(columnDefinition = "geometry(LineString)",nullable = false)
+    @Column(columnDefinition = "geometry(LineString)", nullable = false)
     private LineString path;
 
     @Column(nullable = true, length = 300)
@@ -86,18 +86,30 @@ public class Dispatch extends BaseEntity {
     private List<DispatchDetail> dispatchDetailList;
 
     public void update(IssueRequest request) {
-            this.issue = request.issue();
+        this.issue = request.issue();
+    }
+
+    public void update(
+            double totalVolume,
+            double totalWeight,
+            double totalDistance,
+            int totalTime
+    ) {
+        this.totalVolume = totalVolume;
+        this.totalWeight = totalWeight;
+        this.totalDistance = totalDistance;
+        this.totalTime = LocalTime.of(0, totalTime);
     }
 
     public void minusOrderCount(int minusOrderCount) {
-        if(deliveryOrderCount - minusOrderCount < 0){
+        if (deliveryOrderCount - minusOrderCount < 0) {
             this.deliveryOrderCount = 0;
-        }else{
+        } else {
             this.deliveryOrderCount -= minusOrderCount;
         }
     }
 
-    public void complete(){
+    public void complete() {
         this.deliveryStatus = DispatchStatus.COMPLETED;
     }
 }
