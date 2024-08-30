@@ -79,4 +79,8 @@ public class DispatchDetail extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private TransportOrder transportOrder;
+
+    public void cancel(){
+        this.dispatchDetailStatus = DispatchDetailStatus.CANCELED;
+    }
 }

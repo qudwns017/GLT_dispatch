@@ -181,7 +181,7 @@ public class TransportOrderService {
     private Stopover mapExistingDestinationToStopover(DeliveryDestination destination, int expectedServiceDuration,
                                                       Map<String, String[]> addressMapping) {
         String roadAddress = destination.getRoadAddress() + " " + destination.getDetailAddress();
-        String[] addressArray = {destination.getCustomerAddress(), destination.getDetailAddress()};
+        String[] addressArray = {destination.getLotNumberAddress(), destination.getDetailAddress()};
         addressMapping.put(roadAddress, addressArray);
 
         return new Stopover(
@@ -253,7 +253,7 @@ public class TransportOrderService {
     private StartStopoverResponse createStartStopoverResponse(Center center) {
         return StartStopoverResponse.builder()
                 .centerId(center.getId())
-                .fullAddress(center.getCustomerAddress() + " " + center.getDetailAddress())
+                .fullAddress(center.getLotNumberAddress() + " " + center.getDetailAddress())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
                 .expectedServiceDuration(LocalTime.of(center.getDelayTime() / 60,
@@ -353,7 +353,7 @@ public class TransportOrderService {
 
         if (destinationId != null){
             DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByIdOrThrow(destinationId);
-            return TransportOrderResponse.of(transportOrder,deliveryDestination.getAdminName(),deliveryDestination.getPhoneNumber(),destinationId);
+            return TransportOrderResponse.of(transportOrder,deliveryDestination.getManagerName(),deliveryDestination.getPhoneNumber(),destinationId);
         }
         return TransportOrderResponse.of(transportOrder);
     }

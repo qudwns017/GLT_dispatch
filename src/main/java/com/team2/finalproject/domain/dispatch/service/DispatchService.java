@@ -58,7 +58,6 @@ public class DispatchService {
             optimizationResponse.startStopover().lon(),
             optimizationResponse.startStopover().delayTime().getHour() * 60
                 + optimizationResponse.startStopover().delayTime().getMinute(),
-            optimizationResponse.startTime(),
             optimizationResponse.resultStopoverList().get(0).startTime()
         );
 
@@ -110,9 +109,6 @@ public class DispatchService {
         //  dispatchNumberIds에 해당하는 배차 코드를 지닌 DispatchNumber 리스트 조회
         List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findByIdIn(dispatchNumberIds);
 
-        // 기사 주행 중 -> 주행 대기
-        updateSmStatusToNotDriving(dispatchNumbersToCancel);
-
         // DispatchNumber 상태 COMPLETED로 변경
         updateDispatchNumberStatusToCompleted(dispatchNumbersToCancel);
 
@@ -120,18 +116,6 @@ public class DispatchService {
         dispatchNumbersToCancel.stream()
                 .flatMap(dn -> dn.getDispatchList().stream())
                 .forEach(this::processDispatchCancellation);
-    }
-
-    // 기사 배송 상태 변경
-    private void updateSmStatusToNotDriving(List<DispatchNumber> dispatchNumbers) {
-        dispatchNumbers.stream()
-                .flatMap(dn -> dn.getDispatchList().stream())
-                .map(Dispatch::getSm)
-                .distinct()
-                .forEach(sm -> {
-                    sm.setIsDriving(false);
-                    smRepository.save(sm);
-                });
     }
 
     // DispatchNumber 상태 COMPLETED로 변경

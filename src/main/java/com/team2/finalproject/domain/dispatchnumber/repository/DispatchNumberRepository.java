@@ -25,9 +25,9 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
                                                                    @Param("startDateTime") LocalDateTime startDateTime,
                                                                    @Param("endDateTime") LocalDateTime endDateTime);
 
-    // 2. 센터 코드, 담당자Id를 기준으로 조회
+    // 2. 센터 코드, 담당자를 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
-            "WHERE d.center = :center AND d.users = :users " +
+            "WHERE d.center = :center AND d.manager = :users " +
             "AND d.loadingStartTime " +
             "BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterAndUsersAndLoadStartDateTimeBetween(@Param("center") Center center,
@@ -47,7 +47,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 4. 센터, 담당자, 배차 번호를 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
-            "WHERE d.center = :center AND d.users = :users " +
+            "WHERE d.center = :center AND d.manager = :users " +
             "AND d.dispatchNumber = :dispatchCode " +
             "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterAndUsersAndDispatchCodeAndLoadStartDateTimeBetween(@Param("center")Center center,
@@ -68,7 +68,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
 
     // 6. 센터, 담당자, 배차명을 기준으로 조회
     @Query("SELECT d FROM DispatchNumber d " +
-            "WHERE d.center = :center AND d.users = :users " +
+            "WHERE d.center = :center AND d.manager = :users " +
             "AND d.dispatchName = :dispatchName " +
             "AND d.loadingStartTime BETWEEN :startDateTime AND :endDateTime")
     List<DispatchNumber> findByCenterAndUsersAndDispatchNameAndLoadStartDateTimeBetween(@Param("center") Center center,
@@ -96,7 +96,7 @@ public interface DispatchNumberRepository extends JpaRepository<DispatchNumber, 
             "JOIN FETCH dn.dispatchList d " +
             "JOIN FETCH d .sm sm " +
             "WHERE dn.center = :center " +
-            "AND dn.users = :users " +
+            "AND dn.manager = :users " +
             "AND dn.loadingStartTime BETWEEN :startDateTime AND :endDateTime " +
             "AND sm.smName = :smName")
     List<DispatchNumber> findByCenterAndUsersAndSmNameAndLoadStartDateTimeBetween(

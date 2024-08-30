@@ -39,12 +39,16 @@ public class DispatchNumber extends BaseEntity {
     private DispatchNumberStatus status = DispatchNumberStatus.WAITING; // 상태
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Users users; // 담당자
+    private Users manager; // 담당자
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center; // 소속 센터
 
     @OneToMany(mappedBy = "dispatchNumber", cascade = CascadeType.REMOVE)
     private List<Dispatch> dispatchList;
+
+    public void complete(){
+        this.status = DispatchNumberStatus.COMPLETED;
+    }
 
 }

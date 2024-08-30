@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -43,10 +42,6 @@ public class Sm extends BaseEntity {
 
     @Column(nullable = false)
     private LocalTime breakTime;  // 휴게시간
-
-    @Setter
-    @Column(nullable = false)
-    private Boolean isDriving;  // 상태  주행여부
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;  // 센터 ID
