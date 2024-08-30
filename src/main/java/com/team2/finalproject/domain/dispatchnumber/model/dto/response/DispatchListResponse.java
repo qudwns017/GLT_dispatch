@@ -2,10 +2,11 @@ package com.team2.finalproject.domain.dispatchnumber.model.dto.response;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor
@@ -24,10 +25,10 @@ public class DispatchListResponse {
     @Schema(example = "3", description = "이슈 주문수")
     private int issueOrderNum;
     private StartStopover startStopover;
-    private List<DispatchResponse> dispatchList;
+    private List<DispatchSimpleResponse> dispatchList;
     private List<Issue> issueList;
 
-    private DispatchListResponse(String dispatchCode,String dispatchName, int totalProgressionRate,int totalCompletedOrderNum, int totalOrderNum, int issueOrderNum, StartStopover startStopover,List<DispatchResponse> dispatchList,List<Issue> issueList){
+    private DispatchListResponse(String dispatchCode,String dispatchName, int totalProgressionRate,int totalCompletedOrderNum, int totalOrderNum, int issueOrderNum, StartStopover startStopover,List<DispatchSimpleResponse> dispatchList,List<Issue> issueList){
         this.dispatchCode = dispatchCode;
         this.dispatchName = dispatchName;
         this.totalProgressionRate = totalProgressionRate;
@@ -39,7 +40,7 @@ public class DispatchListResponse {
         this.issueList = issueList;
     }
 
-    public static DispatchListResponse of(String dispatchCode,String dispatchName, int totalProgressionRate,int totalCompletedOrderNum, int totalOrderNum, int issueOrderNum, StartStopover startStopover,List<DispatchResponse> dispatchList,List<Issue> issueList){
+    public static DispatchListResponse of(String dispatchCode,String dispatchName, int totalProgressionRate,int totalCompletedOrderNum, int totalOrderNum, int issueOrderNum, StartStopover startStopover,List<DispatchSimpleResponse> dispatchList,List<Issue> issueList){
         return new DispatchListResponse(dispatchCode,dispatchName,totalProgressionRate,totalCompletedOrderNum,totalOrderNum,issueOrderNum,startStopover,dispatchList,issueList);
     }
 
@@ -72,7 +73,7 @@ public class DispatchListResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class DispatchResponse{
+    public static class DispatchSimpleResponse{
         @Schema(example = "2", description = "배차id")
         private Long dispatchId;
         @Schema(example = "주행중", description = "배차상태(주행중, 주행대기, 주행완료)")
@@ -102,7 +103,7 @@ public class DispatchListResponse {
         )
         private List<Map<String, Double>> coordinates;
 
-        private DispatchResponse(Long dispatchId,String dispatchStatus,String smName, int completedOrderNum,int orderNum,int progressionRate,List<Map<String, Double>> stopoverList,List<Map<String, Double>> coordinates){
+        private DispatchSimpleResponse(Long dispatchId,String dispatchStatus,String smName, int completedOrderNum,int orderNum,int progressionRate,List<Map<String, Double>> stopoverList,List<Map<String, Double>> coordinates){
             this.dispatchId = dispatchId;
             this.dispatchStatus = dispatchStatus;
             this.smName = smName;
@@ -113,8 +114,8 @@ public class DispatchListResponse {
             this.coordinates = coordinates;
         }
 
-        public static DispatchResponse of(Long dispatchId,String dispatchStatus,String smName, int completedOrderNum,int orderNum,int progressionRate,List<Map<String, Double>> stopoverList,List<Map<String, Double>> coordinates){
-            return new DispatchResponse(dispatchId,dispatchStatus,smName,completedOrderNum,orderNum,progressionRate,stopoverList,coordinates);
+        public static DispatchSimpleResponse of(Long dispatchId,String dispatchStatus,String smName, int completedOrderNum,int orderNum,int progressionRate,List<Map<String, Double>> stopoverList,List<Map<String, Double>> coordinates){
+            return new DispatchSimpleResponse(dispatchId,dispatchStatus,smName,completedOrderNum,orderNum,progressionRate,stopoverList,coordinates);
         }
     }
 

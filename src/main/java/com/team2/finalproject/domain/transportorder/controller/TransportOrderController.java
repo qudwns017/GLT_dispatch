@@ -3,7 +3,7 @@ package com.team2.finalproject.domain.transportorder.controller;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchResponse;
 import com.team2.finalproject.domain.transportorder.model.dto.request.TransportOrderRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.request.ValidationListRequest;
-import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndZipCodeResponse;
+import com.team2.finalproject.domain.transportorder.model.dto.response.SmNameAndSmIdResponse;
 import com.team2.finalproject.domain.transportorder.model.dto.response.TransportOrderResponse;
 import com.team2.finalproject.domain.transportorder.service.TransportOrderService;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
@@ -47,10 +47,10 @@ public class TransportOrderController implements SwaggerTransportOrderController
     }
 
     @PostMapping("/valid")
-    public ResponseEntity<List<SmNameAndZipCodeResponse>> validateSmNameAndZipCodes(
+    public ResponseEntity<List<SmNameAndSmIdResponse>> validateSmNameAndSmIds(
             @RequestBody ValidationListRequest request) {
 
-        List<SmNameAndZipCodeResponse> results = transportOrderService.validateSmNameAndZipCodes(request.requests());
+        List<SmNameAndSmIdResponse> results = transportOrderService.validateSmNames(request.requests());
 
         return ApiResponse.OK(results);
     }

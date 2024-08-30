@@ -1,10 +1,12 @@
 package com.team2.finalproject.domain.dispatch.model.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -12,9 +14,21 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StartStopoverResponse {
-    private long centerId;  // 센터 ID (출발지)
-    private String fullAddress;  // 출발지 주소
-    private double lat;  // 출발지 위도
-    private double lon;  // 출발지 경도
-    private LocalTime expectedServiceDuration;  // 상차 작업 시간 (기본 1시간)
+    @Schema(description = "센터 ID (출발지)", example = "123")
+    private long centerId;
+
+    @Schema(description = "출발지 주소", example = "서울시 강동구 천호동")
+    private String fullAddress;
+
+    @Schema(description = "출발지 위도", example = "37.5409")
+    private double lat;
+
+    @Schema(description = "출발지 경도", example = "127.1263")
+    private double lon;
+
+    @Schema(description = "상차 작업 시간 (기본 1시간)", example = "01:00")
+    private LocalTime expectedServiceDuration;
+
+    @Schema(description = "첫 경유지로 운송 시작 시간", example = "2024-08-30T10:00:00")
+    private LocalDateTime departureTime;
 }
