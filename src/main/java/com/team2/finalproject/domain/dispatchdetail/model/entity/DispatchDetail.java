@@ -56,11 +56,17 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = false)
     private Long distance; //이동거리
 
+    @Column(nullable = false)
+    private int ett; // 예상 이동 시간
+
     @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DispatchDetailStatus dispatchDetailStatus = DispatchDetailStatus.WORK_WAITING; // 배차상세상태
+
+    @Column(nullable = false)
+    private boolean isResting; // 휴식 여부
 
     @Column(nullable = true)
     private LocalDateTime transportationStartTime; // 운송시작시간
@@ -73,4 +79,8 @@ public class DispatchDetail extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private TransportOrder transportOrder;
+
+    public void cancel(){
+        this.dispatchDetailStatus = DispatchDetailStatus.CANCELED;
+    }
 }

@@ -90,4 +90,8 @@ public class TransportOrder extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;
+
+    public void pend(){
+        this.isPending = true;
+    }
 }
