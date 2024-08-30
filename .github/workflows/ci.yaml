@@ -28,6 +28,12 @@ jobs:
           redis.host: ${{ secrets.REDIS_HOST }}
           redis.port: ${{ secrets.REDIS_PORT }}
           redis.password: ${{ secrets.REDIS_PASSWORD }}
+          spring.jwt.access-secret: ${{ secrets.JWT_ACCESS_SECRET }}
+          spring.jwt.refresh-secret: ${{ secrets.JWT_REFRESH_SECRET }}
+          spring.jwt.access-expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
+          spring.jwt.refresh-expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
+          optimization-api.uri: ${{ secrets.OPTIMIZATION_API_URI }}
+          kakao.api. key :  ${{ secrets.KAKAO_API_KEY }}
 
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew

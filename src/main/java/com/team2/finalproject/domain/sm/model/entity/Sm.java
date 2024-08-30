@@ -1,28 +1,29 @@
 package com.team2.finalproject.domain.sm.model.entity;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 public class Sm extends BaseEntity {
 
     @Column(nullable = false, length = 30)
     private String smName;  // SM명
-
-    @Column(nullable = false, length = 11)
-    private String userId;  // 사용자ID
 
     @Column(nullable = false, length = 20)
     private String logisticsCode;  // 물류코드
@@ -42,15 +43,15 @@ public class Sm extends BaseEntity {
     @Column(nullable = false)
     private LocalTime breakTime;  // 휴게시간
 
-    @Column(nullable = false)
-    private Boolean status;  // 상태
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;  // 센터 ID
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Users users; // 사용자 ID
+    @OneToOne(mappedBy = "sm")
+    private Users users;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Vehicle vehicle; // 차량 ID
+    @OneToOne(mappedBy = "sm")
+    private Vehicle vehicle;
+
+    @OneToMany(mappedBy = "sm")
+    private List<Dispatch> dispatchList;
 }
