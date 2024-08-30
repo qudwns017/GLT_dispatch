@@ -10,8 +10,10 @@ public record CenterRequest(
         String centerCode,
         @Schema(example = "충남정보센터", description = "센터이름")
         String centerName,
-        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "주소")
-        String address,
+        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "도로명 주소")
+        String roadAddress,
+        @Schema(example = "충남 논산시 중앙동 41", description = "지번 주소")
+        String lotNumberAddress,
         @Schema(example = "1층 물류센터", description = "상세주소")
         String detailAddress,
         @Schema(example = "32934", description = "우편번호")
@@ -36,8 +38,9 @@ public record CenterRequest(
         return Center.builder().
                 centerCode(request.centerCode()).
                 centerName(request.centerName()).
-                roadAddress(request.address()).
+                roadAddress(request.roadAddress()).
                 detailAddress(request.detailAddress()).
+                lotNumberAddress(request.lotNumberAddress()).
                 zipCode(request.zipCode()).
                 managerName(request.adminName()).
                 phoneNumber(request.phoneNumber()).
