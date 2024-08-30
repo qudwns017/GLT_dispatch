@@ -48,7 +48,7 @@ public class Users extends BaseEntity {
     @OneToOne
     private Sm sm;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "manager")
     private List<DispatchNumber> dispatchNumberList;
 
 }

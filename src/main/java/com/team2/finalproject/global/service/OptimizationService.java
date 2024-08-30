@@ -149,7 +149,7 @@ public class OptimizationService {
                 .detailAddress(addressMapping.get(stopover.getAddress())[1])
                 .expectedServiceDuration(TransportOrderUtil.convertLocalTimeToMinutes(stopover.getDelayTime()))
                 .deliveryDestinationId(destination != null ? destination.getId() : 0)
-                .managerName(destination != null ? destination.getAdminName() : null)
+                .managerName(destination != null ? destination.getManagerName() : null)
                 .phoneNumber(destination != null ? destination.getPhoneNumber() : null)
                 .deliveryType(order.deliveryType())
                 .smId(order.smId())

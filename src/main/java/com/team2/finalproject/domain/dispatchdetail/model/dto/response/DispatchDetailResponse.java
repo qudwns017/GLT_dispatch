@@ -151,7 +151,7 @@ public class DispatchDetailResponse {
                 .destinationType(dispatchDetail.getDestinationType())
                 .destinationId(dispatchDetail.getDestinationId())
                 .destinationComment(comment)
-                .address(transportOrder.getCustomerAddress())
+                .address(transportOrder.getLotNumberAddress())
                 .transportOrderId(transportOrder.getId())
                 .lat(dispatchDetail.getDestinationLatitude())
                 .lon(dispatchDetail.getDestinationLongitude())
