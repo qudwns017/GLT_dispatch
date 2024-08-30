@@ -30,7 +30,7 @@ public class DispatchDetailResponse {
     private String smPhoneNumber;
 
     @Schema(example = "80", description = "용적률")
-    private int floorAreaRatio;
+    private double floorAreaRatio;
 
     @Schema(example = "WING_BODY", description = "차종")
     private VehicleType vehicleType;

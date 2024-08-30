@@ -94,7 +94,7 @@ public class CourseResponse {
         private String smName;
 
         @Schema(description = "운송장 번호", example = "1234567890")
-        private String shipmentNum;
+        private String shipmentNumber;
 
         @Schema(description = "업체 주문 번호", example = "A123456789")
         private String clientOrderKey;

@@ -16,7 +16,7 @@ public record OrderRequest(
         String smName,
 
         @Schema(example = "1234567890", description = "운송장 번호", requiredMode = Schema.RequiredMode.REQUIRED)
-        String shipmentNum,
+        String shipmentNumber,
 
         @Schema(example = "A123456789", description = "업체 주문 번호")
         String clientOrderKey,
