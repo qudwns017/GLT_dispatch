@@ -39,16 +39,16 @@ public class DispatchController implements SwaggerDispatchController{
         return ApiResponse.OK();
     }
 
+    @PutMapping
+    public ResponseEntity<DispatchUpdateResponse> updateDispatch(@RequestBody @Valid DispatchUpdateRequest request){
+        DispatchUpdateResponse response = dispatchService.updateDispatch(request);
+        return ApiResponse.OK(response);
+    }
+
     @PatchMapping("/{dispatchId}/issue")
     public ResponseEntity<Void> updateIssue(@PathVariable long dispatchId,
                                             @RequestBody IssueRequest request) {
         dispatchService.updateIssue(dispatchId, request);
         return ApiResponse.OK();
-    }
-
-    @PutMapping
-    public ResponseEntity<DispatchUpdateResponse> updateDispatch(@RequestBody @Valid DispatchUpdateRequest request){
-        DispatchUpdateResponse response = dispatchService.updateDispatch(request);
-        return ApiResponse.OK(response);
     }
 }
