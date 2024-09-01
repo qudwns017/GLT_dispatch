@@ -25,7 +25,6 @@ import com.team2.finalproject.global.security.jwt.TokenStatus;
 import com.team2.finalproject.global.security.jwt.TokenType;
 import com.team2.finalproject.global.util.cookies.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
