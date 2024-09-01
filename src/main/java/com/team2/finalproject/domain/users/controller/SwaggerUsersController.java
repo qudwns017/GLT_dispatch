@@ -16,7 +16,7 @@ public interface SwaggerUsersController {
     @Operation(summary = "관리자 등록", description = "관리자를 등록합니다.")
     ResponseEntity<Void> registerAdmin(@RequestBody RegisterAdminRequest registerAdminRequest);
 
-    @Operation(summary = "SM 등록", description = "기사를 등록합니다.")
+    @Operation(summary = "기사 등록", description = "기사를 등록합니다.")
     ResponseEntity<Void> registerDriver(@RequestBody RegisterDriverRequest registerDriverRequest);
 
     @Operation(summary = "사용자 로그인", description = "로그인을 시도합니다.")

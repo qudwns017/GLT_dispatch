@@ -9,6 +9,7 @@ import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.users.exception.UsersErrorCode;
 import com.team2.finalproject.domain.users.exception.UsersException;
 import com.team2.finalproject.domain.users.model.dto.request.LoginRequest;
+import com.team2.finalproject.domain.users.model.dto.request.RegisterSuperAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.response.LoginResponse;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverRequest;
@@ -49,6 +50,26 @@ public class SecurityService {
     private final JwtProvider jwtProvider;
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
+
+    @Transactional
+    public void registerSuperAdmin(RegisterSuperAdminRequest registerSuperAdminRequest) {
+        log.info("최고 관리자 회원가입 시도: 이름={}, 아이디={}", registerSuperAdminRequest.name(), registerSuperAdminRequest.username());
+
+        if(usersRepository.existsByUsername(registerSuperAdminRequest.username())) {
+            throw new UsersException(UsersErrorCode.DUPLICATE_USERNAME);
+        }
+
+        Users users = Users.builder()
+                .name(registerSuperAdminRequest.name())
+                .username(registerSuperAdminRequest.username())
+                .encryptedPassword(passwordEncoder.encode(registerSuperAdminRequest.password()))
+                .phoneNumber(registerSuperAdminRequest.phoneNumber())
+                .role(Role.SUPER_ADMIN)
+                .build();
+        usersRepository.save(users);
+
+        log.info("최고 관리자 추가: {}", users.getName());
+    }
 
     @Transactional
     public void registerAdmin(RegisterAdminRequest registerAdminRequest) {
