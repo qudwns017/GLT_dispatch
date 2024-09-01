@@ -13,8 +13,8 @@ import com.team2.finalproject.domain.users.model.dto.request.RegisterSuperAdminR
 import com.team2.finalproject.domain.users.model.dto.response.LoginResponse;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverRequest;
+import com.team2.finalproject.domain.users.model.dto.result.LoginResult;
 import com.team2.finalproject.domain.users.model.entity.Users;
-import com.team2.finalproject.domain.users.model.type.Role;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.security.exception.SecurityErrorCode;
@@ -59,13 +59,9 @@ public class SecurityService {
             throw new UsersException(UsersErrorCode.DUPLICATE_USERNAME);
         }
 
-        Users users = Users.builder()
-                .name(registerSuperAdminRequest.name())
-                .username(registerSuperAdminRequest.username())
-                .encryptedPassword(passwordEncoder.encode(registerSuperAdminRequest.password()))
-                .phoneNumber(registerSuperAdminRequest.phoneNumber())
-                .role(Role.SUPER_ADMIN)
-                .build();
+        Users users = registerSuperAdminRequest.toEntity();
+        users.updatePassword(passwordEncoder.encode(registerSuperAdminRequest.password()));
+
         usersRepository.save(users);
 
         log.info("최고 관리자 추가: {}", users.getName());
@@ -83,14 +79,10 @@ public class SecurityService {
             throw new CenterException(CenterErrorCode.NOT_FOUND_CENTER);
         }
 
-        Users users = Users.builder()
-                .center(centerRepository.findByIdOrThrow(registerAdminRequest.centerId()))
-                .name(registerAdminRequest.name())
-                .username(registerAdminRequest.username())
-                .encryptedPassword(passwordEncoder.encode(registerAdminRequest.password()))
-                .phoneNumber(registerAdminRequest.phoneNumber())
-                .role(Role.ADMIN)
-                .build();
+        Users users = registerAdminRequest.toEntity();
+        users.updatePassword(passwordEncoder.encode(registerAdminRequest.password()));
+        users.updateCenter(centerRepository.findByIdOrThrow(registerAdminRequest.centerId()));
+
         usersRepository.save(users);
 
         log.info("관리자 추가: {}", users.getName());
@@ -112,22 +104,18 @@ public class SecurityService {
             throw new SmException(SmErrorCode.NOT_FOUND_SM);
         }
 
-        Users users = Users.builder()
-                .center(centerRepository.findByIdOrThrow(registerDriverRequest.centerId()))
-                .sm(smRepository.findByIdOrThrow(registerDriverRequest.smId()))
-                .name(registerDriverRequest.name())
-                .username(registerDriverRequest.username())
-                .encryptedPassword(passwordEncoder.encode(registerDriverRequest.password()))
-                .phoneNumber(registerDriverRequest.phoneNumber())
-                .role(Role.DRIVER)
-                .build();
+        Users users = registerDriverRequest.toEntity();
+        users.updatePassword(passwordEncoder.encode(registerDriverRequest.password()));
+        users.updateCenter(centerRepository.findByIdOrThrow(registerDriverRequest.centerId()));
+        users.updateSm(smRepository.findByIdOrThrow(registerDriverRequest.smId()));
+
         usersRepository.save(users);
 
         log.info("기사 추가: {}", users.getName());
     }
 
     @Transactional
-    public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
+    public LoginResult login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("사용자 로그인 시도: 아이디={}", loginRequest.username());
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -140,14 +128,17 @@ public class SecurityService {
         Users users = userDetails.getUsers();
 
         String accessToken = jwtProvider.generateToken(users.getUsername(), TokenType.ACCESS);
-        jwtProvider.addTokenCookie(response, accessToken, TokenType.ACCESS);
         String refreshToken = jwtProvider.generateToken(users.getUsername(), TokenType.REFRESH);
-        jwtProvider.addTokenCookie(response, refreshToken, TokenType.REFRESH);
         tokenService.saveRefreshToken(users.getUsername(), refreshToken);
+
         log.info("사용자 로그인 성공: {}", users.getName());
 
-        return LoginResponse.builder()
-                .name(users.getName())
+        return LoginResult.builder()
+                .loginResponse(LoginResponse.builder()
+                        .name(users.getName())
+                        .build())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 

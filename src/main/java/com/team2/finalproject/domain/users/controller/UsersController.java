@@ -5,6 +5,9 @@ import com.team2.finalproject.domain.users.model.dto.request.RegisterSuperAdminR
 import com.team2.finalproject.domain.users.model.dto.response.LoginResponse;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverRequest;
+import com.team2.finalproject.domain.users.model.dto.result.LoginResult;
+import com.team2.finalproject.global.security.jwt.JwtProvider;
+import com.team2.finalproject.global.security.jwt.TokenType;
 import com.team2.finalproject.global.security.service.SecurityService;
 import com.team2.finalproject.global.util.cookies.CookieUtil;
 import com.team2.finalproject.global.util.response.ApiResponse;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsersController implements SwaggerUsersController{
 
     private final SecurityService securityService;
+    private final JwtProvider jwtProvider;
 
     @PostMapping("/register/super-admin")
     public ResponseEntity<Void> registerSuperAdmin(@RequestBody RegisterSuperAdminRequest registerSuperAdminRequest) {
@@ -42,8 +46,10 @@ public class UsersController implements SwaggerUsersController{
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        LoginResponse loginResponse = securityService.login(loginRequest, response);
-        return ApiResponse.OK(loginResponse);
+        LoginResult loginResult = securityService.login(loginRequest, response);
+        jwtProvider.addTokenCookie(response, loginResult.getAccessToken(), TokenType.ACCESS);
+        jwtProvider.addTokenCookie(response, loginResult.getRefreshToken(), TokenType.REFRESH);
+        return ApiResponse.OK(loginResult.getLoginResponse());
     }
 
     @GetMapping("/logout")

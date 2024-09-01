@@ -1,5 +1,7 @@
 package com.team2.finalproject.domain.users.model.dto.request;
 
+import com.team2.finalproject.domain.users.model.entity.Users;
+import com.team2.finalproject.domain.users.model.type.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record RegisterSuperAdminRequest(
@@ -15,4 +17,14 @@ public record RegisterSuperAdminRequest(
 
         @Schema(example = "010-1234-5678", description = "관리자 전화번호", requiredMode = Schema.RequiredMode.REQUIRED)
         String phoneNumber
-) {}
+) {
+        // 비밀 번호 제외
+        public Users toEntity() {
+                return Users.builder()
+                        .name(this.name())
+                        .username(this.username())
+                        .phoneNumber(this.phoneNumber())
+                        .role(Role.SUPER_ADMIN)
+                        .build();
+        }
+}
