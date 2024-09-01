@@ -15,6 +15,7 @@ import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverReque
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.model.type.Role;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
+import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.security.exception.SecurityErrorCode;
 import com.team2.finalproject.global.security.exception.SecurityException;
 import com.team2.finalproject.global.security.jwt.JwtProvider;
@@ -27,6 +28,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +48,7 @@ public class SecurityService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
 
     @Transactional
     public void registerAdmin(RegisterAdminRequest registerAdminRequest) {
@@ -103,11 +109,14 @@ public class SecurityService {
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         log.info("사용자 로그인 시도: 아이디={}", loginRequest.username());
 
-        Users users = usersRepository.findByUsernameOrThrow(loginRequest.username());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
 
-        if (!passwordEncoder.matches(loginRequest.password(), users.getEncryptedPassword())) {
-            throw new UsersException(UsersErrorCode.PASSWORD_MISMATCH);
-        }
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder .getContext().setAuthentication(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Users users = userDetails.getUsers();
 
         String accessToken = jwtProvider.generateToken(users.getUsername(), TokenType.ACCESS);
         jwtProvider.addTokenCookie(response, accessToken, TokenType.ACCESS);
