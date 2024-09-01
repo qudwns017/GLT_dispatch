@@ -84,7 +84,7 @@ public class SecurityService {
         }
 
         Users users = Users.builder()
-                .center(centerRepository.findById(registerAdminRequest.centerId()).get())
+                .center(centerRepository.findByIdOrThrow(registerAdminRequest.centerId()))
                 .name(registerAdminRequest.name())
                 .username(registerAdminRequest.username())
                 .encryptedPassword(passwordEncoder.encode(registerAdminRequest.password()))
@@ -113,8 +113,8 @@ public class SecurityService {
         }
 
         Users users = Users.builder()
-                .center(centerRepository.findById(registerDriverRequest.centerId()).get())
-                .sm(smRepository.findById(registerDriverRequest.smId()).get())
+                .center(centerRepository.findByIdOrThrow(registerDriverRequest.centerId()))
+                .sm(smRepository.findByIdOrThrow(registerDriverRequest.smId()))
                 .name(registerDriverRequest.name())
                 .username(registerDriverRequest.username())
                 .encryptedPassword(passwordEncoder.encode(registerDriverRequest.password()))
