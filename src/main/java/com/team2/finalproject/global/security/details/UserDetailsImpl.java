@@ -1,5 +1,8 @@
 package com.team2.finalproject.global.security.details;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.users.exception.UsersErrorCode;
+import com.team2.finalproject.domain.users.exception.UsersException;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,7 +20,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public UserDetailsImpl(Users users) {
         if (users == null) {
-            throw new IllegalArgumentException("Users 값이 null이 될 수 없습니다.");
+            throw new UsersException(UsersErrorCode.NOT_FOUND_USER);
         }
         this.users = users;
     }
@@ -28,6 +31,10 @@ public class UserDetailsImpl implements UserDetails {
 
     public String getName() {
         return users.getName();
+    }
+
+    public Center getCenter() {
+        return users.getCenter();
     }
 
     @Override

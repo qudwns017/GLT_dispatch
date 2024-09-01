@@ -93,7 +93,7 @@ public class DispatchService {
         List<DispatchDetail> pendingDispatchDetailList = new ArrayList<>();
 
         Users usersEntity = userDetails.getUsers();
-        Center centerEntity = usersEntity.getCenter();
+        Center centerEntity = userDetails.getCenter();
         DispatchNumber dispatchNumberEntity = DispatchConfirmRequest.toDispatchNumberEntity(request, usersEntity,
                 centerEntity);
         DispatchNumber savedDispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);

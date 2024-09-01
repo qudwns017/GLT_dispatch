@@ -28,7 +28,7 @@ public class DispatchNumberController implements SwaggerDispatchNumberController
     public ResponseEntity<DispatchNumberSearchResponse> searchDispatches(@ModelAttribute DispatchNumberSearchRequest request,
                                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        DispatchNumberSearchResponse response = dispatchNumberService.searchDispatches(request, userDetails.getId());
+        DispatchNumberSearchResponse response = dispatchNumberService.searchDispatches(request, userDetails);
         return ApiResponse.OK(response);
     }
 }
