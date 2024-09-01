@@ -115,7 +115,7 @@ public class SecurityService {
     }
 
     @Transactional
-    public LoginResult login(LoginRequest loginRequest, HttpServletResponse response) {
+    public LoginResult login(LoginRequest loginRequest) {
         log.info("사용자 로그인 시도: 아이디={}", loginRequest.username());
 
         UsernamePasswordAuthenticationToken authenticationToken =

@@ -46,7 +46,7 @@ public class UsersController implements SwaggerUsersController{
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        LoginResult loginResult = securityService.login(loginRequest, response);
+        LoginResult loginResult = securityService.login(loginRequest);
         jwtProvider.addTokenCookie(response, loginResult.getAccessToken(), TokenType.ACCESS);
         jwtProvider.addTokenCookie(response, loginResult.getRefreshToken(), TokenType.REFRESH);
         return ApiResponse.OK(loginResult.getLoginResponse());

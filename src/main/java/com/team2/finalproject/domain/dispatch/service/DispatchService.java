@@ -48,7 +48,6 @@ public class DispatchService {
     private final SmRepository smRepository;
     private final TransportOrderRepository transportOrderRepository;
     private final DispatchDetailRepository dispatchDetailRepository;
-    private final UsersRepository usersRepository;
 
     private final OptimizationApiUtil optimizationApiUtil;
 
