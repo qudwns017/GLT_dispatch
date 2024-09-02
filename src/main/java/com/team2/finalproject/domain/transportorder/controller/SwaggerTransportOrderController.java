@@ -13,14 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 
 @Tag(name = "Transport Order", description = "운송 주문")
 public interface SwaggerTransportOrderController {
@@ -60,7 +58,6 @@ public interface SwaggerTransportOrderController {
         @ApiResponse(responseCode = "404", description = "운송실행주문을 찾지 못하였습니다", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     ResponseEntity<TransportOrderResponse> getTransportOrderById(
-        @PathVariable Long transportOrderId,
-        @RequestParam(required = false) Long destinationId
+        @PathVariable Long transportOrderId
     );
 }
