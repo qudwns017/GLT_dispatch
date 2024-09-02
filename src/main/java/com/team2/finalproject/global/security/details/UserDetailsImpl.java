@@ -1,13 +1,17 @@
 package com.team2.finalproject.global.security.details;
 
+import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.users.exception.UsersErrorCode;
+import com.team2.finalproject.domain.users.exception.UsersException;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 @Getter
 @ToString
@@ -16,7 +20,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public UserDetailsImpl(Users users) {
         if (users == null) {
-            throw new IllegalArgumentException("Users 값이 null이 될 수 없습니다.");
+            throw new UsersException(UsersErrorCode.NOT_FOUND_USER);
         }
         this.users = users;
     }
@@ -29,9 +33,13 @@ public class UserDetailsImpl implements UserDetails {
         return users.getName();
     }
 
+    public Center getCenter() {
+        return users.getCenter();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + users.getRole().name()));
     }
 
     @Override

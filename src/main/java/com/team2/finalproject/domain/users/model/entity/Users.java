@@ -51,4 +51,15 @@ public class Users extends BaseEntity {
     @OneToMany(mappedBy = "manager")
     private List<DispatchNumber> dispatchNumberList;
 
+    public void updatePassword(String encryptedPassword) {
+        this.encryptedPassword = encryptedPassword;
+    }
+
+    public void updateCenter(Center center) {
+        this.center = center;
+    }
+
+    public void updateSm(Sm sm) {
+        this.sm = sm;
+    }
 }

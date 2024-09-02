@@ -23,7 +23,6 @@ import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
 import com.team2.finalproject.domain.users.model.entity.Users;
-import com.team2.finalproject.domain.users.repository.UsersRepository;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
@@ -48,7 +47,6 @@ public class DispatchService {
     private final SmRepository smRepository;
     private final TransportOrderRepository transportOrderRepository;
     private final DispatchDetailRepository dispatchDetailRepository;
-    private final UsersRepository usersRepository;
 
     private final OptimizationApiUtil optimizationApiUtil;
 
@@ -93,7 +91,7 @@ public class DispatchService {
         List<DispatchDetail> pendingDispatchDetailList = new ArrayList<>();
 
         Users usersEntity = userDetails.getUsers();
-        Center centerEntity = usersEntity.getCenter();
+        Center centerEntity = userDetails.getCenter();
         DispatchNumber dispatchNumberEntity = DispatchConfirmRequest.toDispatchNumberEntity(request, usersEntity,
                 centerEntity);
         DispatchNumber savedDispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
