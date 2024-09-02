@@ -12,10 +12,10 @@ public class CookieUtil {
     public static void addCookie(HttpServletResponse response, String name, String value, long maxAgeInSeconds) {
         ResponseCookie cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
-                .secure(true)
+//                .secure(true)
                 .path("/")
                 .maxAge(Duration.ofSeconds(maxAgeInSeconds))
-                .sameSite("None")
+//                .sameSite("None")
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
     }

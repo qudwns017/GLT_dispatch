@@ -1,6 +1,5 @@
 package com.team2.finalproject.domain.deliverydestination.controller;
 
-import com.team2.finalproject.domain.center.service.CenterService;
 import com.team2.finalproject.domain.deliverydestination.model.dto.request.DeliveryDestinationRequest;
 import com.team2.finalproject.domain.deliverydestination.model.dto.request.UpdateDeliveryDestinationRequest;
 import com.team2.finalproject.domain.deliverydestination.model.dto.response.DeliveryDestinationResponse;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,18 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeliveryDestinationController implements SwaggerDeliveryDestinationController {
 
     private final DeliveryDestinationService deliveryDestinationService;
-    private final CenterService centerService;
 
-    @GetMapping("/{placeId}")
-    public ResponseEntity<?> getCenterOrDeliveryDestinationInfo(
-            @PathVariable long placeId,
-            @RequestParam(value = "is-center") boolean isCenter) {
-
-        if (!isCenter) {
-            return ApiResponse.OK(deliveryDestinationService.getDeliveryDestination(placeId));
-        } else {
-            return ApiResponse.OK(centerService.getCenter(placeId));
-        }
+    @GetMapping("/{deliveryDestinationId}")
+    public ResponseEntity<?> getDeliveryDestination(@PathVariable long deliveryDestinationId) {
+        DeliveryDestinationResponse response = deliveryDestinationService.getDeliveryDestination(deliveryDestinationId);
+        return ApiResponse.OK(response);
     }
 
     @PostMapping
