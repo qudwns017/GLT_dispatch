@@ -5,6 +5,7 @@ import com.team2.finalproject.domain.center.service.CenterService;
 import com.team2.finalproject.global.util.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,12 @@ import com.team2.finalproject.domain.center.model.dto.request.CenterRequest;
 public class CenterController implements SwaggerCenterController {
 
     private final CenterService centerService;
+
+    @GetMapping("/{centerId}")
+    public ResponseEntity<?> getCenter(@PathVariable long centerId) {
+        CenterResponse response = centerService.getCenter(centerId);
+        return ApiResponse.OK(response);
+    }
 
     @PostMapping
     public ResponseEntity<?> addCenter(@RequestBody CenterRequest request) {
