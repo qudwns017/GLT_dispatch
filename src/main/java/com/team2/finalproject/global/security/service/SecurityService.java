@@ -8,15 +8,11 @@ import com.team2.finalproject.domain.sm.exception.SmException;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.users.exception.UsersErrorCode;
 import com.team2.finalproject.domain.users.exception.UsersException;
-import com.team2.finalproject.domain.users.model.dto.request.LoginRequest;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterSuperAdminRequest;
-import com.team2.finalproject.domain.users.model.dto.response.LoginResponse;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverRequest;
-import com.team2.finalproject.domain.users.model.dto.result.LoginResult;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
-import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.security.exception.SecurityErrorCode;
 import com.team2.finalproject.global.security.exception.SecurityException;
 import com.team2.finalproject.global.security.jwt.JwtProvider;
@@ -28,10 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +40,6 @@ public class SecurityService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final TokenService tokenService;
-    private final AuthenticationManager authenticationManager;
 
     @Transactional
     public void registerSuperAdmin(RegisterSuperAdminRequest registerSuperAdminRequest) {
@@ -111,34 +102,6 @@ public class SecurityService {
         usersRepository.save(users);
 
         log.info("기사 추가: {}", users.getName());
-    }
-
-    @Transactional
-    public LoginResult login(LoginRequest loginRequest) {
-        log.info("사용자 로그인 시도: 아이디={}", loginRequest.username());
-
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
-
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        SecurityContextHolder .getContext().setAuthentication(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Users users = userDetails.getUsers();
-
-        String accessToken = jwtProvider.generateToken(users.getUsername(), TokenType.ACCESS);
-        String refreshToken = jwtProvider.generateToken(users.getUsername(), TokenType.REFRESH);
-        tokenService.saveRefreshToken(users.getUsername(), refreshToken);
-
-        log.info("사용자 로그인 성공: {}", users.getName());
-
-        return LoginResult.builder()
-                .loginResponse(LoginResponse.builder()
-                        .name(users.getName())
-                        .build())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
     }
 
     @Transactional

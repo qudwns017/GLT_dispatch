@@ -1,8 +1,10 @@
 package com.team2.finalproject.global.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.finalproject.global.security.details.UserDetailsServiceImpl;
 import com.team2.finalproject.global.security.exception.JwtAuthenticationEntryPoint;
 import com.team2.finalproject.global.security.filter.JwtAuthenticationFilter;
+import com.team2.finalproject.global.security.filter.LoginAuthenticationFilter;
 import com.team2.finalproject.global.security.jwt.JwtProvider;
 import com.team2.finalproject.global.security.jwt.TokenService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,9 +33,23 @@ public class SecurityConfig {
     private final TokenService tokenService;
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final ObjectMapper objectMapper;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public LoginAuthenticationFilter loginAuthenticationFilter(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return new LoginAuthenticationFilter(
+                "/api/users/login",
+                authenticationConfiguration.getAuthenticationManager(),
+                objectMapper,
+                jwtProvider,
+                tokenService
+        );
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -54,7 +70,7 @@ public class SecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
@@ -68,8 +84,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/center/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/center/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/center/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/users/login").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(loginAuthenticationFilter(authenticationConfiguration), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenService, userDetailsService),
                         UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(handling -> handling

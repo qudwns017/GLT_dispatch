@@ -1,18 +1,14 @@
 package com.team2.finalproject.domain.users.controller;
 
-import com.team2.finalproject.domain.users.model.dto.request.LoginRequest;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterSuperAdminRequest;
-import com.team2.finalproject.domain.users.model.dto.response.LoginResponse;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterAdminRequest;
 import com.team2.finalproject.domain.users.model.dto.request.RegisterDriverRequest;
-import com.team2.finalproject.domain.users.model.dto.result.LoginResult;
-import com.team2.finalproject.global.security.jwt.JwtProvider;
-import com.team2.finalproject.global.security.jwt.TokenType;
 import com.team2.finalproject.global.security.service.SecurityService;
 import com.team2.finalproject.global.util.cookies.CookieUtil;
 import com.team2.finalproject.global.util.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +20,9 @@ import org.springframework.web.bind.annotation.*;
 public class UsersController implements SwaggerUsersController{
 
     private final SecurityService securityService;
-    private final JwtProvider jwtProvider;
 
     @PostMapping("/register/super-admin")
-    public ResponseEntity<Void> registerSuperAdmin(@RequestBody RegisterSuperAdminRequest registerSuperAdminRequest) {
+    public ResponseEntity<Void> registerSuperAdmin(@Valid @RequestBody RegisterSuperAdminRequest registerSuperAdminRequest) {
         securityService.registerSuperAdmin(registerSuperAdminRequest);
         return ApiResponse.OK();
     }
@@ -42,14 +37,6 @@ public class UsersController implements SwaggerUsersController{
     public ResponseEntity<Void> registerDriver(@RequestBody RegisterDriverRequest registerDriverRequest) {
         securityService.registerDriver(registerDriverRequest);
         return ApiResponse.OK();
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        LoginResult loginResult = securityService.login(loginRequest);
-        jwtProvider.addTokenCookie(response, loginResult.getAccessToken(), TokenType.ACCESS);
-        jwtProvider.addTokenCookie(response, loginResult.getRefreshToken(), TokenType.REFRESH);
-        return ApiResponse.OK(loginResult.getLoginResponse());
     }
 
     @GetMapping("/logout")

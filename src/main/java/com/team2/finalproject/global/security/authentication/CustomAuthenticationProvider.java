@@ -1,15 +1,16 @@
 package com.team2.finalproject.global.security.authentication;
 
-import com.team2.finalproject.domain.users.exception.UsersErrorCode;
 import com.team2.finalproject.domain.users.exception.UsersException;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -25,10 +26,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        Users users = usersRepository.findByUsernameOrThrow(username);
+        Users users;
+        try {
+            users = usersRepository.findByUsernameOrThrow(username);
+        } catch (UsersException e) {
+            throw new UsernameNotFoundException("존재하는 아이디가 없습니다.");
+        }
 
         if(!passwordEncoder.matches(password, users.getEncryptedPassword())) {
-            throw new UsersException(UsersErrorCode.PASSWORD_MISMATCH);
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
         UserDetailsImpl userDetails = new UserDetailsImpl(users);
