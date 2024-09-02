@@ -17,6 +17,7 @@ import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberSta
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
+import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -71,9 +72,9 @@ public class DispatchNumberService {
     }
 
     @Transactional(readOnly = true)
-    public DispatchNumberSearchResponse searchDispatches(DispatchNumberSearchRequest request, Long userId) {
-        Users users = usersRepository.findByIdOrThrow(userId);
-        Center center = users.getCenter();
+    public DispatchNumberSearchResponse searchDispatches(DispatchNumberSearchRequest request, UserDetailsImpl userDetails) {
+        Users users = userDetails.getUsers();
+        Center center = userDetails.getCenter();
         LocalDateTime startDateTime = request.startDate().atStartOfDay();
         LocalDateTime endDateTime = request.endDateTime();
 
