@@ -198,7 +198,7 @@ public class DispatchService {
         cancelInTransitDispatch(inTransitDispatchNumbers);
 
         // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
-        dispatchNumberRepository.deleteAllInBatch(waitingDispatchNumbers);
+        dispatchNumberRepository.deleteAll(waitingDispatchNumbers);
     }
 
     // 주행 중인 경우 배차 취소
