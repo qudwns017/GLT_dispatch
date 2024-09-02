@@ -26,7 +26,7 @@ public class DispatchNumber extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime loadingStartTime;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 20, unique = true)
     private String dispatchNumber; // 배차번호
 
     @Column(nullable = false, length = 50)
