@@ -27,6 +27,7 @@ import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
 import com.team2.finalproject.global.util.optimization.OptimizationResponse;
+import com.team2.finalproject.global.util.request.Stopover;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +57,11 @@ public class DispatchService {
         Order startOrder = orders.get(0);
         orders.remove(0);
 
-        OptimizationRequest.Stopover startStopoverRequest = OptimizationRequest.Stopover.of(startOrder.address(),
+        Stopover startStopoverRequest = Stopover.of(startOrder.address(),
                 startOrder.lat(), startOrder.lon(),
                 LocalTime.of(startOrder.expectedServiceDuration() / 60, startOrder.expectedServiceDuration() % 60, 0));
-        List<OptimizationRequest.Stopover> stopoverList = orders.stream()
-                .map((order) -> OptimizationRequest.Stopover.of(order.address(), order.lat(), order.lon(),
+        List<Stopover> stopoverList = orders.stream()
+                .map((order) -> Stopover.of(order.address(), order.lat(), order.lon(),
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
                 .toList();
 

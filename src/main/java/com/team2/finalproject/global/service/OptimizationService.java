@@ -209,4 +209,15 @@ public class OptimizationService {
         return Arrays.stream(restrictedTonCode.split(","))
                 .anyMatch(code -> vehicleCode.equals(code.trim()));
     }
+
+    public com.team2.finalproject.global.util.optimization.OptimizationResponse getOptimizationResponse(
+        com.team2.finalproject.global.util.optimization.OptimizationRequest request){
+        return webClient.post()
+            .uri("/api/OptimumPath")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(com.team2.finalproject.global.util.optimization.OptimizationResponse.class)
+            .block();
+    }
 }
