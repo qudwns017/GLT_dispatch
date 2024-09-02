@@ -10,8 +10,12 @@ public record OptimizationResponse (
     long totalTime,
     LocalDateTime startTime,
     StartStopover startStopover,
+    LocalTime breakStartTime,
+    LocalTime breakEndTime,
+    int restingPosition, // 휴식경유지 해당 경유지 도착전
     List<ResultStopover> resultStopoverList,
     List<Map<String,Double>> coordinates
+
 ){
 
     public record ResultStopover(

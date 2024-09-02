@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record DispatchUpdateRequest(
+    @Schema(example = "1", description = "기사id")
+    @NotNull Long smId,
     @Schema(example = "2024-06-15T09:00:00", description = "상차 시작 시간", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull LocalDateTime loadingStartTime,
     @Valid List<Order> orderList

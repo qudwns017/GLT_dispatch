@@ -23,7 +23,6 @@ import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
 import com.team2.finalproject.domain.users.model.entity.Users;
-import com.team2.finalproject.domain.users.repository.UsersRepository;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
@@ -48,8 +47,6 @@ public class DispatchService {
     private final SmRepository smRepository;
     private final TransportOrderRepository transportOrderRepository;
     private final DispatchDetailRepository dispatchDetailRepository;
-    private final UsersRepository usersRepository;
-
     private final OptimizationApiUtil optimizationApiUtil;
 
     @Transactional(readOnly = true)
@@ -67,8 +64,9 @@ public class DispatchService {
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
                 .toList();
 
-        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(
-                OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
+        Sm sm = smRepository.findByIdOrThrow(request.smId());
+
+        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList, sm.getBreakStartTime(), sm.getBreakTime()));
 
         DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
                 optimizationResponse.startStopover().address(),
@@ -84,7 +82,7 @@ public class DispatchService {
                 resultStopoverList);
 
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
-                startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
+            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
     }
 
     @Transactional
