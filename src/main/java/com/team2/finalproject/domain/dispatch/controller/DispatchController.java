@@ -34,8 +34,9 @@ public class DispatchController implements SwaggerDispatchController{
     }
 
     @PatchMapping
-    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request) {
-        dispatchService.cancelDispatch(request);
+    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        dispatchService.cancelDispatch(request, userDetails.getCenter());
         return ApiResponse.OK();
     }
 
