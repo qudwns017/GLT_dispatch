@@ -1,9 +1,5 @@
 package com.team2.finalproject.domain.dispatchdetail.model.dto.response;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
@@ -12,10 +8,16 @@ import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
-import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
-import com.team2.finalproject.domain.vehicledetail.model.type.VehicleType;
+import com.team2.finalproject.domain.vehicle.model.type.VehicleType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -159,7 +161,7 @@ public class DispatchDetailResponse {
     }
 
     public static DispatchDetailResponse of(
-            Dispatch dispatch, Sm sm, Users users, Vehicle vehicle, VehicleDetail vehicleDetail,
+            Dispatch dispatch, Sm sm, Users users, Vehicle vehicle,
             DispatchDetailResponse.StartStopover startStopover,
             List<DispatchDetailResponse.DispatchDetail> dispatchDetailList) {
 
@@ -168,7 +170,7 @@ public class DispatchDetailResponse {
                 .smPhoneNumber(users.getPhoneNumber())
                 .floorAreaRatio(dispatch.getLoadingRate())
                 .vehicleType(vehicle.getVehicleType())
-                .vehicleTon(vehicleDetail.getVehicleTon())
+                .vehicleTon(vehicle.getVehicleTon())
                 .progressionRate(calcProgress(dispatch.getDeliveryOrderCount(), dispatch.getCompletedOrderCount()))
                 .completedOrderCount(dispatch.getCompletedOrderCount())
                 .deliveryOrderCount(dispatch.getDeliveryOrderCount())

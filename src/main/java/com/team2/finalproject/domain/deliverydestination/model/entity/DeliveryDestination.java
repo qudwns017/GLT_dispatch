@@ -46,8 +46,14 @@ public class DeliveryDestination extends BaseEntity {
     @Column(nullable = false)
     private Double longitude;  // 경도
 
-    @Column(nullable = true, length = 10)
-    private String restrictedTonCode;    // 진입 불가 톤 코드
+    @Column(nullable = true, length = 20)
+    private String restrictedWingBody;  // 진입 불가 톤 코드
+
+    @Column(nullable = true, length = 20)
+    private String restrictedBox;       // 진입 불가 톤 코드
+
+    @Column(nullable = true, length = 20)
+    private String restrictedCargo;     // 진입 불가 톤 코드
 
     @Column(nullable = true, length = 100)
     private String comment; // 비고
@@ -60,8 +66,14 @@ public class DeliveryDestination extends BaseEntity {
     private Center center;
 
     public void update(UpdateDeliveryDestinationRequest request) {
-        if (request.restrictedTonCode() != null) {
-            this.restrictedTonCode = request.restrictedTonCode();
+        if (request.restrictedWingBody() != null) {
+            this.restrictedWingBody = request.restrictedWingBody();
+        }
+        if (request.restrictedBox() != null) {
+            this.restrictedBox = request.restrictedBox();
+        }
+        if (request.restrictedCargo() != null) {
+            this.restrictedCargo = request.restrictedCargo();
         }
         if (request.comment() != null) {
             this.comment = request.comment();

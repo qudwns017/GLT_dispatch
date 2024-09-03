@@ -2,8 +2,7 @@ package com.team2.finalproject.domain.vehicle.model.entity;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
-import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
-import com.team2.finalproject.domain.vehicledetail.model.type.VehicleType;
+import com.team2.finalproject.domain.vehicle.model.type.VehicleType;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,6 +24,9 @@ public class Vehicle extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private VehicleType vehicleType; // 차종
+
+    @Column(nullable = false)
+    private Double vehicleTon;  // 차량 톤수
 
     @Column(nullable = false)
     private boolean ownershipType; // 지입/용차 (True for 지입, False for 용차)
@@ -64,9 +66,6 @@ public class Vehicle extends BaseEntity {
 
     @Column(nullable = false)
     private String updatedBy; // 수정한 사용자
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private VehicleDetail vehicleDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;
