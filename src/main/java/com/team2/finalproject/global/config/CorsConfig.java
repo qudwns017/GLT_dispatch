@@ -15,7 +15,7 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://api.gltkorea.site"));
         configuration.setAllowedHeaders(List.of("HEAD", "GET", "POST","PUT","DELETE","PATCH","OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
