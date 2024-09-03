@@ -7,9 +7,8 @@ import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.dto.request.OrderRequest;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
+import com.team2.finalproject.domain.vehicle.model.type.VehicleType;
 import com.team2.finalproject.domain.vehicle.repository.VehicleRepository;
-import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
-import com.team2.finalproject.domain.vehicledetail.repository.VehicleDetailRepository;
 import com.team2.finalproject.global.util.TransportOrderUtil;
 import com.team2.finalproject.global.util.request.OptimizationRequest;
 import com.team2.finalproject.global.util.response.OptimizationResponse;
@@ -19,6 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,17 +32,14 @@ public class OptimizationService {
     private final DeliveryDestinationRepository deliveryDestinationRepository;
     private final SmRepository smRepository;
     private final VehicleRepository vehicleRepository;
-    private final VehicleDetailRepository vehicleDetailRepository;
     private final WebClient webClient;
 
     public OptimizationService(DeliveryDestinationRepository deliveryDestinationRepository,
                                SmRepository smRepository, VehicleRepository vehicleRepository,
-                               VehicleDetailRepository vehicleDetailRepository,
                                @Value("${optimization-api.uri}")String uri){
         this.deliveryDestinationRepository = deliveryDestinationRepository;
         this.smRepository = smRepository;
         this.vehicleRepository = vehicleRepository;
-        this.vehicleDetailRepository = vehicleDetailRepository;
         this.webClient = WebClient.builder().baseUrl(uri).build();
     }
 
@@ -79,20 +78,19 @@ public class OptimizationService {
                                                 OptimizationResponse response, Map<String, String[]> addressMapping) {
         Sm sm = smRepository.findByIdOrThrow(mapOrderAndAddress.get(mapOrderAndAddress.keySet().iterator().next()).get(0).smId());
         Vehicle vehicle = vehicleRepository.findBySm(sm);
-        VehicleDetail vehicleDetail = vehicleDetailRepository.findByVehicle(vehicle);
 
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList =
-                createCourseDetailResponseList(response.getResultStopoverList(), mapOrderAndAddress, vehicleDetail, addressMapping);
+                createCourseDetailResponseList(response.getResultStopoverList(), mapOrderAndAddress, vehicle, addressMapping);
 
         int floorAreaRatio = calculateFloorAreaRatio(vehicle, courseDetailResponseList);
         List<CourseResponse.CoordinatesResponse> coordinatesResponseList = mapCoordinates(response);
 
-        return buildCourseResponse(sm, vehicleDetail, response, floorAreaRatio, courseDetailResponseList, coordinatesResponseList);
+        return buildCourseResponse(sm, vehicle, response, floorAreaRatio, courseDetailResponseList, coordinatesResponseList);
     }
 
     private List<CourseResponse.CourseDetailResponse> createCourseDetailResponseList(List<ResultStopover> stopovers,
                                                                                      Map<String, List<OrderRequest>> orderRequestMap,
-                                                                                     VehicleDetail vehicleDetail,
+                                                                                     Vehicle vehicle,
                                                                                      Map<String, String[]> addressMapping) {
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList = new ArrayList<>();
 
@@ -102,10 +100,12 @@ public class OptimizationService {
             DeliveryDestination destination = findDestination(stopover);
 
             // 배송처(경유지)별로 진입 불가 톤코드를 검사
-            boolean isRestricted = checkRestrictedTonCode(vehicleDetail.getVehicleCode(),
-                    destination != null ? destination.getRestrictedTonCode() : null);
+            boolean isRestricted = checkRestrictedTonCodes(vehicle, destination);
 
-            courseDetailResponseList.add(createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, addressMapping));
+            boolean isDelayed = checkDelayedTime(TransportOrderUtil.addDelayTime(stopover.getEndTime(), stopover.getDelayTime()),
+                    matchingOrder.serviceRequestTime(), matchingOrder.serviceRequestDate());
+
+            courseDetailResponseList.add(createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, isDelayed, addressMapping));
         }
 
         return courseDetailResponseList;
@@ -124,9 +124,11 @@ public class OptimizationService {
     private CourseResponse.CourseDetailResponse createCourseDetailResponse(ResultStopover stopover, OrderRequest order,
                                                                            DeliveryDestination destination,
                                                                            boolean isRestricted,
+                                                                           boolean isDelayed,
                                                                            Map<String, String[]> addressMapping) {
         return CourseResponse.CourseDetailResponse.builder()
-                .errorYn(isRestricted)
+                .restrictedTonCode(isRestricted)
+                .delayRequestTime(isDelayed)
                 .ett(stopover.getTimeFromPrevious() / 1000 / 60)
                 .expectationOperationStartTime(stopover.getEndTime())
                 .expectationOperationEndTime(TransportOrderUtil.addDelayTime(stopover.getEndTime(), stopover.getDelayTime()))
@@ -183,41 +185,75 @@ public class OptimizationService {
                 .toList();
     }
 
-    private CourseResponse buildCourseResponse(Sm sm, VehicleDetail vehicleDetail, OptimizationResponse response,
+    private CourseResponse buildCourseResponse(Sm sm, Vehicle vehicle, OptimizationResponse response,
                                                int floorAreaRatio,
                                                List<CourseResponse.CourseDetailResponse> courseDetailResponseList,
                                                List<CourseResponse.CoordinatesResponse> coordinatesResponseList) {
+
+        boolean errorYn = courseDetailResponseList.stream().anyMatch(
+                detail -> detail.isRestrictedTonCode() || detail.isDelayRequestTime());
+
         return CourseResponse.builder()
-                .errorYn(courseDetailResponseList.stream().anyMatch(CourseResponse.CourseDetailResponse::isErrorYn))
+                .errorYn(errorYn)
                 .smName(sm.getSmName())
                 .smPhoneNumber(sm.getUsers().getPhoneNumber())
-                .tonCode(vehicleDetail.getVehicleCode())
-                .ton(vehicleDetail.getVehicleTon())
+                .vehicleType(vehicle.getVehicleType().toString())
+                .vehicleTon(vehicle.getVehicleTon())
                 .orderNum(response.getResultStopoverList().size())
                 .mileage((int) response.getTotalDistance() / 1000)
-                .totalTime(response.getTotalTime())
+                .totalTime(response.getTotalTime() / 1000 / 60)
                 .floorAreaRatio(floorAreaRatio)
                 .courseDetailResponseList(courseDetailResponseList)
                 .coordinatesResponseList(coordinatesResponseList)
                 .build();
     }
 
-    private boolean checkRestrictedTonCode(String vehicleCode, String restrictedTonCode) {
+    private boolean checkRestrictedTonCodes(Vehicle vehicle, DeliveryDestination destination) {
+        if (destination == null) {
+            return false;
+        }
+
+        String restrictedTonCode = null;
+
+        if (vehicle.getVehicleType() == VehicleType.WING_BODY) {
+            restrictedTonCode = destination.getRestrictedWingBody();
+        } else if (vehicle.getVehicleType() == VehicleType.BOX) {
+            restrictedTonCode = destination.getRestrictedBox();
+        } else if (vehicle.getVehicleType() == VehicleType.CARGO) {
+            restrictedTonCode = destination.getRestrictedCargo();
+        }
+
+        return checkRestrictedTonCode(vehicle.getVehicleTon(), restrictedTonCode);
+    }
+
+    private boolean checkRestrictedTonCode(Double vehicleTon, String restrictedTonCode) {
         if (restrictedTonCode == null || restrictedTonCode.isEmpty()) {
             return false;
         }
         return Arrays.stream(restrictedTonCode.split(","))
-                .anyMatch(code -> vehicleCode.equals(code.trim()));
+                .map(String::trim)
+                .mapToDouble(Double::parseDouble)
+                .anyMatch(vehicleTon::equals);
     }
 
-    public com.team2.finalproject.global.util.optimization.OptimizationResponse getOptimizationResponse(
-        com.team2.finalproject.global.util.optimization.OptimizationRequest request){
-        return webClient.post()
-            .uri("/api/OptimumPath")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .retrieve()
-            .bodyToMono(com.team2.finalproject.global.util.optimization.OptimizationResponse.class)
-            .block();
+    private boolean checkDelayedTime(LocalDateTime expectationOperationEndTime, LocalTime serviceRequestTime,
+                                     LocalDate serviceRequestDate) {
+        if (serviceRequestTime == null || serviceRequestDate == null) {
+            return false;
+        }
+
+        LocalDate endDate = expectationOperationEndTime.toLocalDate();
+        LocalTime endTime = expectationOperationEndTime.toLocalTime();
+
+        if (serviceRequestDate.isBefore(endDate)) {
+            return true;
+        }
+
+        if(serviceRequestDate.isAfter(endDate)) {
+            return false;
+        }
+
+        return endTime.isAfter(serviceRequestTime);
     }
+
 }
