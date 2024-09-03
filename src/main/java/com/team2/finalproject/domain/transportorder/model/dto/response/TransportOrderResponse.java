@@ -31,14 +31,10 @@ public class TransportOrderResponse {
     private double volume;
     @Schema(example = "80.1", description = "중량")
     private double weight;
-    @Schema(example = "유관순", description = "담당자명")
-    private String managerName;
-    @Schema(example = "010-1111-2222", description = "담당자 연락처")
-    private String phoneNumber;
-    @Schema(example = "4", description = "배송처 코드")
-    private Long deliveryDestinationCode;
+    private DestinationInfo destinationInfo;
+    private ClientInfo clientInfo;
 
-    private TransportOrderResponse(String shipmentNumber,String deliveryType,LocalDate requestedWorkDate, LocalTime requestedArrivalTime,LocalTime estimatedWorkTime, String smName,String productName, int productCount, double volume, double weight, String managerName,String phoneNumber, Long deliveryDestinationCode){
+    private TransportOrderResponse(String shipmentNumber,String deliveryType,LocalDate requestedWorkDate, LocalTime requestedArrivalTime,LocalTime estimatedWorkTime, String smName,String productName, int productCount, double volume, double weight,DestinationInfo destinationInfo,ClientInfo clientInfo){
         this.shipmentNumber = shipmentNumber;
         this.deliveryType = deliveryType;
         this.requestedWorkDate = requestedWorkDate;
@@ -49,12 +45,11 @@ public class TransportOrderResponse {
         this.productCount = productCount;
         this.volume = volume;
         this.weight = weight;
-        this.managerName = managerName;
-        this.phoneNumber = phoneNumber;
-        this.deliveryDestinationCode = deliveryDestinationCode;
+        this.destinationInfo = destinationInfo;
+        this.clientInfo = clientInfo;
     }
 
-    public static TransportOrderResponse of(TransportOrder transportOrder,String managerName,String phoneNumber, Long deliveryDestinationCode){
+    public static TransportOrderResponse of(TransportOrder transportOrder,String managerName, String phoneNumber, Long deliveryDestinationCode){
         return new TransportOrderResponse(
             transportOrder.getShipmentNumber(),
             transportOrder.getDeliveryType(),
@@ -66,26 +61,74 @@ public class TransportOrderResponse {
             transportOrder.getProductCount(),
             transportOrder.getVolume(),
             transportOrder.getWeight(),
-            managerName,
-            phoneNumber,
-            deliveryDestinationCode
-        );
-    }
-    public static TransportOrderResponse of(TransportOrder transportOrder){
-        return new TransportOrderResponse(
-            transportOrder.getShipmentNumber(),
-            transportOrder.getDeliveryType(),
-            transportOrder.getRequestedWorkDate(),
-            transportOrder.getRequestedArrivalTime(),
-            transportOrder.getEstimatedWorkTime(),
-            transportOrder.getSmName(),
-            transportOrder.getProductName(),
-            transportOrder.getProductCount(),
-            transportOrder.getVolume(),
-            transportOrder.getWeight(),
-            null,
-            null,
+            DestinationInfo.of(managerName, phoneNumber, deliveryDestinationCode),
             null
         );
     }
+    public static TransportOrderResponse of(TransportOrder transportOrder,String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+        return new TransportOrderResponse(
+            transportOrder.getShipmentNumber(),
+            transportOrder.getDeliveryType(),
+            transportOrder.getRequestedWorkDate(),
+            transportOrder.getRequestedArrivalTime(),
+            transportOrder.getEstimatedWorkTime(),
+            transportOrder.getSmName(),
+            transportOrder.getProductName(),
+            transportOrder.getProductCount(),
+            transportOrder.getVolume(),
+            transportOrder.getWeight(),
+            null,
+            ClientInfo.of(clientName, phoneNumber, roadAddress, detailAddress, note)
+        );
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class DestinationInfo{
+        @Schema(example = "유관순", description = "담당자명")
+        private String managerName;
+        @Schema(example = "010-1111-2222", description = "담당자 연락처")
+        private String phoneNumber;
+        @Schema(example = "4", description = "배송처 코드")
+        private Long deliveryDestinationCode;
+
+        private DestinationInfo(String managerName, String phoneNumber, Long deliveryDestinationCode){
+            this.managerName = managerName;
+            this.phoneNumber = phoneNumber;
+            this.deliveryDestinationCode = deliveryDestinationCode;
+        }
+
+        private static DestinationInfo of(String managerName, String phoneNumber, Long deliveryDestinationCode){
+            return new DestinationInfo(managerName, phoneNumber, deliveryDestinationCode);
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ClientInfo{
+        @Schema(example = "홍길동", description = "고객명")
+        private String clientName;
+        @Schema(example = "01012345678", description = "연락처")
+        private String phoneNumber;
+        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "도로명 주소")
+        private String roadAddress;
+        @Schema(example = "1층 물류센터", description = "상세주소")
+        private String detailAddress;
+        @Schema(example = "조심히 다뤄주세요.", description = "고객 전달 사항")
+        private String note;
+
+        private ClientInfo(String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+            this.clientName = clientName;
+            this.phoneNumber = phoneNumber;
+            this.roadAddress = roadAddress;
+            this.detailAddress = detailAddress;
+            this.note = note;
+        }
+
+        private static ClientInfo of(String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+            return new ClientInfo(clientName, phoneNumber, roadAddress, detailAddress, note);
+        }
+    }
+
+
 }
