@@ -97,8 +97,10 @@ public class DispatchUpdateResponse {
         private Double lon;
         @Schema(example = "30.4", description = "이동거리 (km)")
         private Double distance;
+        @Schema(example = "true", description = "요청 시간 지연 여부")
+        private boolean delayRequestTime;
 
-        private DispatchDetailResponse(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distance){
+        private DispatchDetailResponse(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distance, boolean delayRequestTime){
             this.address = address;
             this.ett = ett;
             this.expectationOperationStartTime = expectationOperationStartTime;
@@ -107,10 +109,11 @@ public class DispatchUpdateResponse {
             this.lat = lat;
             this.lon = lon;
             this.distance = distance;
+            this.delayRequestTime = delayRequestTime;
         }
 
-        public static DispatchDetailResponse of(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distanceTypeMeter){
-            return new DispatchDetailResponse(address,ett,expectationOperationStartTime,expectationOperationEndTime,expectedServiceDuration,lat,lon, distanceTypeMeter / 1000);
+        public static DispatchDetailResponse of(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distanceTypeMeter, boolean delayRequestTime){
+            return new DispatchDetailResponse(address,ett,expectationOperationStartTime,expectationOperationEndTime,expectedServiceDuration,lat,lon, distanceTypeMeter / 1000, delayRequestTime);
         }
 
 

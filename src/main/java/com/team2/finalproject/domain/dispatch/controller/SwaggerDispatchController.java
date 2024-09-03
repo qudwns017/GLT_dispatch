@@ -42,7 +42,9 @@ public interface SwaggerDispatchController {
             @ApiResponse(responseCode = "500", description = "서버 에러", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     ResponseEntity<DispatchUpdateResponse> updateDispatch(
-            @Parameter(description = "배차 변경 요청 정보") @RequestBody DispatchUpdateRequest request);
+            @Parameter(description = "배차 변경 요청 정보") @RequestBody DispatchUpdateRequest request,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    );
 
     @Operation(summary = "배송 이슈", description = "배송 이슈를 등록합니다.")
     @ApiResponses({

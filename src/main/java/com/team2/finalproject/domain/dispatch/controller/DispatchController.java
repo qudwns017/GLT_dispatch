@@ -27,8 +27,9 @@ public class DispatchController implements SwaggerDispatchController{
     private final DispatchService dispatchService;
 
     @PostMapping
-    public ResponseEntity<Void> confirmDispatch(@RequestBody DispatchConfirmRequest request, @AuthenticationPrincipal
-                                                UserDetailsImpl user) {
+    public ResponseEntity<Void> confirmDispatch(
+        @RequestBody DispatchConfirmRequest request,
+        @AuthenticationPrincipal UserDetailsImpl user) {
         dispatchService.confirmDispatch(request, user);
         return ApiResponse.CREATED();
     }
@@ -40,8 +41,12 @@ public class DispatchController implements SwaggerDispatchController{
     }
 
     @PutMapping
-    public ResponseEntity<DispatchUpdateResponse> updateDispatch(@RequestBody @Valid DispatchUpdateRequest request){
-        DispatchUpdateResponse response = dispatchService.updateDispatch(request);
+    public ResponseEntity<DispatchUpdateResponse> updateDispatch(
+        @RequestBody @Valid DispatchUpdateRequest request,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+        ){
+        DispatchUpdateResponse response = dispatchService.updateDispatch(request,userDetails);
+
         return ApiResponse.OK(response);
     }
 
