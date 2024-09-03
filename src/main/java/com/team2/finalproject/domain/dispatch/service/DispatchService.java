@@ -1,12 +1,12 @@
 package com.team2.finalproject.domain.dispatch.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.center.repository.CenterRepository;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList.DispatchDetailList;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
-import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest.Order;
 import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
@@ -29,6 +29,8 @@ import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
 import com.team2.finalproject.global.util.optimization.OptimizationResponse;
+import com.team2.finalproject.global.util.request.Stopover;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,24 +56,25 @@ public class DispatchService {
     private final DispatchDetailRepository dispatchDetailRepository;
 
     private final OptimizationApiUtil optimizationApiUtil;
+    private final CenterRepository centerRepository;
 
     @Transactional(readOnly = true)
-    public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request) {
+    public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request,UserDetailsImpl userDetails) {
         List<DispatchUpdateRequest.Order> orders = request.orderList();
+        Long centerId = userDetails.getUsers().getCenter().getId();
+        Center center = centerRepository.findByIdOrThrow(centerId);
 
-        Order startOrder = orders.get(0);
-        orders.remove(0);
-
-        OptimizationRequest.Stopover startStopoverRequest = OptimizationRequest.Stopover.of(startOrder.address(),
-                startOrder.lat(), startOrder.lon(),
-                LocalTime.of(startOrder.expectedServiceDuration() / 60, startOrder.expectedServiceDuration() % 60, 0));
-        List<OptimizationRequest.Stopover> stopoverList = orders.stream()
-                .map((order) -> OptimizationRequest.Stopover.of(order.address(), order.lat(), order.lon(),
+        Stopover startStopoverRequest = Stopover.of(center.getRoadAddress(),
+                center.getLatitude(), center.getLongitude(),
+                LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0));
+        List<Stopover> stopoverList = orders.stream()
+                .map((order) -> Stopover.of(order.address(), order.lat(), order.lon(),
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
                 .toList();
 
-        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(
-                OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
+        Sm sm = smRepository.findByIdOrThrow(request.smId());
+
+        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList, sm.getBreakStartTime(), sm.getBreakTime()));
 
         DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
                 optimizationResponse.startStopover().address(),
@@ -83,11 +86,10 @@ public class DispatchService {
         );
 
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
-        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(
-                resultStopoverList);
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(resultStopoverList, orders ,request.loadingStartTime());
 
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
-                startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
+            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
     }
 
     @Transactional
@@ -148,12 +150,20 @@ public class DispatchService {
         dispatchDetailRepository.saveAll(pendingDispatchDetailList);
     }
 
-    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(
-            List<OptimizationResponse.ResultStopover> resultStopoverList) {
+    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(List<OptimizationResponse.ResultStopover> resultStopoverList, List<DispatchUpdateRequest.Order> orderList, LocalDateTime startDateTime) {
 
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = new ArrayList<>();
-
         for (int i = 0; i < resultStopoverList.size(); i++) {
+
+            boolean delayRequestTime = false;
+
+            if (orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
+                (orderList.get(i).serviceRequestTime() != null &&
+                    orderList.get(i).serviceRequestTime().isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
+                    orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
+                delayRequestTime = true;
+            }
+
             DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
                     resultStopoverList.get(i).address(),
                     resultStopoverList.get(i).timeFromPrevious() / 60000, // ms -> 분
@@ -166,8 +176,9 @@ public class DispatchService {
                     resultStopoverList.get(i).delayTime().getHour() * 60
                             + resultStopoverList.get(i).delayTime().getMinute(),
                     resultStopoverList.get(i).lat(),
-                    resultStopoverList.get(i).lon(),
-                    resultStopoverList.get(i).distance()
+                    resultStopoverList  .get(i).lon(),
+                    resultStopoverList.get(i).distance(),
+                    delayRequestTime
             );
             dispatchDetailResponseList.add(dispatchDetailResponse);
         }

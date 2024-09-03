@@ -4,10 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public record DispatchUpdateRequest(
+    @Schema(example = "1", description = "기사id")
+    @NotNull Long smId,
     @Schema(example = "2024-06-15T09:00:00", description = "상차 시작 시간", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull LocalDateTime loadingStartTime,
     @Valid List<Order> orderList
@@ -21,7 +25,11 @@ public record DispatchUpdateRequest(
         @Schema(example = "127.243", description = "경도", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull Double lon,
         @Schema(example = "60", description = "예상 작업시간", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotNull int expectedServiceDuration
+        @NotNull int expectedServiceDuration,
+        @Schema(example = "2024-06-15", description = "희망 도착일", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull LocalDate serviceRequestDate,
+        @Schema(example = "11:00:00", description = "희망 도착시간", requiredMode = Schema.RequiredMode.REQUIRED)
+        LocalTime serviceRequestTime
     ){
 
     }
