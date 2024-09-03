@@ -19,10 +19,10 @@ public class DispatchUpdateResponse {
     private Long totalTime; // 주행시간 (분)
     @Schema(example = "14:00:00", description = "휴식시작시간")
     private LocalTime breakStartTime;
-    @Schema(example = "01:00:00", description = "휴식시간")
+    @Schema(example = "15:00:00", description = "휴식종료시간")
     private LocalTime breakEndTime;
     @Schema(example = "3", description = "휴식경유지(해당경유지로 이동중)")
-    private int restingPosition;
+    private int restingStopover;
     private StartStopover startStopover;
     private List<DispatchDetailResponse> dispatchDetailList;
     @ArraySchema(
@@ -34,19 +34,19 @@ public class DispatchUpdateResponse {
     )
     private List<Map<String,Double>> coordinates;
 
-    private DispatchUpdateResponse(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingPosition, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
+    private DispatchUpdateResponse(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingStopover, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
         this.mileage = mileage;
         this.totalTime = totalTime;
         this.breakStartTime = breakStartTime;
         this.breakEndTime = breakEndTime;
-        this.restingPosition = restingPosition;
+        this.restingStopover = restingStopover;
         this.startStopover = startStopover;
         this.dispatchDetailList = dispatchDetailList;
         this.coordinates = coordinates;
     }
 
-    public static DispatchUpdateResponse of(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingPosition, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
-        return new DispatchUpdateResponse(mileage,totalTime, breakStartTime,breakEndTime,restingPosition, startStopover, dispatchDetailList, coordinates);
+    public static DispatchUpdateResponse of(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingStopover, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
+        return new DispatchUpdateResponse(mileage,totalTime, breakStartTime,breakEndTime,restingStopover, startStopover, dispatchDetailList, coordinates);
     }
 
     @Getter
