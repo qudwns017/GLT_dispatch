@@ -17,7 +17,7 @@ public record DispatchUpdateRequest(
     @Valid List<Order> orderList
 ) {
 
-    public record   Order(
+    public record Order(
         @Schema(example = "서울시 강동구 천호동", description = "주소(주소가 아니더라도 특정할 수 있는 데이터 ex)start ,stopover1)", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank String address,
         @Schema(example = "38.3333", description = "위도", requiredMode = Schema.RequiredMode.REQUIRED)
