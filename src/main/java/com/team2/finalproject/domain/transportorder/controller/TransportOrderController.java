@@ -57,10 +57,9 @@ public class TransportOrderController implements SwaggerTransportOrderController
 
     @GetMapping("/{transportOrderId}")
     public ResponseEntity<TransportOrderResponse> getTransportOrderById(
-        @PathVariable Long transportOrderId,
-        @RequestParam(required = false) Long destinationId
+        @PathVariable Long transportOrderId
         ) {
-        TransportOrderResponse transportOrderResponse = transportOrderService.getTransportOrderById(transportOrderId, destinationId);
+        TransportOrderResponse transportOrderResponse = transportOrderService.getTransportOrderById(transportOrderId);
 
         return ApiResponse.OK(transportOrderResponse);
     }

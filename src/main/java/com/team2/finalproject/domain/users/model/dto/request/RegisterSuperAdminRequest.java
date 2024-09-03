@@ -4,9 +4,7 @@ import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.model.type.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record RegisterAdminRequest(
-        @Schema(example = "1", description = "센터 ID", requiredMode = Schema.RequiredMode.REQUIRED)
-        long centerId,
+public record RegisterSuperAdminRequest(
 
         @Schema(example = "John Doe", description = "관리자 이름", requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
@@ -20,12 +18,13 @@ public record RegisterAdminRequest(
         @Schema(example = "010-1234-5678", description = "관리자 전화번호", requiredMode = Schema.RequiredMode.REQUIRED)
         String phoneNumber
 ) {
+        // 비밀 번호 제외
         public Users toEntity() {
                 return Users.builder()
                         .name(this.name())
                         .username(this.username())
                         .phoneNumber(this.phoneNumber())
-                        .role(Role.ADMIN)
+                        .role(Role.SUPER_ADMIN)
                         .build();
         }
 }

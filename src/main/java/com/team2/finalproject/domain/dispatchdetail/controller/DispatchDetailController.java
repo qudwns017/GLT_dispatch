@@ -33,7 +33,7 @@ public class DispatchDetailController implements SwaggerDispatchDetailController
         @RequestBody List<Long> dispatchDetailIdList,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        dispatchDetailService.cancelDispatchDetailList(dispatchDetailIdList,userDetails.getUsers().getCenter().getId());
+        dispatchDetailService.cancelDispatchDetailList(dispatchDetailIdList,userDetails.getCenter().getId());
         return ApiResponse.OK();
     }
 }

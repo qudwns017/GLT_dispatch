@@ -30,8 +30,12 @@ public interface SwaggerDispatchController {
     UserDetailsImpl user);
 
     @Operation(summary = "차량관제 탭, 배차 삭제", description = "차량관제 탭에서 배차 삭제를 합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "배차 삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "올바르지 않은 배차번호 id가 있습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
     ResponseEntity<Void> cancelDispatch(
-            @Parameter(description = "배차 취소 요청 정보") @RequestBody DispatchCancelRequest cancelDispatchRequest
+            @Parameter(description = "배차 취소 요청 정보") @RequestBody DispatchCancelRequest cancelDispatchRequest, @AuthenticationPrincipal UserDetailsImpl user
     );
 
     @Operation(summary = "배차 변경", description = "배차 탭에서 배차 변경을 합니다. (DispatchUpdateRequest, DispatchUpdateResponse)")

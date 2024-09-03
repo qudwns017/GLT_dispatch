@@ -15,6 +15,8 @@ import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.dispatchdetail.repository.DispatchDetailRepository;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberErrorCode;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberException;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
@@ -32,6 +34,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -49,6 +54,7 @@ public class DispatchService {
     private final SmRepository smRepository;
     private final TransportOrderRepository transportOrderRepository;
     private final DispatchDetailRepository dispatchDetailRepository;
+
     private final OptimizationApiUtil optimizationApiUtil;
     private final CenterRepository centerRepository;
 
@@ -92,7 +98,7 @@ public class DispatchService {
         List<DispatchDetail> pendingDispatchDetailList = new ArrayList<>();
 
         Users usersEntity = userDetails.getUsers();
-        Center centerEntity = usersEntity.getCenter();
+        Center centerEntity = userDetails.getCenter();
         DispatchNumber dispatchNumberEntity = DispatchConfirmRequest.toDispatchNumberEntity(request, usersEntity,
                 centerEntity);
         DispatchNumber savedDispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
@@ -182,27 +188,46 @@ public class DispatchService {
 
     // 배차 탭에서의 배차 취소
     @Transactional
-    public void cancelDispatch(DispatchCancelRequest request) {
+    public void cancelDispatch(DispatchCancelRequest request, Center center) {
+        // center, ids로 DispatchNumber 리스트 가져오기
+        List<DispatchNumber> dispatchNumbers =
+                dispatchNumberRepository.findByIdsAndCenter(request.dispatchNumberIds(), center);
 
-        if (request.isInTransit()) {
-            // 주행 중인 경우
-            cancelInTransitDispatch(request.dispatchNumberIds());
-        } else {
-            // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
-            dispatchNumberRepository.deleteByIdIn(request.dispatchNumberIds());
+        // 입력 받은 DispatchNumberIds의 개수와 dispatchNumbers의 개수가 다를 경우 잘못된 요청
+        // 존재 하지 않거나 담당 센터가 아닌 배차에 대한 취소 요청
+        if (dispatchNumbers.size() != request.dispatchNumberIds().size()) {
+            throw new DispatchNumberException(DispatchNumberErrorCode.INVALID_IN_REQUEST);
         }
+
+        // 주행 완료된 DispatchNumber가 포함되어 있는지 확인
+        boolean hasCompletedDispatch = dispatchNumbers.stream()
+                .anyMatch(dispatchNumber -> dispatchNumber.getStatus() == DispatchNumberStatus.COMPLETED);
+
+        if (hasCompletedDispatch) {
+            throw new DispatchNumberException(DispatchNumberErrorCode.CANNOT_CANCEL_COMPLETED_DISPATCH_NUMBER);
+        }
+
+        // DispatchNumber 리스트를 상태에 따라 분리
+        Map<Boolean, List<DispatchNumber>> partitionedDispatchNumbers = dispatchNumbers.stream()
+                .collect(Collectors.partitioningBy(dispatchNumber -> dispatchNumber.getStatus() == DispatchNumberStatus.IN_TRANSIT));
+
+        List<DispatchNumber> inTransitDispatchNumbers = partitionedDispatchNumbers.get(true);
+        List<DispatchNumber> waitingDispatchNumbers = partitionedDispatchNumbers.get(false);
+
+        // 주행 중인 경우
+        cancelInTransitDispatch(inTransitDispatchNumbers);
+
+        // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
+        dispatchNumberRepository.deleteAll(waitingDispatchNumbers);
     }
 
     // 주행 중인 경우 배차 취소
-    private void cancelInTransitDispatch(List<Long> dispatchNumberIds) {
-        //  dispatchNumberIds에 해당하는 배차 코드를 지닌 DispatchNumber 리스트 조회
-        List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findByIdIn(dispatchNumberIds);
-
+    private void cancelInTransitDispatch(List<DispatchNumber> inTransitDispatchNumbers) {
         // DispatchNumber 상태 COMPLETED로 변경
-        updateDispatchNumberStatusToCompleted(dispatchNumbersToCancel);
+        updateDispatchNumberStatusToCompleted(inTransitDispatchNumbers);
 
         // 각 Dispatch 처리 (내부의 DispatchDetail, TransportOrder 포함)
-        dispatchNumbersToCancel.stream()
+        inTransitDispatchNumbers.stream()
                 .flatMap(dn -> dn.getDispatchList().stream())
                 .forEach(this::processDispatchCancellation);
     }

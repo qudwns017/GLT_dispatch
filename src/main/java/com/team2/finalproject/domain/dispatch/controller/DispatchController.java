@@ -27,16 +27,16 @@ public class DispatchController implements SwaggerDispatchController{
     private final DispatchService dispatchService;
 
     @PostMapping
-    public ResponseEntity<Void> confirmDispatch(
-        @RequestBody DispatchConfirmRequest request,
-        @AuthenticationPrincipal UserDetailsImpl user) {
-        dispatchService.confirmDispatch(request, user);
+    public ResponseEntity<Void> confirmDispatch(@RequestBody DispatchConfirmRequest request, @AuthenticationPrincipal
+                                                UserDetailsImpl userDetails) {
+        dispatchService.confirmDispatch(request, userDetails);
         return ApiResponse.CREATED();
     }
 
     @PatchMapping
-    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request) {
-        dispatchService.cancelDispatch(request);
+    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        dispatchService.cancelDispatch(request, userDetails.getCenter());
         return ApiResponse.OK();
     }
 

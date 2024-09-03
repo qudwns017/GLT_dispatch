@@ -11,8 +11,10 @@ public record DeliveryDestinationRequest(
         long centerId,
         @Schema(example = "충남정보센터", description = "배송처 이름")
         String destinationName,
-        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "주소")
-        String address,
+        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "도로명 주소")
+        String roadAddress,
+        @Schema(example = "충남 논산시 중앙동 41", description = "지번 주소")
+        String lotNumberAddress,
         @Schema(example = "1층 물류센터", description = "상세주소")
         String detailAddress,
         @Schema(example = "32934", description = "우편번호")
@@ -30,13 +32,15 @@ public record DeliveryDestinationRequest(
         @Schema(example = "윙바디 진입 불가", description = "비고")
         String comment,
         @Schema(example = "70", description = "작업추가 소요시간")
-        int delayTime) {
+        int delayTime
+) {
 
     public static DeliveryDestination toEntity(DeliveryDestinationRequest request, Center center) {
         return DeliveryDestination.builder().
                 center(center).
                 destinationName(request.destinationName()).
-                roadAddress(request.address()).
+                roadAddress(request.roadAddress()).
+                roadAddress(request.lotNumberAddress()).
                 detailAddress(request.detailAddress()).
                 zipCode(request.zipCode()).
                 managerName(request.adminName()).
