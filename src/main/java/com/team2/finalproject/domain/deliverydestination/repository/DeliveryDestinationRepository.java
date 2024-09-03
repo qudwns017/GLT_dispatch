@@ -40,7 +40,7 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
     @Query("SELECT d.comment FROM DeliveryDestination d WHERE d.id = :id")
     Optional<String> findCommentById(@Param("id") Long id);
 
-    default String findCommentByIdOrThrow(Long id) {
-        return findCommentById(id).orElseThrow(() -> new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION));
+    default String findCommentByIdOrNull(Long id) {
+        return findCommentById(id).orElse(null);
     }
 }

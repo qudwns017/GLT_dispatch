@@ -70,9 +70,9 @@ public class DispatchDetailService {
 
     private String getComment(DispatchDetail dispatchDetail) {
         if (dispatchDetail.getDestinationType() == DestinationType.CENTER) {
-            return centerRepository.findCommentByIdOrThrow(dispatchDetail.getDestinationId());
+            return centerRepository.findCommentByIdOrNull(dispatchDetail.getDestinationId());
         }else if(dispatchDetail.getDestinationType() == DestinationType.DELIVERY_DESTINATION) {
-            return deliveryDestinationRepository.findCommentByIdOrThrow(dispatchDetail.getDestinationId());
+            return deliveryDestinationRepository.findCommentByIdOrNull(dispatchDetail.getDestinationId());
         }
         return null;
     }

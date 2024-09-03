@@ -14,7 +14,7 @@ public record RegisterDriverRequest(
         @Schema(example = "John Smith", description = "기사 이름", requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
 
-        @Schema(example = "driver123", description = "기사 ID", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(example = "driver", description = "기사 ID", requiredMode = Schema.RequiredMode.REQUIRED)
         String username,
 
         @Schema(example = "password", description = "기사 PW", requiredMode = Schema.RequiredMode.REQUIRED)

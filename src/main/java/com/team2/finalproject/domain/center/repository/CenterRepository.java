@@ -25,7 +25,7 @@ public interface CenterRepository extends JpaRepository<Center, Long> {
     @Query("SELECT c.comment FROM Center c WHERE c.id = :id")
     Optional<String> findCommentById(@Param("id") Long id);
 
-    default String findCommentByIdOrThrow(Long id) {
-        return findCommentById(id).orElseThrow(() -> new CenterException(CenterErrorCode.NOT_FOUND_CENTER));
+    default String findCommentByIdOrNull(Long id) {
+        return findCommentById(id).orElse(null);
     }
 }
