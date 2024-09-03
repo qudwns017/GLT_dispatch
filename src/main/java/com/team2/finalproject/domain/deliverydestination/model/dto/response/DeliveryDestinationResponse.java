@@ -7,12 +7,16 @@ import lombok.Builder;
 
 @Builder
 public record DeliveryDestinationResponse(
+        @Schema(example = "1", description = "배송처 ID")
+        long deliveryDestinationId,
         @Schema(example = "1", description = "센터 ID")
         long centerId,
         @Schema(example = "충남정보센터", description = "배송처 이름")
         String destinationName,
-        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "주소")
-        String address,
+        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "도로명 주소")
+        String roadAddress,
+        @Schema(example = "충남 논산시 중앙동 41", description = "지번 주소")
+        String lotNumberAddress,
         @Schema(example = "1층 물류센터", description = "상세주소")
         String detailAddress,
         @Schema(example = "32934", description = "우편번호")
@@ -37,9 +41,11 @@ public record DeliveryDestinationResponse(
 
     public static DeliveryDestinationResponse of(DeliveryDestination deliveryDestination) {
         return DeliveryDestinationResponse.builder().
+                deliveryDestinationId(deliveryDestination.getId()).
                 centerId(deliveryDestination.getCenter().getId()).
                 destinationName(deliveryDestination.getDestinationName()).
-                address(deliveryDestination.getRoadAddress()).
+                lotNumberAddress(deliveryDestination.getRoadAddress()).
+                roadAddress(deliveryDestination.getRoadAddress()).
                 detailAddress(deliveryDestination.getDetailAddress()).
                 zipCode(deliveryDestination.getZipCode()).
                 adminName(deliveryDestination.getManagerName()).

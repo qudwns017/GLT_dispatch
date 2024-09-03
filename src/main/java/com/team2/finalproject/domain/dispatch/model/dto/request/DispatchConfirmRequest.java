@@ -79,9 +79,6 @@ public record DispatchConfirmRequest(
                 @Schema(example = "홍길동", description = "기사 이름")
                 String smName,
 
-                @Schema(example = "false", description = "진입 조건 여부")
-                boolean errorYn,
-
                 @Schema(example = "30", description = "예상 이동 시간 (분)")
                 int ett,
 

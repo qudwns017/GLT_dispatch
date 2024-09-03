@@ -7,12 +7,16 @@ import lombok.Builder;
 
 @Builder
 public record CenterResponse(
-        @Schema(example = "C001", description = "사용자 ID")
+        @Schema(example = "1", description = "센터 ID")
+        long centerId,
+        @Schema(example = "C001", description = "센터 코드")
         String centerCode,
         @Schema(example = "충남정보센터", description = "센터이름")
         String centerName,
-        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "주소")
-        String address,
+        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "도로명 주소")
+        String roadAddress,
+        @Schema(example = "충남 논산시 중앙동 41", description = "지번 주소")
+        String lotNumberAddress,
         @Schema(example = "1층 물류센터", description = "상세주소")
         String detailAddress,
         @Schema(example = "32934", description = "우편번호")
@@ -37,9 +41,11 @@ public record CenterResponse(
 
     public static CenterResponse of(Center center) {
         return CenterResponse.builder().
+                centerId(center.getId()).
                 centerCode(center.getCenterCode()).
                 centerName(center.getCenterName()).
-                address(center.getRoadAddress()).
+                lotNumberAddress(center.getRoadAddress()).
+                roadAddress(center.getRoadAddress()).
                 detailAddress(center.getDetailAddress()).
                 zipCode(center.getZipCode()).
                 adminName(center.getManagerName()).
