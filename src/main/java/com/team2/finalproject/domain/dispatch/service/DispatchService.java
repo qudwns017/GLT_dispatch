@@ -157,11 +157,10 @@ public class DispatchService {
 
             boolean delayRequestTime = false;
 
-            if (orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate())){
-                delayRequestTime = true;
-            }
-            if(orderList.get(i).serviceRequestTime() != null && orderList.get(i).serviceRequestTime().isBefore(resultStopoverList.get(i).endTime().toLocalTime()) && orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()))
-            {
+            if (orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
+                (orderList.get(i).serviceRequestTime() != null &&
+                    orderList.get(i).serviceRequestTime().isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
+                    orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
                 delayRequestTime = true;
             }
 
