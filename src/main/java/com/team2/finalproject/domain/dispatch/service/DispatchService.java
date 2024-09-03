@@ -1,8 +1,6 @@
 package com.team2.finalproject.domain.dispatch.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
-import com.team2.finalproject.domain.dispatch.exception.DispatchErrorCode;
-import com.team2.finalproject.domain.dispatch.exception.DispatchException;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList;
@@ -17,6 +15,8 @@ import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.dispatchdetail.repository.DispatchDetailRepository;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberErrorCode;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberException;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
@@ -184,7 +184,15 @@ public class DispatchService {
         // 입력 받은 DispatchNumberIds의 개수와 dispatchNumbers의 개수가 다를 경우 잘못된 요청
         // 존재 하지 않거나 담당 센터가 아닌 배차에 대한 취소 요청
         if (dispatchNumbers.size() != request.dispatchNumberIds().size()) {
-            throw new DispatchException(DispatchErrorCode.INVALID_IN_REQUEST);
+            throw new DispatchNumberException(DispatchNumberErrorCode.INVALID_IN_REQUEST);
+        }
+
+        // 주행 완료된 DispatchNumber가 포함되어 있는지 확인
+        boolean hasCompletedDispatch = dispatchNumbers.stream()
+                .anyMatch(dispatchNumber -> dispatchNumber.getStatus() == DispatchNumberStatus.COMPLETED);
+
+        if (hasCompletedDispatch) {
+            throw new DispatchNumberException(DispatchNumberErrorCode.CANNOT_CANCEL_COMPLETED_DISPATCH_NUMBER);
         }
 
         // DispatchNumber 리스트를 상태에 따라 분리
