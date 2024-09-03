@@ -7,7 +7,6 @@ import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
-import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
 import com.team2.finalproject.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,8 +52,14 @@ public class Center extends BaseEntity {
     @Column(nullable = false)
     private Double longitude;  // 경도
 
-    @Column(nullable = true, length = 10)
-    private String restrictedTonCode;    // 진입 불가 톤 코드
+    @Column(nullable = true, length = 20)
+    private String restrictedWingBody;  // 진입 불가 톤 코드
+
+    @Column(nullable = true, length = 20)
+    private String restrictedBox;       // 진입 불가 톤 코드
+
+    @Column(nullable = true, length = 20)
+    private String restrictedCargo;     // 진입 불가 톤 코드
 
     @Column(nullable = false, length = 20)
     private String phoneNumber; //전화번호
@@ -79,17 +84,20 @@ public class Center extends BaseEntity {
     List<Vehicle> vehicleList;
 
     @OneToMany(mappedBy = "center")
-    List<VehicleDetail> vehicleDetailList;
-
-    @OneToMany(mappedBy = "center")
     List<DispatchNumber> dispatchNumberList;
 
     @OneToMany(mappedBy = "center")
     List<TransportOrder> transportOrderList;
 
     public void update(UpdateCenterRequest request) {
-        if (request.restrictedTonCode() != null) {
-            this.restrictedTonCode = request.restrictedTonCode();
+        if (request.restrictedWingBody() != null) {
+            this.restrictedWingBody = request.restrictedWingBody();
+        }
+        if (request.restrictedBox() != null) {
+            this.restrictedBox = request.restrictedBox();
+        }
+        if (request.restrictedCargo() != null) {
+            this.restrictedCargo = request.restrictedCargo();
         }
         if (request.comment() != null) {
             this.comment = request.comment();

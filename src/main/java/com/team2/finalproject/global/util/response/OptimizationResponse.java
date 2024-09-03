@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -18,6 +19,9 @@ public class OptimizationResponse {
     private int totalTime;
     private LocalDateTime startTime;
     private Stopover startStopover;
+    private LocalTime breakStartTime;
+    private LocalTime breakEndTime;
+    private int restingPosition;
     private List<ResultStopover> resultStopoverList;
     private List<Coordinate> coordinates;
 }

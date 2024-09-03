@@ -18,12 +18,12 @@ import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
-import com.team2.finalproject.domain.vehicledetail.model.entity.VehicleDetail;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -46,7 +46,6 @@ public class DispatchDetailService {
         Sm sm = dispatch.getSm();
         Users users = sm.getUsers();
         Vehicle vehicle = sm.getVehicle();
-        VehicleDetail vehicleDetail = vehicle.getVehicleDetail();
 
         List<DispatchDetail> dispatchDetails = dispatch.getDispatchDetailList();
 
@@ -65,7 +64,7 @@ public class DispatchDetailService {
                 .toList();
 
         return DispatchDetailResponse.of(
-                dispatch, sm, users, vehicle, vehicleDetail, startStopover, dispatchDetailList);
+                dispatch, sm, users, vehicle, startStopover, dispatchDetailList);
     }
 
     private String getComment(DispatchDetail dispatchDetail) {

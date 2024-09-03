@@ -8,6 +8,7 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.CourseResponse;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchResponse;
 import com.team2.finalproject.domain.dispatch.model.dto.response.StartStopoverResponse;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
+import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.dto.request.OrderRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameRequest;
@@ -229,12 +230,18 @@ public class TransportOrderService {
     private List<OptimizationRequest> createOptimizationRequests(TransportOrderRequest request,
                                                                  Stopover startStopover,
                                                                  Map<Long, List<Stopover>> stopoversGroupedBySmId) {
-        return stopoversGroupedBySmId.values().stream()
-                .map(stopovers -> new OptimizationRequest(
-                        request.loadingStartTime(),
-                        startStopover,
-                        stopovers
-                ))
+        return stopoversGroupedBySmId.keySet().stream()
+                .map(smId -> {
+                    Sm sm = smRepository.findByIdOrThrow(smId);
+
+                    return new OptimizationRequest(
+                            request.loadingStartTime(),
+                            sm.getBreakStartTime(),
+                            sm.getBreakTime(),
+                            startStopover,
+                            stopoversGroupedBySmId.get(smId)
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
