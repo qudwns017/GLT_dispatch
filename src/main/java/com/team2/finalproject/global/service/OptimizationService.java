@@ -249,6 +249,10 @@ public class OptimizationService {
             return true;
         }
 
+        if(serviceRequestDate.isAfter(endDate)) {
+            return false;
+        }
+
         return endTime.isAfter(serviceRequestTime);
     }
 
