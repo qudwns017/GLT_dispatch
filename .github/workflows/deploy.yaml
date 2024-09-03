@@ -39,7 +39,7 @@ jobs:
           spring.jwt.access-expiration: ${{ secrets.JWT_ACCESS_EXPIRATION }}
           spring.jwt.refresh-expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
           optimization-api.uri: ${{ secrets.OPTIMIZATION_API_URI }}
-          kakao.api. key :  ${{ secrets.KAKAO_API_KEY }}
+          kakao.api.key :  ${{ secrets.KAKAO_API_KEY }}
 
 
       - name: Grant execute permission to gradlew
@@ -89,6 +89,6 @@ jobs:
           script: |
             docker stop $(docker ps -a -q)
             docker rm $(docker ps -a -q)
-            docker pull ${{ env.REGISTRY }}/fastcampus-final-group2/finalproject_server:main:${{ env.IMAGE_TAG }}
+            docker pull ${{ env.REGISTRY }}/fastcampus-final-group2/finalproject_server:${{ env.IMAGE_TAG }}
             docker run -d --name fc-final-container --restart unless-stopped --log-driver=syslog -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod ${{ env.REGISTRY }}/fastcampus-final-group2/finalproject_server:${{ env.IMAGE_TAG }}
             docker image prune -a -f

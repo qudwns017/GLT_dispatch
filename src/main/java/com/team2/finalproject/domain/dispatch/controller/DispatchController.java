@@ -28,8 +28,8 @@ public class DispatchController implements SwaggerDispatchController{
 
     @PostMapping
     public ResponseEntity<Void> confirmDispatch(@RequestBody DispatchConfirmRequest request, @AuthenticationPrincipal
-                                                UserDetailsImpl user) {
-        dispatchService.confirmDispatch(request, user);
+                                                UserDetailsImpl userDetails) {
+        dispatchService.confirmDispatch(request, userDetails);
         return ApiResponse.CREATED();
     }
 

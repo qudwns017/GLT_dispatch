@@ -12,7 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/dispatchNumber")
+@RequestMapping("/api/dispatch-number")
 @RequiredArgsConstructor
 public class DispatchNumberController implements SwaggerDispatchNumberController{
 
@@ -28,7 +28,7 @@ public class DispatchNumberController implements SwaggerDispatchNumberController
     public ResponseEntity<DispatchNumberSearchResponse> searchDispatches(@ModelAttribute DispatchNumberSearchRequest request,
                                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        DispatchNumberSearchResponse response = dispatchNumberService.searchDispatches(request, userDetails.getId());
+        DispatchNumberSearchResponse response = dispatchNumberService.searchDispatches(request, userDetails);
         return ApiResponse.OK(response);
     }
 }

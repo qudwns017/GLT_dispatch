@@ -366,14 +366,16 @@ public class TransportOrderService {
     }
 
     @Transactional(readOnly = true)
-    public TransportOrderResponse getTransportOrderById(Long transportOrderId,Long destinationId) {
+    public TransportOrderResponse getTransportOrderById(Long transportOrderId) {
         TransportOrder transportOrder = transportOrderRepository.findOrderWithDispatchDetailByIdOrThrow(transportOrderId);
+        Long destinationId = transportOrder.getDispatchDetail().getDestinationId();
 
         if (destinationId != null){
             DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByIdOrThrow(destinationId);
             return TransportOrderResponse.of(transportOrder,deliveryDestination.getManagerName(),deliveryDestination.getPhoneNumber(),destinationId);
         }
-        return TransportOrderResponse.of(transportOrder);
+
+        return TransportOrderResponse.of(transportOrder,transportOrder.getCustomerName(),transportOrder.getCustomerPhoneNumber(),transportOrder.getRoadAddress(),transportOrder.getDetailAddress(),transportOrder.getCustomerNotes());
     }
 }
 
