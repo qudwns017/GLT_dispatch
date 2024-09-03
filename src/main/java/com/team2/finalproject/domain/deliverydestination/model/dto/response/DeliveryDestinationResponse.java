@@ -25,8 +25,12 @@ public record DeliveryDestinationResponse(
         double latitude,
         @Schema(example = "127.1724", description = "경도")
         double longitude,
-        @Schema(example = "윙바디 8T", description = "진입불가 톤 코드")
-        String restrictedTonCode,
+        @Schema(example = "1,2.5,5", description = "윙바디 진입 불가")
+        String restrictedWingBody,  // 진입 불가 톤 코드
+        @Schema(example = "1", description = "탑차 진입 불가")
+        String restrictedBox,       // 진입 불가 톤 코드
+        @Schema(example = "2.5,5", description = "카고 진입 불가")
+        String restrictedCargo,     // 진입 불가 톤 코드
         @Schema(example = "윙바디 진입 불가", description = "비고")
         String comment,
         @Schema(example = "70", description = "작업추가 소요시간")
@@ -46,7 +50,9 @@ public record DeliveryDestinationResponse(
                 phoneNumber(deliveryDestination.getPhoneNumber()).
                 latitude(deliveryDestination.getLatitude()).
                 longitude(deliveryDestination.getLongitude()).
-                restrictedTonCode(deliveryDestination.getRestrictedTonCode()).
+                restrictedWingBody(deliveryDestination.getRestrictedWingBody()).
+                restrictedBox(deliveryDestination.getRestrictedBox()).
+                restrictedCargo(deliveryDestination.getRestrictedCargo()).
                 comment(deliveryDestination.getComment()).
                 delayTime(deliveryDestination.getDelayTime()).
                 updateAt(deliveryDestination.getUpdateAt()).
