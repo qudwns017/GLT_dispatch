@@ -28,7 +28,6 @@ jobs:
         with:
           files: ./src/main/resources/application.yaml
         env:
-          swagger-ui-url: ${{ secrets.SWAGGER_UI_REQUEST_URL }}
           spring.datasource.url: ${{ secrets.MYSQL_URL }}
           spring.datasource.username: ${{ secrets.MYSQL_USERNAME }}
           spring.datasource.password: ${{ secrets.MYSQL_PASSWORD }}
@@ -41,7 +40,7 @@ jobs:
           spring.jwt.refresh-expiration: ${{ secrets.JWT_REFRESH_EXPIRATION }}
           optimization-api.uri: ${{ secrets.OPTIMIZATION_API_URI }}
           kakao.api.key :  ${{ secrets.KAKAO_API_KEY }}
-
+          server.url: ${{ secrets.SERVER_URL }}
 
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew

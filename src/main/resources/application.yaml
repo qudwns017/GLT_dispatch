@@ -39,3 +39,7 @@ optimization-api:
   uri: ${OPTIMIZATION_API_URI}
 
 
+server:
+  url: ${SERVER_URL}
+
+
