@@ -40,7 +40,7 @@ public interface SwaggerUsersController {
     ResponseEntity<Void> registerDriver(@RequestBody RegisterDriverRequest registerDriverRequest);
 
     @Operation(summary = "사용자 로그인", description = "로그인을 시도합니다.")
-    @PostMapping("/api/users/login")
+    @PostMapping("/login")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패"),
