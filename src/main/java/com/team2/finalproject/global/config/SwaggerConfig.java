@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-    @Value("${swagger-ui.request.url}")
+    @Value("${server.url}")
     String requestUrl;
 
     @Bean
