@@ -3,6 +3,7 @@ package com.team2.finalproject.domain.dispatch.model.dto.response;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
@@ -16,6 +17,12 @@ public class DispatchUpdateResponse {
     private Double mileage;  // 주행거리 (km)
     @Schema(example = "34", description = "주행시간 (분)")
     private Long totalTime; // 주행시간 (분)
+    @Schema(example = "14:00:00", description = "휴식시작시간")
+    private LocalTime breakStartTime;
+    @Schema(example = "15:00:00", description = "휴식종료시간")
+    private LocalTime breakEndTime;
+    @Schema(example = "3", description = "휴식경유지(해당경유지로 이동중)")
+    private int restingStopover;
     private StartStopover startStopover;
     private List<DispatchDetailResponse> dispatchDetailList;
     @ArraySchema(
@@ -27,16 +34,19 @@ public class DispatchUpdateResponse {
     )
     private List<Map<String,Double>> coordinates;
 
-    private DispatchUpdateResponse(Double mileage,Long totalTime, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
+    private DispatchUpdateResponse(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingStopover, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
         this.mileage = mileage;
         this.totalTime = totalTime;
+        this.breakStartTime = breakStartTime;
+        this.breakEndTime = breakEndTime;
+        this.restingStopover = restingStopover;
         this.startStopover = startStopover;
         this.dispatchDetailList = dispatchDetailList;
         this.coordinates = coordinates;
     }
 
-    public static DispatchUpdateResponse of(Double mileage,Long totalTime, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
-        return new DispatchUpdateResponse(mileage,totalTime, startStopover, dispatchDetailList, coordinates);
+    public static DispatchUpdateResponse of(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingStopover, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
+        return new DispatchUpdateResponse(mileage,totalTime, breakStartTime,breakEndTime,restingStopover, startStopover, dispatchDetailList, coordinates);
     }
 
     @Getter
@@ -87,8 +97,10 @@ public class DispatchUpdateResponse {
         private Double lon;
         @Schema(example = "30.4", description = "이동거리 (km)")
         private Double distance;
+        @Schema(example = "true", description = "요청 시간 지연 여부")
+        private boolean delayRequestTime;
 
-        private DispatchDetailResponse(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distance){
+        private DispatchDetailResponse(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distance, boolean delayRequestTime){
             this.address = address;
             this.ett = ett;
             this.expectationOperationStartTime = expectationOperationStartTime;
@@ -97,10 +109,11 @@ public class DispatchUpdateResponse {
             this.lat = lat;
             this.lon = lon;
             this.distance = distance;
+            this.delayRequestTime = delayRequestTime;
         }
 
-        public static DispatchDetailResponse of(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distanceTypeMeter){
-            return new DispatchDetailResponse(address,ett,expectationOperationStartTime,expectationOperationEndTime,expectedServiceDuration,lat,lon, distanceTypeMeter / 1000);
+        public static DispatchDetailResponse of(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distanceTypeMeter, boolean delayRequestTime){
+            return new DispatchDetailResponse(address,ett,expectationOperationStartTime,expectationOperationEndTime,expectedServiceDuration,lat,lon, distanceTypeMeter / 1000, delayRequestTime);
         }
 
 

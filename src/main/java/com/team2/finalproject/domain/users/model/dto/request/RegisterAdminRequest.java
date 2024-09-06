@@ -11,7 +11,7 @@ public record RegisterAdminRequest(
         @Schema(example = "John Doe", description = "관리자 이름", requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
 
-        @Schema(example = "admin123", description = "관리자 ID", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(example = "admin", description = "관리자 ID", requiredMode = Schema.RequiredMode.REQUIRED)
         String username,
 
         @Schema(example = "password", description = "관리자 PW", requiredMode = Schema.RequiredMode.REQUIRED)

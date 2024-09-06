@@ -1,12 +1,12 @@
 package com.team2.finalproject.domain.dispatch.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
+import com.team2.finalproject.domain.center.repository.CenterRepository;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList.DispatchDetailList;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
-import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest.Order;
 import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
@@ -15,6 +15,8 @@ import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.dispatchdetail.repository.DispatchDetailRepository;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberErrorCode;
+import com.team2.finalproject.domain.dispatchnumber.exception.DispatchNumberException;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
@@ -27,9 +29,14 @@ import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
 import com.team2.finalproject.global.util.optimization.OptimizationResponse;
+import com.team2.finalproject.global.util.request.Stopover;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -49,24 +56,25 @@ public class DispatchService {
     private final DispatchDetailRepository dispatchDetailRepository;
 
     private final OptimizationApiUtil optimizationApiUtil;
+    private final CenterRepository centerRepository;
 
     @Transactional(readOnly = true)
-    public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request) {
+    public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request,UserDetailsImpl userDetails) {
         List<DispatchUpdateRequest.Order> orders = request.orderList();
+        Long centerId = userDetails.getUsers().getCenter().getId();
+        Center center = centerRepository.findByIdOrThrow(centerId);
 
-        Order startOrder = orders.get(0);
-        orders.remove(0);
-
-        OptimizationRequest.Stopover startStopoverRequest = OptimizationRequest.Stopover.of(startOrder.address(),
-                startOrder.lat(), startOrder.lon(),
-                LocalTime.of(startOrder.expectedServiceDuration() / 60, startOrder.expectedServiceDuration() % 60, 0));
-        List<OptimizationRequest.Stopover> stopoverList = orders.stream()
-                .map((order) -> OptimizationRequest.Stopover.of(order.address(), order.lat(), order.lon(),
+        Stopover startStopoverRequest = Stopover.of(center.getRoadAddress(),
+                center.getLatitude(), center.getLongitude(),
+                LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0));
+        List<Stopover> stopoverList = orders.stream()
+                .map((order) -> Stopover.of(order.address(), order.lat(), order.lon(),
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
                 .toList();
 
-        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(
-                OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList));
+        Sm sm = smRepository.findByIdOrThrow(request.smId());
+
+        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList, sm.getBreakStartTime(), sm.getBreakTime()));
 
         DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
                 optimizationResponse.startStopover().address(),
@@ -78,11 +86,10 @@ public class DispatchService {
         );
 
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
-        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(
-                resultStopoverList);
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(resultStopoverList, orders ,request.loadingStartTime());
 
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
-                startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
+            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
     }
 
     @Transactional
@@ -143,12 +150,20 @@ public class DispatchService {
         dispatchDetailRepository.saveAll(pendingDispatchDetailList);
     }
 
-    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(
-            List<OptimizationResponse.ResultStopover> resultStopoverList) {
+    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(List<OptimizationResponse.ResultStopover> resultStopoverList, List<DispatchUpdateRequest.Order> orderList, LocalDateTime startDateTime) {
 
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = new ArrayList<>();
-
         for (int i = 0; i < resultStopoverList.size(); i++) {
+
+            boolean delayRequestTime = false;
+
+            if (orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
+                (orderList.get(i).serviceRequestTime() != null &&
+                    orderList.get(i).serviceRequestTime().isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
+                    orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
+                delayRequestTime = true;
+            }
+
             DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
                     resultStopoverList.get(i).address(),
                     resultStopoverList.get(i).timeFromPrevious() / 60000, // ms -> 분
@@ -161,8 +176,9 @@ public class DispatchService {
                     resultStopoverList.get(i).delayTime().getHour() * 60
                             + resultStopoverList.get(i).delayTime().getMinute(),
                     resultStopoverList.get(i).lat(),
-                    resultStopoverList.get(i).lon(),
-                    resultStopoverList.get(i).distance()
+                    resultStopoverList  .get(i).lon(),
+                    resultStopoverList.get(i).distance(),
+                    delayRequestTime
             );
             dispatchDetailResponseList.add(dispatchDetailResponse);
         }
@@ -171,27 +187,46 @@ public class DispatchService {
 
     // 배차 탭에서의 배차 취소
     @Transactional
-    public void cancelDispatch(DispatchCancelRequest request) {
+    public void cancelDispatch(DispatchCancelRequest request, Center center) {
+        // center, ids로 DispatchNumber 리스트 가져오기
+        List<DispatchNumber> dispatchNumbers =
+                dispatchNumberRepository.findByIdsAndCenter(request.dispatchNumberIds(), center);
 
-        if (request.isInTransit()) {
-            // 주행 중인 경우
-            cancelInTransitDispatch(request.dispatchNumberIds());
-        } else {
-            // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
-            dispatchNumberRepository.deleteByIdIn(request.dispatchNumberIds());
+        // 입력 받은 DispatchNumberIds의 개수와 dispatchNumbers의 개수가 다를 경우 잘못된 요청
+        // 존재 하지 않거나 담당 센터가 아닌 배차에 대한 취소 요청
+        if (dispatchNumbers.size() != request.dispatchNumberIds().size()) {
+            throw new DispatchNumberException(DispatchNumberErrorCode.INVALID_IN_REQUEST);
         }
+
+        // 주행 완료된 DispatchNumber가 포함되어 있는지 확인
+        boolean hasCompletedDispatch = dispatchNumbers.stream()
+                .anyMatch(dispatchNumber -> dispatchNumber.getStatus() == DispatchNumberStatus.COMPLETED);
+
+        if (hasCompletedDispatch) {
+            throw new DispatchNumberException(DispatchNumberErrorCode.CANNOT_CANCEL_COMPLETED_DISPATCH_NUMBER);
+        }
+
+        // DispatchNumber 리스트를 상태에 따라 분리
+        Map<Boolean, List<DispatchNumber>> partitionedDispatchNumbers = dispatchNumbers.stream()
+                .collect(Collectors.partitioningBy(dispatchNumber -> dispatchNumber.getStatus() == DispatchNumberStatus.IN_TRANSIT));
+
+        List<DispatchNumber> inTransitDispatchNumbers = partitionedDispatchNumbers.get(true);
+        List<DispatchNumber> waitingDispatchNumbers = partitionedDispatchNumbers.get(false);
+
+        // 주행 중인 경우
+        cancelInTransitDispatch(inTransitDispatchNumbers);
+
+        // 주행 대기인 경우 -  해당하는 DispatchNumber, Dispatch, DispatchDetail, Transport_order 모두 삭제
+        dispatchNumberRepository.deleteAll(waitingDispatchNumbers);
     }
 
     // 주행 중인 경우 배차 취소
-    private void cancelInTransitDispatch(List<Long> dispatchNumberIds) {
-        //  dispatchNumberIds에 해당하는 배차 코드를 지닌 DispatchNumber 리스트 조회
-        List<DispatchNumber> dispatchNumbersToCancel = dispatchNumberRepository.findByIdIn(dispatchNumberIds);
-
+    private void cancelInTransitDispatch(List<DispatchNumber> inTransitDispatchNumbers) {
         // DispatchNumber 상태 COMPLETED로 변경
-        updateDispatchNumberStatusToCompleted(dispatchNumbersToCancel);
+        updateDispatchNumberStatusToCompleted(inTransitDispatchNumbers);
 
         // 각 Dispatch 처리 (내부의 DispatchDetail, TransportOrder 포함)
-        dispatchNumbersToCancel.stream()
+        inTransitDispatchNumbers.stream()
                 .flatMap(dn -> dn.getDispatchList().stream())
                 .forEach(this::processDispatchCancellation);
     }

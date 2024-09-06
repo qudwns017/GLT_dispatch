@@ -25,11 +25,11 @@ public class CourseResponse {
     @Schema(description = "기사 전화번호", example = "010-1234-5678")
     private String smPhoneNumber;
 
-    @Schema(description = "차량 톤 코드", example = "5T")
-    private String tonCode;
+    @Schema(description = "차량 종류", example = "WING_BODY")
+    private String vehicleType;
 
-    @Schema(description = "차량 톤", example = "5.0")
-    private double ton;
+    @Schema(description = "차량 톤", example = "2.5")
+    private double vehicleTon;
 
     @Schema(description = "주문 수", example = "10")
     private int orderNum;
@@ -54,8 +54,11 @@ public class CourseResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CourseDetailResponse {
-        @Schema(description = "진입 조건", example = "false")
-        private boolean errorYn;
+        @Schema(description = "톤코드 오류 여부", example = "false")
+        private boolean restrictedTonCode;
+
+        @Schema(description = "요청 시간 지연 여부", example = "false")
+        private boolean delayRequestTime;
 
         @Schema(description = "예상 이동 시간 (분)", example = "30")
         private int ett;

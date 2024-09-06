@@ -37,7 +37,6 @@ public interface DispatchRepository extends JpaRepository<Dispatch, Long> {
             "JOIN FETCH d.sm s " +
             "JOIN FETCH s.users " +
             "JOIN FETCH s.vehicle v " +
-            "JOIN FETCH v.vehicleDetail " +
             "JOIN FETCH d.dispatchDetailList ddl " +
             "JOIN FETCH ddl.transportOrder " +
             "WHERE d.id = :id")

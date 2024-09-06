@@ -34,14 +34,19 @@ public class DispatchController implements SwaggerDispatchController{
     }
 
     @PatchMapping
-    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request) {
-        dispatchService.cancelDispatch(request);
+    public ResponseEntity<Void> cancelDispatch(@RequestBody DispatchCancelRequest request,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        dispatchService.cancelDispatch(request, userDetails.getCenter());
         return ApiResponse.OK();
     }
 
     @PutMapping
-    public ResponseEntity<DispatchUpdateResponse> updateDispatch(@RequestBody @Valid DispatchUpdateRequest request){
-        DispatchUpdateResponse response = dispatchService.updateDispatch(request);
+    public ResponseEntity<DispatchUpdateResponse> updateDispatch(
+        @RequestBody @Valid DispatchUpdateRequest request,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+        ){
+        DispatchUpdateResponse response = dispatchService.updateDispatch(request,userDetails);
+
         return ApiResponse.OK(response);
     }
 

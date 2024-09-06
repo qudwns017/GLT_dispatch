@@ -8,6 +8,7 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.CourseResponse;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchResponse;
 import com.team2.finalproject.domain.dispatch.model.dto.response.StartStopoverResponse;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
+import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.dto.request.OrderRequest;
 import com.team2.finalproject.domain.transportorder.model.dto.request.SmNameRequest;
@@ -229,12 +230,18 @@ public class TransportOrderService {
     private List<OptimizationRequest> createOptimizationRequests(TransportOrderRequest request,
                                                                  Stopover startStopover,
                                                                  Map<Long, List<Stopover>> stopoversGroupedBySmId) {
-        return stopoversGroupedBySmId.values().stream()
-                .map(stopovers -> new OptimizationRequest(
-                        request.loadingStartTime(),
-                        startStopover,
-                        stopovers
-                ))
+        return stopoversGroupedBySmId.keySet().stream()
+                .map(smId -> {
+                    Sm sm = smRepository.findByIdOrThrow(smId);
+
+                    return new OptimizationRequest(
+                            request.loadingStartTime(),
+                            sm.getBreakStartTime(),
+                            sm.getBreakTime(),
+                            startStopover,
+                            stopoversGroupedBySmId.get(smId)
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -366,14 +373,16 @@ public class TransportOrderService {
     }
 
     @Transactional(readOnly = true)
-    public TransportOrderResponse getTransportOrderById(Long transportOrderId,Long destinationId) {
+    public TransportOrderResponse getTransportOrderById(Long transportOrderId) {
         TransportOrder transportOrder = transportOrderRepository.findOrderWithDispatchDetailByIdOrThrow(transportOrderId);
+        Long destinationId = transportOrder.getDispatchDetail().getDestinationId();
 
         if (destinationId != null){
             DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByIdOrThrow(destinationId);
             return TransportOrderResponse.of(transportOrder,deliveryDestination.getManagerName(),deliveryDestination.getPhoneNumber(),destinationId);
         }
-        return TransportOrderResponse.of(transportOrder);
+
+        return TransportOrderResponse.of(transportOrder,transportOrder.getCustomerName(),transportOrder.getCustomerPhoneNumber(),transportOrder.getRoadAddress(),transportOrder.getDetailAddress(),transportOrder.getCustomerNotes());
     }
 }
 
