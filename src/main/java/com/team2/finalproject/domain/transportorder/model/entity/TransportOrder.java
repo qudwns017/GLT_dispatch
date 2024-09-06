@@ -44,6 +44,7 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String customerName; // 고객명
 
+    @Column(nullable = false, length = 15)
     private String customerPhoneNumber; //고객연락처
 
     @Column(nullable = false, length = 50)
