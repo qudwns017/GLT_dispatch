@@ -23,10 +23,10 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String smName; // sm명
 
-    @Column(nullable = false,length = 100)
+    @Column(nullable = false, length = 100)
     private String shipmentNumber; // 운송장번호
 
-    @Column(nullable = true,length = 100)
+    @Column(nullable = true, length = 100)
     private String orderNumber; // 업체주문번호
 
     @Column(nullable = true, length = 10)
@@ -41,7 +41,7 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false)
     private LocalTime requestedArrivalTime; // 희망도착시간
 
-    @Column(nullable = false,length = 30)
+    @Column(nullable = false, length = 30)
     private String customerName; // 고객명
 
     private String customerPhoneNumber; //고객연락처
@@ -49,10 +49,10 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String roadAddress; // 도로명 주소
 
-    @Column(nullable = false,length = 50)
+    @Column(nullable = false, length = 50)
     private String lotNumberAddress; // 주소
 
-    @Column(nullable = false,length = 50)
+    @Column(nullable = false, length = 50)
     private String detailAddress; // 상세 주소
 
     @Column(nullable = false, length = 7)
@@ -69,7 +69,7 @@ public class TransportOrder extends BaseEntity {
 
     @Builder.Default
     @Column(nullable = true)
-    private LocalTime estimatedWorkTime = LocalTime.of(0,1);  // 예상작업시간
+    private LocalTime estimatedWorkTime = LocalTime.of(0, 1);  // 예상작업시간
 
     @Column(nullable = false, length = 100)
     private String productName; // 상품명
@@ -91,7 +91,7 @@ public class TransportOrder extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;
 
-    public void pend(){
+    public void pend() {
         this.isPending = true;
     }
 }
