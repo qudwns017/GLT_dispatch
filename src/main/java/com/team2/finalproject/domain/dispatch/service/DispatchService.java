@@ -156,14 +156,11 @@ public class DispatchService {
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = new ArrayList<>();
         for (int i = 0; i < resultStopoverList.size(); i++) {
 
-            boolean delayRequestTime = false;
-
-            if (orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
-                (orderList.get(i).serviceRequestTime() != null &&
-                    orderList.get(i).serviceRequestTime().isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
-                    orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
-                delayRequestTime = true;
-            }
+            boolean delayRequestTime = orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
+                    (orderList.get(i).serviceRequestTime() != null &&
+                            orderList.get(i).serviceRequestTime()
+                                    .isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
+                            orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()));
 
             DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
                     resultStopoverList.get(i).address(),
