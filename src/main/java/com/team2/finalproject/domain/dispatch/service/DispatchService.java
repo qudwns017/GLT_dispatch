@@ -61,12 +61,13 @@ public class DispatchService {
     @Transactional(readOnly = true)
     public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request,UserDetailsImpl userDetails) {
         List<DispatchUpdateRequest.Order> orders = request.orderList();
+
         Long centerId = userDetails.getUsers().getCenter().getId();
         Center center = centerRepository.findByIdOrThrow(centerId);
-
         Stopover startStopoverRequest = Stopover.of(center.getRoadAddress(),
                 center.getLatitude(), center.getLongitude(),
                 LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0));
+
         List<Stopover> stopoverList = orders.stream()
                 .map((order) -> Stopover.of(order.address(), order.lat(), order.lon(),
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
