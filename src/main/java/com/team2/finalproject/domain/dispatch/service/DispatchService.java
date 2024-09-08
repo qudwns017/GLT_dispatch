@@ -2,11 +2,14 @@ package com.team2.finalproject.domain.dispatch.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
+import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
+import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchCancelRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList.DispatchDetailList;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest;
+import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest.Order;
 import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
@@ -26,18 +29,21 @@ import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
 import com.team2.finalproject.domain.users.model.entity.Users;
+import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
+import com.team2.finalproject.domain.vehicle.model.type.VehicleType;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
 import com.team2.finalproject.global.util.optimization.OptimizationResponse;
+import com.team2.finalproject.global.util.optimization.OptimizationResponse.ResultStopover;
 import com.team2.finalproject.global.util.request.Stopover;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -59,6 +65,8 @@ public class DispatchService {
     private final OptimizationApiUtil optimizationApiUtil;
     private final CenterRepository centerRepository;
 
+    private final DeliveryDestinationRepository deliveryDestinationRepository;
+
     @Transactional(readOnly = true)
     public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request,UserDetailsImpl userDetails) {
         List<DispatchUpdateRequest.Order> orders = request.orderList();
@@ -70,7 +78,7 @@ public class DispatchService {
                 LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0));
 
         List<Stopover> stopoverList = orders.stream()
-                .map((order) -> Stopover.of(order.address(), order.lat(), order.lon(),
+                .map((order) -> Stopover.of(order.roadAddress(), order.lat(), order.lon(),
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
                 .toList();
 
@@ -88,7 +96,7 @@ public class DispatchService {
         );
 
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
-        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(resultStopoverList, orders ,request.loadingStartTime());
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(resultStopoverList, orders ,request.loadingStartTime(),sm.getVehicle());
 
         // 기사 계약에 따른 전체 주문 or 거리
         int totalOrderOrDistanceNum = sm.getCompletedNumOfMonth() + ( sm.getContractType() == ContractType.JIIP ?  + (int) (optimizationResponse.totalDistance() / 1000) : orders.size());
@@ -155,39 +163,79 @@ public class DispatchService {
         dispatchDetailRepository.saveAll(pendingDispatchDetailList);
     }
 
-    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(List<OptimizationResponse.ResultStopover> resultStopoverList, List<DispatchUpdateRequest.Order> orderList, LocalDateTime startDateTime) {
+    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(List<OptimizationResponse.ResultStopover> resultStopoverList, List<DispatchUpdateRequest.Order> orderList, LocalDateTime startDateTime , Vehicle vehicle) {
 
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = new ArrayList<>();
         for (int i = 0; i < resultStopoverList.size(); i++) {
 
             boolean delayRequestTime = false;
 
-            if (orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
-                (orderList.get(i).serviceRequestTime() != null &&
-                    orderList.get(i).serviceRequestTime().isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
-                    orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
+            ResultStopover resultStopover = resultStopoverList.get(i);
+            Order order = orderList.get(i);
+
+            // 희망 도착시간 및 도착일 초과 확인
+            if (order.serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
+                (order.serviceRequestTime() != null &&
+                    order.serviceRequestTime().isBefore(resultStopover.endTime().toLocalTime()) &&
+                    order.serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
                 delayRequestTime = true;
             }
 
+            // 배송처 오류 확인
+            DeliveryDestination destination = deliveryDestinationRepository.findByFullAddress(order.roadAddress(), order.detailAddress());
+
+            boolean isEntryRestricted = checkRestrictedTonCodes(vehicle,destination);
+
             DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
-                    resultStopoverList.get(i).address(),
-                    resultStopoverList.get(i).timeFromPrevious() / 60000, // ms -> 분
-                    resultStopoverList.get(i).endTime(),
+                resultStopover.address(),
+                resultStopover.timeFromPrevious() / 60000, // ms -> 분
+                resultStopover.endTime(),
                     i + 1 != resultStopoverList.size() ? resultStopoverList.get(i + 1).startTime()
-                            : resultStopoverList.get(i).endTime()
-                                    .plusHours(resultStopoverList.get(i).delayTime().getHour())
-                                    .plusMinutes(resultStopoverList.get(i).delayTime().getMinute())
-                                    .plusSeconds(resultStopoverList.get(i).delayTime().getSecond()),
-                    resultStopoverList.get(i).delayTime().getHour() * 60
-                            + resultStopoverList.get(i).delayTime().getMinute(),
-                    resultStopoverList.get(i).lat(),
-                    resultStopoverList  .get(i).lon(),
-                    resultStopoverList.get(i).distance(),
-                    delayRequestTime
+                            : resultStopover.endTime()
+                                    .plusHours(resultStopover.delayTime().getHour())
+                                    .plusMinutes(resultStopover.delayTime().getMinute())
+                                    .plusSeconds(resultStopover.delayTime().getSecond()),
+                resultStopover.delayTime().getHour() * 60
+                            + resultStopover.delayTime().getMinute(),
+                resultStopover.lat(),
+                resultStopover.lon(),
+                resultStopover.distance(),
+                delayRequestTime,
+                isEntryRestricted
             );
             dispatchDetailResponseList.add(dispatchDetailResponse);
         }
         return dispatchDetailResponseList;
+    }
+
+    //TODO 유틸로 빼기
+    private boolean checkRestrictedTonCodes(Vehicle vehicle, DeliveryDestination destination) {
+        if (destination == null) {
+            return false;
+        }
+
+        String restrictedTonCode = null;
+
+        if (vehicle.getVehicleType() == VehicleType.WING_BODY) {
+            restrictedTonCode = destination.getRestrictedWingBody();
+        } else if (vehicle.getVehicleType() == VehicleType.BOX) {
+            restrictedTonCode = destination.getRestrictedBox();
+        } else if (vehicle.getVehicleType() == VehicleType.CARGO) {
+            restrictedTonCode = destination.getRestrictedCargo();
+        }
+
+        return checkRestrictedTonCode(vehicle.getVehicleTon(), restrictedTonCode);
+    }
+
+    //TODO 유틸로 빼기
+    private boolean checkRestrictedTonCode(Double vehicleTon, String restrictedTonCode) {
+        if (restrictedTonCode == null || restrictedTonCode.isEmpty()) {
+            return false;
+        }
+        return Arrays.stream(restrictedTonCode.split(","))
+            .map(String::trim)
+            .mapToDouble(Double::parseDouble)
+            .anyMatch(vehicleTon::equals);
     }
 
     // 배차 탭에서의 배차 취소

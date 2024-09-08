@@ -23,6 +23,8 @@ public class DispatchUpdateResponse {
     private LocalTime breakEndTime;
     @Schema(example = "3", description = "휴식경유지(해당경유지로 이동중)")
     private int restingStopover;
+    @Schema(example = "true", description = "진입불가 톤 코드 오류인 주문이 있는지 없는지")
+    private boolean isRestricted;
     @Schema(example = "true", description = "최대 계약 초과 오류")
     private boolean maxContractOver;
     @Schema(example = "20", description = "전체 주문 or 거리")
@@ -56,6 +58,8 @@ public class DispatchUpdateResponse {
         this.breakStartTime = breakStartTime;
         this.breakEndTime = breakEndTime;
         this.restingStopover = restingStopover;
+        this.isRestricted = dispatchDetailList.stream()
+            .anyMatch(DispatchDetailResponse::isEntryRestricted); // 집입제한 조건이 하나라도 오류이면 true
         this.maxContractOver = totalOrderOrDistanceNum > availableNum; // 계약에 다른 최대치 초과 오류
         this.totalOrderOrDistanceNum = totalOrderOrDistanceNum;
         this.availableNum = availableNum;
@@ -131,13 +135,15 @@ public class DispatchUpdateResponse {
         private Double lon;
         @Schema(example = "30.4", description = "이동거리 (km)")
         private Double distance;
-        @Schema(example = "true", description = "요청 시간 지연 여부")
+        @Schema(example = "true", description = "희망 도착시간 및 도착일 지연 여부")
         private boolean delayRequestTime;
+        @Schema(example = "true", description = "진입불가 톤 코드 오류")
+        private boolean isEntryRestricted;
 
         private DispatchDetailResponse(String address, Long ett,
             LocalDateTime expectationOperationStartTime, LocalDateTime expectationOperationEndTime,
             int expectedServiceDuration, Double lat, Double lon, Double distance,
-            boolean delayRequestTime) {
+            boolean delayRequestTime, boolean isEntryRestricted) {
             this.address = address;
             this.ett = ett;
             this.expectationOperationStartTime = expectationOperationStartTime;
@@ -147,15 +153,16 @@ public class DispatchUpdateResponse {
             this.lon = lon;
             this.distance = distance;
             this.delayRequestTime = delayRequestTime;
+            this.isEntryRestricted = isEntryRestricted;
         }
 
         public static DispatchDetailResponse of(String address, Long ett,
             LocalDateTime expectationOperationStartTime, LocalDateTime expectationOperationEndTime,
             int expectedServiceDuration, Double lat, Double lon, Double distanceTypeMeter,
-            boolean delayRequestTime) {
+            boolean delayRequestTime,boolean isEntryRestricted) {
             return new DispatchDetailResponse(address, ett, expectationOperationStartTime,
                 expectationOperationEndTime, expectedServiceDuration, lat, lon,
-                distanceTypeMeter / 1000, delayRequestTime);
+                distanceTypeMeter / 1000, delayRequestTime,isEntryRestricted);
         }
 
 
