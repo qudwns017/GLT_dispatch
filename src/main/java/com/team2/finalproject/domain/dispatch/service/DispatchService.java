@@ -21,6 +21,7 @@ import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRepository;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
+import com.team2.finalproject.domain.sm.model.type.ContractType;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.transportorder.repository.TransportOrderRepository;
@@ -89,8 +90,11 @@ public class DispatchService {
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(resultStopoverList, orders ,request.loadingStartTime());
 
+        // 기사 계약에 따른 전체 주문 or 거리
+        int totalOrderOrDistanceNum = sm.getCompletedNumOfMonth() + ( sm.getContractType() == ContractType.JIIP ?  + (int) (optimizationResponse.totalDistance() / 1000) : orders.size());
+
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
-            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
+            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,totalOrderOrDistanceNum ,sm.getContractNumOfMonth(),startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
     }
 
     @Transactional

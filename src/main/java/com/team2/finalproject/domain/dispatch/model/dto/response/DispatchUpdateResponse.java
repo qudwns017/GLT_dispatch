@@ -23,6 +23,12 @@ public class DispatchUpdateResponse {
     private LocalTime breakEndTime;
     @Schema(example = "3", description = "휴식경유지(해당경유지로 이동중)")
     private int restingStopover;
+    @Schema(example = "true", description = "최대 계약 초과 오류")
+    private boolean maxContractOver;
+    @Schema(example = "20", description = "전체 주문 or 거리")
+    private int totalOrderOrDistanceNum;
+    @Schema(example = "80", description = "가용 주문")
+    private int availableNum;
     private StartStopover startStopover;
     private List<DispatchDetailResponse> dispatchDetailList;
     @ArraySchema(
@@ -32,26 +38,51 @@ public class DispatchUpdateResponse {
             description = "경로 좌표"
         )
     )
-    private List<Map<String,Double>> coordinates;
+    private List<Map<String, Double>> coordinates;
 
-    private DispatchUpdateResponse(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingStopover, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
+    private DispatchUpdateResponse(
+        Double mileage,
+        Long totalTime,
+        LocalTime breakStartTime,
+        LocalTime breakEndTime,
+        int restingStopover,
+        int totalOrderOrDistanceNum,
+        int availableNum,
+        StartStopover startStopover,
+        List<DispatchDetailResponse> dispatchDetailList,
+        List<Map<String, Double>> coordinates) {
         this.mileage = mileage;
         this.totalTime = totalTime;
         this.breakStartTime = breakStartTime;
         this.breakEndTime = breakEndTime;
         this.restingStopover = restingStopover;
+        this.maxContractOver = totalOrderOrDistanceNum > availableNum; // 계약에 다른 최대치 초과 오류
+        this.totalOrderOrDistanceNum = totalOrderOrDistanceNum;
+        this.availableNum = availableNum;
         this.startStopover = startStopover;
         this.dispatchDetailList = dispatchDetailList;
         this.coordinates = coordinates;
     }
 
-    public static DispatchUpdateResponse of(Double mileage,Long totalTime,LocalTime breakStartTime, LocalTime breakEndTime, int restingStopover, StartStopover startStopover, List<DispatchDetailResponse> dispatchDetailList,List<Map<String,Double>> coordinates){
-        return new DispatchUpdateResponse(mileage,totalTime, breakStartTime,breakEndTime,restingStopover, startStopover, dispatchDetailList, coordinates);
+    public static DispatchUpdateResponse of(
+        Double mileage,
+        Long totalTime,
+        LocalTime breakStartTime,
+        LocalTime breakEndTime,
+        int restingStopover,
+        int totalOrderOrDistanceNum,
+        int availableNum,
+        StartStopover startStopover,
+        List<DispatchDetailResponse> dispatchDetailList,
+        List<Map<String, Double>> coordinates)
+    {
+        return new DispatchUpdateResponse(mileage, totalTime, breakStartTime, breakEndTime, restingStopover, totalOrderOrDistanceNum, availableNum, startStopover, dispatchDetailList, coordinates);
     }
 
     @Getter
     @NoArgsConstructor
-    public static class StartStopover{
+    public static class StartStopover {
+
         @Schema(example = "서울시 강동구 천호동", description = "주소")
         private String address;
         @Schema(example = "37.5409", description = "위도")
@@ -63,7 +94,8 @@ public class DispatchUpdateResponse {
         @Schema(example = "2023-06-15T09:00:00", description = "운송 시작 시간")
         private LocalDateTime departureTime;
 
-        private StartStopover(String address,Double lat,Double lon,int delayTime, LocalDateTime departureTime){
+        private StartStopover(String address, Double lat, Double lon, int delayTime,
+            LocalDateTime departureTime) {
             this.address = address;
             this.lat = lat;
             this.lon = lon;
@@ -72,14 +104,16 @@ public class DispatchUpdateResponse {
 
         }
 
-        public static DispatchUpdateResponse.StartStopover of(String address,Double lat,Double lon,int delayTime,LocalDateTime departureTime){
-            return new DispatchUpdateResponse.StartStopover(address,lat,lon,delayTime,departureTime);
+        public static DispatchUpdateResponse.StartStopover of(String address, Double lat,
+            Double lon, int delayTime, LocalDateTime departureTime) {
+            return new DispatchUpdateResponse.StartStopover(address, lat, lon, delayTime,
+                departureTime);
         }
     }
 
     @Getter
     @NoArgsConstructor
-    public static class DispatchDetailResponse{
+    public static class DispatchDetailResponse {
 
         @Schema(example = "서울시 강동구 천호동", description = "주소")
         private String address;
@@ -100,7 +134,10 @@ public class DispatchUpdateResponse {
         @Schema(example = "true", description = "요청 시간 지연 여부")
         private boolean delayRequestTime;
 
-        private DispatchDetailResponse(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distance, boolean delayRequestTime){
+        private DispatchDetailResponse(String address, Long ett,
+            LocalDateTime expectationOperationStartTime, LocalDateTime expectationOperationEndTime,
+            int expectedServiceDuration, Double lat, Double lon, Double distance,
+            boolean delayRequestTime) {
             this.address = address;
             this.ett = ett;
             this.expectationOperationStartTime = expectationOperationStartTime;
@@ -112,8 +149,13 @@ public class DispatchUpdateResponse {
             this.delayRequestTime = delayRequestTime;
         }
 
-        public static DispatchDetailResponse of(String address,Long ett,LocalDateTime expectationOperationStartTime,LocalDateTime expectationOperationEndTime,int expectedServiceDuration,Double lat,Double lon,Double distanceTypeMeter, boolean delayRequestTime){
-            return new DispatchDetailResponse(address,ett,expectationOperationStartTime,expectationOperationEndTime,expectedServiceDuration,lat,lon, distanceTypeMeter / 1000, delayRequestTime);
+        public static DispatchDetailResponse of(String address, Long ett,
+            LocalDateTime expectationOperationStartTime, LocalDateTime expectationOperationEndTime,
+            int expectedServiceDuration, Double lat, Double lon, Double distanceTypeMeter,
+            boolean delayRequestTime) {
+            return new DispatchDetailResponse(address, ett, expectationOperationStartTime,
+                expectationOperationEndTime, expectedServiceDuration, lat, lon,
+                distanceTypeMeter / 1000, delayRequestTime);
         }
 
 
