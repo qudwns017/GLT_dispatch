@@ -55,6 +55,15 @@ public class DispatchDetailResponse {
     @Schema(example = "No issues", description = "이슈 및 메모")
     private String issue;
 
+    @Schema(example = "13:00", description = "휴식 시작 시간")
+    private LocalTime breakStartTime;
+
+    @Schema(example = "15:00", description = "휴식 종료 시간")
+    private LocalTime breakEndTime;
+
+    @Schema(example = "3", description = "휴식 경유지 위치 (해당 경유지의 바로 앞)")
+    private int restingStopover;
+
     private StartStopover startStopover;
 
     private List<DispatchDetail> dispatchDetailList;
@@ -176,6 +185,9 @@ public class DispatchDetailResponse {
                 .deliveryOrderCount(dispatch.getDeliveryOrderCount())
                 .totalTime(dispatch.getTotalTime())
                 .issue(dispatch.getIssue())
+                .breakStartTime(dispatch.getBreakStartTime())
+                .breakEndTime(dispatch.getBreakEndTime())
+                .restingStopover(dispatch.getRestingStopover())
                 .startStopover(startStopover)
                 .dispatchDetailList(dispatchDetailList)
                 .build();
