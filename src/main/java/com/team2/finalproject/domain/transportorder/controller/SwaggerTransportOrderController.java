@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.ErrorResponse;
@@ -47,7 +46,7 @@ public interface SwaggerTransportOrderController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @Operation(summary = "운송 주문 데이터 검증", description = "등록된 운송 주문의 SM명과 SM 아이디의 존재를 확인합니다.")
-    ResponseEntity<List<SmNameAndSmIdResponse>> validateSmNameAndSmIds(
+    ResponseEntity<SmNameAndSmIdResponse> validateSmNameAndSmIds(
             @RequestBody ValidationListRequest request);
 
     @Operation(summary = "주문 상세 조회", description = "배차 상세에서 주문 상세를 조회 (TransportOrderResponse)")
