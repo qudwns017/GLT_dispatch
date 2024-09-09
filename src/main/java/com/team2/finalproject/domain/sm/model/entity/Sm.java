@@ -2,6 +2,7 @@ package com.team2.finalproject.domain.sm.model.entity;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
+import com.team2.finalproject.domain.sm.model.type.ContractType;
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.global.entity.BaseEntity;
@@ -42,6 +43,16 @@ public class Sm extends BaseEntity {
 
     @Column(nullable = false)
     private LocalTime breakTime;  // 휴게시간
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ContractType contractType;
+
+    @Column(nullable = false)
+    private int completedNumOfMonth; // 한달 완료 진행 수
+
+    @Column(nullable = false)
+    private int contractNumOfMonth; // 한달 계약 수(거리,주문)
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Center center;  // 센터 ID

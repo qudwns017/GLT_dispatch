@@ -61,12 +61,13 @@ public class DispatchService {
     @Transactional(readOnly = true)
     public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request,UserDetailsImpl userDetails) {
         List<DispatchUpdateRequest.Order> orders = request.orderList();
+
         Long centerId = userDetails.getUsers().getCenter().getId();
         Center center = centerRepository.findByIdOrThrow(centerId);
-
         Stopover startStopoverRequest = Stopover.of(center.getRoadAddress(),
                 center.getLatitude(), center.getLongitude(),
                 LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0));
+
         List<Stopover> stopoverList = orders.stream()
                 .map((order) -> Stopover.of(order.address(), order.lat(), order.lon(),
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
@@ -101,7 +102,7 @@ public class DispatchService {
         Center centerEntity = userDetails.getCenter();
         DispatchNumber dispatchNumberEntity = DispatchConfirmRequest.toDispatchNumberEntity(request, usersEntity,
                 centerEntity);
-        DispatchNumber savedDispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
+        DispatchNumber dispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
 
         for (DispatchList dispatch : request.dispatchList()) {
             double totalVolume = 0;
@@ -121,8 +122,8 @@ public class DispatchService {
             LineString path = geometryFactory.createLineString(coordinates.toArray(new Coordinate[0]));
 
             Dispatch dispatchEntity = DispatchConfirmRequest.toDispatchEntity(
-                    request, savedDispatchNumber, smEntity, centerEntity,
-                    totalVolume, totalWeight, totalDistance, totalTime, path
+                    request, dispatchNumber, smEntity, centerEntity,
+                    totalVolume, totalWeight, totalDistance, totalTime, path, dispatch
             );
 
             Dispatch savedDispatch = dispatchRepository.save(dispatchEntity);
@@ -155,14 +156,11 @@ public class DispatchService {
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = new ArrayList<>();
         for (int i = 0; i < resultStopoverList.size(); i++) {
 
-            boolean delayRequestTime = false;
-
-            if (orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
-                (orderList.get(i).serviceRequestTime() != null &&
-                    orderList.get(i).serviceRequestTime().isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
-                    orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
-                delayRequestTime = true;
-            }
+            boolean delayRequestTime = orderList.get(i).serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
+                    (orderList.get(i).serviceRequestTime() != null &&
+                            orderList.get(i).serviceRequestTime()
+                                    .isBefore(resultStopoverList.get(i).endTime().toLocalTime()) &&
+                            orderList.get(i).serviceRequestDate().isEqual(startDateTime.toLocalDate()));
 
             DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
                     resultStopoverList.get(i).address(),

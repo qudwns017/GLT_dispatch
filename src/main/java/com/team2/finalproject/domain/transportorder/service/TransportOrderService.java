@@ -134,19 +134,21 @@ public class TransportOrderService {
         }
     }
 
-    public List<SmNameAndSmIdResponse> validateSmNames(List<SmNameRequest> requests) {
-        return requests.stream()
+    public SmNameAndSmIdResponse validateSmNames(List<SmNameRequest> requests) {
+        List<SmNameAndSmIdResponse.ValidList> validLists = requests.stream()
                 .map(request -> {
                     Long smId = smRepository.findSmIdBySmName(request.smName());
                     boolean isValid = smId != null;
                     int resultSmId = isValid ? smId.intValue() : 0;
 
-                    return SmNameAndSmIdResponse.builder()
+                    return SmNameAndSmIdResponse.ValidList.builder()
                             .smNameValid(isValid)
                             .smId(resultSmId)
                             .build();
                 })
                 .toList();
+
+        return new SmNameAndSmIdResponse(validLists);
     }
 
     private Center getCenterByUser(Users user) {

@@ -6,13 +6,22 @@ import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.global.entity.BaseEntity;
-import jakarta.persistence.*;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.locationtech.jts.geom.LineString;
 
 
@@ -63,6 +72,15 @@ public class Dispatch extends BaseEntity {
 
     @Column(nullable = false)
     private double loadingRate; // 적재율
+
+    @Column(nullable = false)
+    private LocalTime breakStartTime; // 휴식 시작 시간
+
+    @Column(nullable = false)
+    private LocalTime breakEndTime; // 휴식 종료 시간
+
+    @Column(nullable = false)
+    private int restingStopover; // 휴식 경유지 위치 (해당 경유지의 바로 앞)
 
     @Setter
     @Builder.Default
