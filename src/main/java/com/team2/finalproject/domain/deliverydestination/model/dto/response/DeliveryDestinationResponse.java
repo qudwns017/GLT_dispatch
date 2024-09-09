@@ -9,8 +9,14 @@ import lombok.Builder;
 public record DeliveryDestinationResponse(
         @Schema(example = "1", description = "배송처 ID")
         long deliveryDestinationId,
-        @Schema(example = "1", description = "센터 ID")
-        long centerId,
+        @Schema(example = "C001", description = "센터 코드")
+        String centerCode,
+        @Schema(example = "충남정보센터", description = "센터이름")
+        String centerName,
+        @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "센터 도로명 주소")
+        String centerRoadAddress,
+        @Schema(example = "충남 논산시 중앙동 41", description = "센터 지번 주소")
+        String centerLotNumberAddress,
         @Schema(example = "충남정보센터", description = "배송처 이름")
         String destinationName,
         @Schema(example = "충남 논산시 중앙대로 374번길 41-11", description = "도로명 주소")
@@ -44,24 +50,27 @@ public record DeliveryDestinationResponse(
 ) {
 
     public static DeliveryDestinationResponse of(DeliveryDestination deliveryDestination) {
-        return DeliveryDestinationResponse.builder().
-                deliveryDestinationId(deliveryDestination.getId()).
-                centerId(deliveryDestination.getCenter().getId()).
-                destinationName(deliveryDestination.getDestinationName()).
-                lotNumberAddress(deliveryDestination.getRoadAddress()).
-                roadAddress(deliveryDestination.getRoadAddress()).
-                detailAddress(deliveryDestination.getDetailAddress()).
-                zipCode(deliveryDestination.getZipCode()).
-                adminName(deliveryDestination.getManagerName()).
-                phoneNumber(deliveryDestination.getPhoneNumber()).
-                latitude(deliveryDestination.getLatitude()).
-                longitude(deliveryDestination.getLongitude()).
-                restrictedWingBody(deliveryDestination.getRestrictedWingBody()).
-                restrictedBox(deliveryDestination.getRestrictedBox()).
-                restrictedCargo(deliveryDestination.getRestrictedCargo()).
-                comment(deliveryDestination.getComment()).
-                delayTime(deliveryDestination.getDelayTime()).
-                updateAt(deliveryDestination.getUpdateAt()).
-                build();
+        return DeliveryDestinationResponse.builder()
+                .deliveryDestinationId(deliveryDestination.getId())
+                .centerCode(deliveryDestination.getCenter().getCenterCode())
+                .centerName(deliveryDestination.getCenter().getCenterName())
+                .centerRoadAddress(deliveryDestination.getCenter().getRoadAddress())
+                .centerLotNumberAddress(deliveryDestination.getCenter().getLotNumberAddress())
+                .destinationName(deliveryDestination.getDestinationName())
+                .lotNumberAddress(deliveryDestination.getRoadAddress())
+                .roadAddress(deliveryDestination.getRoadAddress())
+                .detailAddress(deliveryDestination.getDetailAddress())
+                .zipCode(deliveryDestination.getZipCode())
+                .adminName(deliveryDestination.getManagerName())
+                .phoneNumber(deliveryDestination.getPhoneNumber())
+                .latitude(deliveryDestination.getLatitude())
+                .longitude(deliveryDestination.getLongitude())
+                .restrictedWingBody(deliveryDestination.getRestrictedWingBody())
+                .restrictedBox(deliveryDestination.getRestrictedBox())
+                .restrictedCargo(deliveryDestination.getRestrictedCargo())
+                .comment(deliveryDestination.getComment())
+                .delayTime(deliveryDestination.getDelayTime())
+                .updateAt(deliveryDestination.getUpdateAt())
+                .build();
     }
 }
