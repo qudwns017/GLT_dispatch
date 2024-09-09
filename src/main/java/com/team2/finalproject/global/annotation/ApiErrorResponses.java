@@ -15,4 +15,3 @@ import java.lang.annotation.Target;
 public @interface ApiErrorResponses {
     ApiErrorResponse[] value() default {};
 }
-//https://github.com/depromeet/street-drop-server/blob/dev/backend/streetdrop-api/src/main/java/com/depromeet/external/swagger/config/CustomOperationCustomizer.java
