@@ -84,7 +84,7 @@ public class TransportOrderResponse {
 
     @Getter
     @NoArgsConstructor
-    public static class DestinationInfo{
+    public static class DestinationInfo {
         @Schema(example = "유관순", description = "담당자명")
         private String managerName;
         @Schema(example = "010-1111-2222", description = "담당자 연락처")
@@ -92,20 +92,20 @@ public class TransportOrderResponse {
         @Schema(example = "4", description = "배송처 코드")
         private Long deliveryDestinationCode;
 
-        private DestinationInfo(String managerName, String phoneNumber, Long deliveryDestinationCode){
+        private DestinationInfo(String managerName, String phoneNumber, Long deliveryDestinationCode) {
             this.managerName = managerName;
             this.phoneNumber = phoneNumber;
             this.deliveryDestinationCode = deliveryDestinationCode;
         }
 
-        private static DestinationInfo of(String managerName, String phoneNumber, Long deliveryDestinationCode){
+        private static DestinationInfo of(String managerName, String phoneNumber, Long deliveryDestinationCode) {
             return new DestinationInfo(managerName, phoneNumber, deliveryDestinationCode);
         }
     }
 
     @Getter
     @NoArgsConstructor
-    public static class ClientInfo{
+    public static class ClientInfo {
         @Schema(example = "홍길동", description = "고객명")
         private String clientName;
         @Schema(example = "01012345678", description = "연락처")
@@ -117,7 +117,8 @@ public class TransportOrderResponse {
         @Schema(example = "조심히 다뤄주세요.", description = "고객 전달 사항")
         private String note;
 
-        private ClientInfo(String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+        private ClientInfo(String clientName, String phoneNumber, String roadAddress, String detailAddress,
+                           String note) {
             this.clientName = clientName;
             this.phoneNumber = phoneNumber;
             this.roadAddress = roadAddress;
@@ -125,7 +126,8 @@ public class TransportOrderResponse {
             this.note = note;
         }
 
-        private static ClientInfo of(String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+        private static ClientInfo of(String clientName, String phoneNumber, String roadAddress, String detailAddress,
+                                     String note) {
             return new ClientInfo(clientName, phoneNumber, roadAddress, detailAddress, note);
         }
     }
