@@ -109,9 +109,6 @@ public record DispatchConfirmRequest(
                 @Schema(example = "C0029384889", description = "운송장 번호")
                 String shipmentNumber,
 
-                @Schema(example = "240812_공동구매", description = "업체 주문 번호")
-                String clientOrderKey,
-
                 @Schema(example = "배송", description = "주문 유형 (배송, 수거)")
                 String orderType,
 
