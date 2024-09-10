@@ -4,6 +4,7 @@ import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDe
 import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.dispatch.model.dto.response.CourseResponse;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
+import com.team2.finalproject.domain.sm.model.type.ContractType;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
 import com.team2.finalproject.domain.transportorder.model.dto.request.OrderRequest;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
@@ -80,7 +81,7 @@ public class OptimizationService {
         Vehicle vehicle = vehicleRepository.findBySm(sm);
 
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList =
-                createCourseDetailResponseList(response.getResultStopoverList(), mapOrderAndAddress, vehicle, addressMapping);
+                createCourseDetailResponseList(sm, response.getResultStopoverList(), mapOrderAndAddress, vehicle, addressMapping);
 
         int floorAreaRatio = calculateFloorAreaRatio(vehicle, courseDetailResponseList);
         List<CourseResponse.CoordinatesResponse> coordinatesResponseList = mapCoordinates(response);
@@ -88,7 +89,7 @@ public class OptimizationService {
         return buildCourseResponse(sm, vehicle, response, floorAreaRatio, courseDetailResponseList, coordinatesResponseList);
     }
 
-    private List<CourseResponse.CourseDetailResponse> createCourseDetailResponseList(List<ResultStopover> stopovers,
+    private List<CourseResponse.CourseDetailResponse> createCourseDetailResponseList(Sm sm, List<ResultStopover> stopovers,
                                                                                      Map<String, List<OrderRequest>> orderRequestMap,
                                                                                      Vehicle vehicle,
                                                                                      Map<String, String[]> addressMapping) {
@@ -105,11 +106,28 @@ public class OptimizationService {
             boolean isDelayed = checkDelayedTime(TransportOrderUtil.addDelayTime(stopover.getEndTime(), stopover.getDelayTime()),
                     matchingOrder.serviceRequestTime(), matchingOrder.serviceRequestDate());
 
-            courseDetailResponseList.add(createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, isDelayed, addressMapping));
+            boolean isOverContractNum = checkOverContractNum(sm, stopover);
+
+            courseDetailResponseList.add(createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, isDelayed, isOverContractNum, addressMapping));
         }
 
         return courseDetailResponseList;
     }
+
+    private boolean checkOverContractNum(Sm sm, ResultStopover stopover) {
+        // 계약 타입에 따른 최대 계약 수 비교
+        if (sm.getContractType() == ContractType.JIIP) {
+            // 지입일 경우 거리로 계산
+            double totalDistance = sm.getCompletedNumOfMonth() + stopover.getDistance();
+            return totalDistance > sm.getContractNumOfMonth();
+        } else if (sm.getContractType() == ContractType.DELIVERY) {
+            // 택배일 경우 주문 수로 계산
+            int completedOrders = sm.getCompletedNumOfMonth() + 1;
+            return completedOrders > sm.getContractNumOfMonth();
+        }
+        return false;
+    }
+
 
     private OrderRequest findMatchingOrder(Map<String, List<OrderRequest>> orderRequestMap, String address) {
         List<OrderRequest> matchingOrders = orderRequestMap.get(address);
@@ -125,17 +143,20 @@ public class OptimizationService {
                                                                            DeliveryDestination destination,
                                                                            boolean isRestricted,
                                                                            boolean isDelayed,
+                                                                           boolean isOverContractNum,
                                                                            Map<String, String[]> addressMapping) {
         return CourseResponse.CourseDetailResponse.builder()
                 .restrictedTonCode(isRestricted)
                 .delayRequestTime(isDelayed)
+                .overContractNum(isOverContractNum)
                 .ett(stopover.getTimeFromPrevious() / 1000 / 60)
                 .expectationOperationStartTime(stopover.getEndTime())
                 .expectationOperationEndTime(TransportOrderUtil.addDelayTime(stopover.getEndTime(), stopover.getDelayTime()))
                 .lat(stopover.getLat())
                 .lon(stopover.getLon())
                 .distance(stopover.getDistance() / 1000.0)
-                .address(addressMapping.get(stopover.getAddress())[0])
+                .roadAddress(stopover.getAddress().replace(addressMapping.get(stopover.getAddress())[1], ""))
+                .lotNumberAddress(addressMapping.get(stopover.getAddress())[0])
                 .detailAddress(addressMapping.get(stopover.getAddress())[1])
                 .expectedServiceDuration(TransportOrderUtil.convertLocalTimeToMinutes(stopover.getDelayTime()))
                 .deliveryDestinationId(destination != null ? destination.getId() : 0)
@@ -203,6 +224,9 @@ public class OptimizationService {
                 .mileage((int) response.getTotalDistance() / 1000)
                 .totalTime(response.getTotalTime() / 1000 / 60)
                 .floorAreaRatio(floorAreaRatio)
+                .breakStartTime(response.getBreakStartTime())
+                .breakEndTime(response.getBreakEndTime())
+                .restingPosition(response.getRestingPosition())
                 .courseDetailResponseList(courseDetailResponseList)
                 .coordinatesResponseList(coordinatesResponseList)
                 .build();

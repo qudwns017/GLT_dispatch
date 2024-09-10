@@ -93,7 +93,7 @@ public class TransportOrderService {
         StartStopoverResponse startStopoverResponse = createStartStopoverResponse(request, center);
 
         // 최종 DispatchResponse 반환
-        return createDispatchResponse(request, center, courses, totalFloorAreaRatio, startStopoverResponse);
+        return createDispatchResponse(user, request, center, courses, totalFloorAreaRatio, startStopoverResponse);
     }
 
     public void downloadOrderFormExcel(HttpServletResponse response) {
@@ -278,7 +278,9 @@ public class TransportOrderService {
     private StartStopoverResponse createStartStopoverResponse(TransportOrderRequest request, Center center) {
         return StartStopoverResponse.builder()
                 .centerId(center.getId())
-                .fullAddress(center.getLotNumberAddress() + " " + center.getDetailAddress())
+                .roadAddress(center.getRoadAddress())
+                .lotNumberAddress(center.getLotNumberAddress())
+                .detailAddress(center.getDetailAddress())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
                 .expectedServiceDuration(LocalTime.of(center.getDelayTime() / 60,
@@ -288,7 +290,7 @@ public class TransportOrderService {
                 .build();
     }
 
-    private DispatchResponse createDispatchResponse(TransportOrderRequest request, Center center,
+    private DispatchResponse createDispatchResponse(Users user, TransportOrderRequest request, Center center,
                                                     List<CourseResponse> courses, int totalFloorAreaRatio,
                                                     StartStopoverResponse startStopoverResponse) {
         return DispatchResponse.builder()
@@ -299,6 +301,7 @@ public class TransportOrderService {
                 .totalTime(courses.stream().mapToInt(CourseResponse::getTotalTime).sum())
                 .totalFloorAreaRatio(totalFloorAreaRatio)
                 .loadingStartTime(request.loadingStartTime())
+                .contractType(user.getSm().getContractType().toString())
                 .startStopoverResponse(startStopoverResponse)
                 .course(courses)
                 .build();

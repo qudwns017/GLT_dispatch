@@ -43,6 +43,15 @@ public class CourseResponse {
     @Schema(description = "용적률", example = "75")
     private int floorAreaRatio;
 
+    @Schema(description = "휴식 시작 시간", example = "11:00:00")
+    private LocalTime breakStartTime;
+
+    @Schema(description = "휴식 종료 시간", example = "12:00:00")
+    private LocalTime breakEndTime;
+
+    @Schema(description = "휴식 경유지 위치", example = "2")
+    private int restingPosition;
+
     @Schema(description = "경로의 상세 정보 리스트")
     private List<CourseDetailResponse> courseDetailResponseList;
 
@@ -59,6 +68,9 @@ public class CourseResponse {
 
         @Schema(description = "요청 시간 지연 여부", example = "false")
         private boolean delayRequestTime;
+
+        @Schema(description = "계약 초과 위반 여부", example = "false")
+        private boolean overContractNum;
 
         @Schema(description = "예상 이동 시간 (분)", example = "30")
         private int ett;
@@ -120,8 +132,11 @@ public class CourseResponse {
         @Schema(description = "고객 연락처", example = "010-1234-5678")
         private String contact;
 
-        @Schema(description = "주소", example = "서울특별시 강남구 테헤란로 123")
-        private String address;
+        @Schema(description = "도로명 주소", example = "서울특별시 강남구 테헤란로 123")
+        private String roadAddress;
+
+        @Schema(description = "지번 주소", example = "서울특별시 강남구 대치동")
+        private String lotNumberAddress;
 
         @Schema(description = "상세 주소", example = "아파트 101호")
         private String detailAddress;

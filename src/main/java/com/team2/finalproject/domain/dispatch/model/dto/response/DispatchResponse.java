@@ -35,12 +35,17 @@ public class DispatchResponse {
     @Schema(description = "상차 시작 시간", example = "2024-08-30T09:00:00")
     private LocalDateTime loadingStartTime;
 
+    @Schema(description = "배송 유형", example = "지입")
+    private String contractType;
+
     @Schema(
             description = "시작 경유지 정보",
             example = """
         {
             "centerId": 123,
-            "fullAddress": "서울시 강동구 천호동",
+            "roadAddress": "서울시 강동구 천호대로 1107"
+            "lotNumberAddress": "서울시 강동구 천호동",
+            'detailAddress": "1층 물류센터",
             "lat": 37.5409,
             "lon": 127.1263,
             "expectedServiceDuration": "01:00",
@@ -64,6 +69,9 @@ public class DispatchResponse {
                 "mileage": 150,
                 "totalTime": 120,
                 "floorAreaRatio": 75,
+                "breakStartTime": "11:00:00",
+                "breakEndTime": "13:00:00",
+                "restingPosition": 2,
                 "courseDetailResponseList": [
                     {
                         "errorYn": false,
@@ -87,7 +95,8 @@ public class DispatchResponse {
                         "serviceRequestTime": "14:00",
                         "clientName": "김철수",
                         "contact": "010-1234-5678",
-                        "address": "서울특별시 강남구 테헤란로 123",
+                        "roadAddress": "서울특별시 강남구 테헤란로 123",
+                        "lotNumberAddress": "서울특별시 강남구 대치동",
                         "detailAddress": "아파트 101호",
                         "zipcode": "06101",
                         "volume": 2.5,
