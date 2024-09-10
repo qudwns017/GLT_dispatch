@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -57,7 +58,7 @@ public class DispatchNumberService {
         List<DispatchListResponse.Issue> issueList = new ArrayList<>();
 
         List<DispatchSimpleResponse> dispatchResponseList = dispatchList.stream()
-            .map((dispatch) -> {
+            .map(dispatch -> {
                 double progressionRate = (double) dispatch.getDeliveryOrderCount() / dispatch.getCompletedOrderCount() * 100;
 
                 List<Map<String, Double>> stopoverList = createStopoverList(dispatch);
@@ -75,7 +76,7 @@ public class DispatchNumberService {
     public DispatchNumberSearchResponse searchDispatches(DispatchNumberSearchRequest request, UserDetailsImpl userDetails) {
         Users users = userDetails.getUsers();
         Center center = userDetails.getCenter();
-        LocalDateTime startDateTime = request.startDate().atStartOfDay();
+        LocalDateTime startDateTime = request.startDateTime();
         LocalDateTime endDateTime = request.endDateTime();
 
         // 검색 기간, 검색 옵션, 담당자 체크 여부에 따른 필터
@@ -96,8 +97,10 @@ public class DispatchNumberService {
         List<DispatchNumber> filteredDispatchNumbers = filterDispatchNumbersByStatus(dispatchNumbers, status);
         log.info("status 필터 후 배차(dispatchNumbers) 개수: {}", filteredDispatchNumbers.size());
 
-        //  Map<DispatchNumber, List<Dispatch>>
-        Map<DispatchNumber, List<Dispatch>> dispatchMap = dispatchRepository.findDispatchMapByDispatchNumbers(filteredDispatchNumbers);
+        // Map<DispatchNumber, List<Dispatch>>
+        List<Dispatch> dispatches = dispatchRepository.findByDispatchNumbersIn(filteredDispatchNumbers);
+        Map<DispatchNumber, List<Dispatch>> dispatchMap = dispatches.stream()
+                .collect(Collectors.groupingBy(Dispatch::getDispatchNumber));
         log.info("dispatchMap: {}", dispatchMap.size());
 
         // DispatchNumberSearchResponse.DispatchResult 생성

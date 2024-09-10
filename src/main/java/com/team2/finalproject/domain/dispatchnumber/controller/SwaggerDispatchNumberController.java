@@ -34,6 +34,10 @@ public interface SwaggerDispatchNumberController {
     );
 
     @Operation(summary = "차량관제 탭, 배차 검색", description = "차량관제 탭에서 배차 검색을 합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "배차 검색 성공", content = @Content(schema = @Schema(implementation = DispatchNumberSearchResponse.class))),
+        @ApiResponse(responseCode = "400", description = "올바르지 않은 검색 옵션 입니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     ResponseEntity<DispatchNumberSearchResponse> searchDispatches(
             @Parameter(description = "배차 검색 요청 정보") @ModelAttribute DispatchNumberSearchRequest dispatchNumberSearchRequest,
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails

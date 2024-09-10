@@ -114,7 +114,7 @@ public class DispatchService {
         Center centerEntity = userDetails.getCenter();
         DispatchNumber dispatchNumberEntity = DispatchConfirmRequest.toDispatchNumberEntity(request, usersEntity,
                 centerEntity);
-        DispatchNumber savedDispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
+        DispatchNumber dispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
 
         for (DispatchList dispatch : request.dispatchList()) {
             double totalVolume = 0;
@@ -134,8 +134,8 @@ public class DispatchService {
             LineString path = geometryFactory.createLineString(coordinates.toArray(new Coordinate[0]));
 
             Dispatch dispatchEntity = DispatchConfirmRequest.toDispatchEntity(
-                    request, savedDispatchNumber, smEntity, centerEntity,
-                    totalVolume, totalWeight, totalDistance, totalTime, path
+                    request, dispatchNumber, smEntity, centerEntity,
+                    totalVolume, totalWeight, totalDistance, totalTime, path, dispatch
             );
 
             Dispatch savedDispatch = dispatchRepository.save(dispatchEntity);
