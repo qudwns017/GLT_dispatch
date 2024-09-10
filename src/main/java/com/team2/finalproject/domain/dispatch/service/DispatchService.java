@@ -102,7 +102,7 @@ public class DispatchService {
         int totalOrderOrDistanceNum = sm.getCompletedNumOfMonth() + ( sm.getContractType() == ContractType.JIIP ?  + (int) (optimizationResponse.totalDistance() / 1000) : orders.size());
 
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
-            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,totalOrderOrDistanceNum ,sm.getContractNumOfMonth(),startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
+            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,totalOrderOrDistanceNum ,sm.getContractNumOfMonth(), sm.getContractType().getContractType(),startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
     }
 
     @Transactional

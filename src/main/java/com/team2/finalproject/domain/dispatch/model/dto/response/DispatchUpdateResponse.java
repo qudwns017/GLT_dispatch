@@ -31,6 +31,8 @@ public class DispatchUpdateResponse {
     private int totalOrderOrDistanceNum;
     @Schema(example = "80", description = "가용 주문")
     private int availableNum;
+    @Schema(example = "지입", description = "배송 유형")
+    private String contractType;
     private StartStopover startStopover;
     private List<DispatchDetailResponse> dispatchDetailList;
     @ArraySchema(
@@ -50,6 +52,7 @@ public class DispatchUpdateResponse {
         int restingStopover,
         int totalOrderOrDistanceNum,
         int availableNum,
+        String contractType,
         StartStopover startStopover,
         List<DispatchDetailResponse> dispatchDetailList,
         List<Map<String, Double>> coordinates) {
@@ -63,6 +66,7 @@ public class DispatchUpdateResponse {
         this.maxContractOver = totalOrderOrDistanceNum > availableNum; // 계약에 다른 최대치 초과 오류
         this.totalOrderOrDistanceNum = totalOrderOrDistanceNum;
         this.availableNum = availableNum;
+        this.contractType = contractType;
         this.startStopover = startStopover;
         this.dispatchDetailList = dispatchDetailList;
         this.coordinates = coordinates;
@@ -76,11 +80,12 @@ public class DispatchUpdateResponse {
         int restingStopover,
         int totalOrderOrDistanceNum,
         int availableNum,
+        String contractType,
         StartStopover startStopover,
         List<DispatchDetailResponse> dispatchDetailList,
         List<Map<String, Double>> coordinates)
     {
-        return new DispatchUpdateResponse(mileage, totalTime, breakStartTime, breakEndTime, restingStopover, totalOrderOrDistanceNum, availableNum, startStopover, dispatchDetailList, coordinates);
+        return new DispatchUpdateResponse(mileage, totalTime, breakStartTime, breakEndTime, restingStopover, totalOrderOrDistanceNum, availableNum, contractType, startStopover, dispatchDetailList, coordinates);
     }
 
     @Getter
