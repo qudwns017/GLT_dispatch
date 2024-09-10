@@ -18,11 +18,13 @@ public record DispatchUpdateRequest(
 ) {
 
     public record Order(
-        @Schema(example = "서울시 강동구 천호동", description = "주소(주소가 아니더라도 특정할 수 있는 데이터 ex)start ,stopover1)", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotBlank String address,
-        @Schema(example = "38.3333", description = "위도", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(example = "충남 천안시 서북구 백석로 123", description = "주소", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank String roadAddress,
+        @Schema(example = "지하 1층", description = "상세 주소", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank String detailAddress,
+        @Schema(example = "36.4501", description = "위도", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull Double lat,
-        @Schema(example = "127.243", description = "경도", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(example = "127.1234", description = "경도", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull Double lon,
         @Schema(example = "60", description = "예상 작업시간", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull int expectedServiceDuration,
