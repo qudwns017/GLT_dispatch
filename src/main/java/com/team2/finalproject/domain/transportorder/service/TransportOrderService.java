@@ -278,9 +278,7 @@ public class TransportOrderService {
     private StartStopoverResponse createStartStopoverResponse(TransportOrderRequest request, Center center) {
         return StartStopoverResponse.builder()
                 .centerId(center.getId())
-                .roadAddress(center.getRoadAddress())
-                .lotNumberAddress(center.getLotNumberAddress())
-                .detailAddress(center.getDetailAddress())
+                .centerName(center.getCenterName())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
                 .expectedServiceDuration(LocalTime.of(center.getDelayTime() / 60,

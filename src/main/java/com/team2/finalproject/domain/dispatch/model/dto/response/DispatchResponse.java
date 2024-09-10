@@ -43,9 +43,7 @@ public class DispatchResponse {
             example = """
         {
             "centerId": 123,
-            "roadAddress": "서울시 강동구 천호대로 1107"
-            "lotNumberAddress": "서울시 강동구 천호동",
-            'detailAddress": "1층 물류센터",
+            "centerName": "물류센터",
             "lat": 37.5409,
             "lon": 127.1263,
             "expectedServiceDuration": "01:00",
