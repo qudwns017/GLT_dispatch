@@ -128,7 +128,6 @@ public class OptimizationService {
         return false;
     }
 
-
     private OrderRequest findMatchingOrder(Map<String, List<OrderRequest>> orderRequestMap, String address) {
         List<OrderRequest> matchingOrders = orderRequestMap.get(address);
         return matchingOrders.remove(0);
