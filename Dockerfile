@@ -4,7 +4,7 @@ ARG JAR_FILE=build/libs/FinalProjectServer.jar
 
 COPY ${JAR_FILE} /FinalProjectServer.jar
 
-ENTRYPOINT  ["java","-Djava.awt.headless=true", "-jar", "FinalProjectServer.jar"]
+ENTRYPOINT  ["java", "-jar", "FinalProjectServer.jar"]
 
 RUN apk update && \
     apk add --no-cache fontconfig freetype && \

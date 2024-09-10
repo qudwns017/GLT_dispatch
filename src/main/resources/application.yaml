@@ -47,3 +47,8 @@ server:
   url: ${SERVER_URL}
 
 
+java:
+  awt:
+    headless: true
+
+
