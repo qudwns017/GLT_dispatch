@@ -6,6 +6,4 @@ COPY ${JAR_FILE} /FinalProjectServer.jar
 
 ENTRYPOINT  ["java", "-jar", "FinalProjectServer.jar"]
 
-RUN apk update && \
-    apk add --no-cache fontconfig freetype && \
-    rm -rf /var/cache/apk/*
+RUN apt-get update && apt-get install -y fonts-dejavu
