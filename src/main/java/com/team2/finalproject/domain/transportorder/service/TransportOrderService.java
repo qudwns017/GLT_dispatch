@@ -278,7 +278,7 @@ public class TransportOrderService {
     private StartStopoverResponse createStartStopoverResponse(TransportOrderRequest request, Center center) {
         return StartStopoverResponse.builder()
                 .centerId(center.getId())
-                .fullAddress(center.getLotNumberAddress() + " " + center.getDetailAddress())
+                .centerName(center.getCenterName())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
                 .expectedServiceDuration(LocalTime.of(center.getDelayTime() / 60,
@@ -299,6 +299,7 @@ public class TransportOrderService {
                 .totalTime(courses.stream().mapToInt(CourseResponse::getTotalTime).sum())
                 .totalFloorAreaRatio(totalFloorAreaRatio)
                 .loadingStartTime(request.loadingStartTime())
+                .contractType(request.orderReuquestList().get(0).deliveryType())
                 .startStopoverResponse(startStopoverResponse)
                 .course(courses)
                 .build();
