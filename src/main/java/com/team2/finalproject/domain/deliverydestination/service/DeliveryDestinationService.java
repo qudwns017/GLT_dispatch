@@ -2,6 +2,8 @@ package com.team2.finalproject.domain.deliverydestination.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
+import com.team2.finalproject.domain.deliverydestination.exception.DeliveryDestinationErrorCode;
+import com.team2.finalproject.domain.deliverydestination.exception.DeliveryDestinationException;
 import com.team2.finalproject.domain.deliverydestination.model.dto.request.DeliveryDestinationRequest;
 import com.team2.finalproject.domain.deliverydestination.model.dto.request.UpdateDeliveryDestinationRequest;
 import com.team2.finalproject.domain.deliverydestination.model.dto.response.DeliveryDestinationResponse;
@@ -18,7 +20,9 @@ public class DeliveryDestinationService {
     private final CenterRepository centerRepository;
 
     public DeliveryDestinationResponse getDeliveryDestination(long deliveryDestinationId) {
-        DeliveryDestination deliveryDestinationEntity = deliveryDestinationRepository.findByIdOrThrow(deliveryDestinationId);
+        DeliveryDestination deliveryDestinationEntity = deliveryDestinationRepository.findByIdWithCenter(
+                        deliveryDestinationId)
+                .orElseThrow(() -> new DeliveryDestinationException(DeliveryDestinationErrorCode.NOT_FOUND_DELIVERY_DESTINATION));
         return DeliveryDestinationResponse.of(deliveryDestinationEntity);
     }
 
