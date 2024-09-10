@@ -6,9 +6,10 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.beans.factory.annotation.Value;
+import io.swagger.v3.oas.models.servers.Server;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,11 +20,11 @@ public class SwaggerConfig {
     @Value("${server.url}")
     String requestUrl;
 
-
     private final CustomOperationCustomizer customOperationCustomizer;
 
     @Bean
     public OpenAPI openAPI() {
+
         String jwt = "JWT";
         SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
         Components components = new Components().addSecuritySchemes(jwt, new SecurityScheme()
@@ -33,10 +34,15 @@ public class SwaggerConfig {
                 .bearerFormat("JWT")
         );
 
+        Server server = new Server()
+            .url(requestUrl)
+            .description("GLT KOREA TMS API Server");
+
         return new OpenAPI()
                 .components(new Components())
                 .info(apiInfo())
                 .addSecurityItem(securityRequirement)
+                .addServersItem(server)
                 .components(components);
     }
 
