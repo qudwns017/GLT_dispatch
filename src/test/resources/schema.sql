@@ -74,7 +74,7 @@ CREATE TABLE dispatch (
                           departure_place_name VARCHAR(50) NOT NULL,
                           departure_time DATETIME(6) NOT NULL,
                           arrival_time DATETIME(6),
-                          path GEOMETRY  NOT NULL,
+                          path GEOMETRY NOT NULL,
                           delivery_status ENUM ('COMPLETED','IN_TRANSIT','WAITING') NOT NULL,
                           issue VARCHAR(300) NOT NULL,
                           total_time TIME(6) NOT NULL,

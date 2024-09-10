@@ -45,11 +45,15 @@ public abstract class BaseIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    // schema.sql 파일을 실행하는 메서드
+    // H2GIS 초기화, schema.sql 파일을 실행하는 메서드
     @PostConstruct
     protected void initSchema() throws SQLException {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
+            // H2GIS 초기화 구문 실행
+            statement.execute("RUNSCRIPT FROM 'classpath:init-h2gis.sql'");
+
+            // schema.sql 실행
             statement.execute("RUNSCRIPT FROM 'classpath:schema.sql'");
         }
     }
@@ -130,11 +134,9 @@ public abstract class BaseIntegrationTest {
                 .andReturn();
 
         Cookie[] cookies = result.getResponse().getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
+        for (Cookie cookie : cookies) {
+            if ("accessToken".equals(cookie.getName())) {
+                return cookie.getValue();
             }
         }
         throw new RuntimeException("Access token not found in response cookies");

@@ -1,6 +1,5 @@
 package com.team2.finalproject.domain.dispatchnumber.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team2.finalproject.domain.dispatchnumber.model.dto.request.DispatchNumberSearchRequest;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
 import com.team2.finalproject.util.BaseIntegrationTest;
@@ -17,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,9 +32,6 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
@@ -46,7 +41,6 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
         log.info("Schema initialized");
 
         log.info("Setting up test data");
-        truncateTables();
         insertCenters(jdbcTemplate);
         insertDeliveryDestinations(jdbcTemplate);
         insertDispatchNumbers(jdbcTemplate);
@@ -118,8 +112,8 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
         String jwtToken = loginAsAdmin();
         DispatchNumberSearchRequest request = new DispatchNumberSearchRequest(
                 DispatchNumberStatus.WAITING,
-                true,
-                LocalDate.now().minusDays(7),
+                false,
+                LocalDateTime.now().minusDays(7),
                 LocalDateTime.now().plusDays(7),
                 null,
                 null
@@ -130,7 +124,7 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("status", request.status().toString())
                         .param("isManager", String.valueOf(request.isManager()))
-                        .param("startDate", request.startDate().toString())
+                        .param("startDateTime", request.startDateTime().toString())
                         .param("endDateTime", request.endDateTime().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.inProgress").isNumber())
@@ -156,8 +150,8 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
         DispatchNumberSearchRequest request = new DispatchNumberSearchRequest(
                 DispatchNumberStatus.WAITING,
                 true,
-                LocalDate.now().minusDays(7),
-                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now().plusDays(7),
                 "dispatchCode",
                 "DN01-1"
         );
@@ -167,7 +161,7 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("status", request.status().toString())
                         .param("isManager", String.valueOf(request.isManager()))
-                        .param("startDate", request.startDate().toString())
+                        .param("startDateTime", request.startDateTime().toString())
                         .param("endDateTime", request.endDateTime().toString())
                         .param("searchOption", request.searchOption())
                         .param("searchKeyword", request.searchKeyword()))
@@ -184,8 +178,8 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
         DispatchNumberSearchRequest request = new DispatchNumberSearchRequest(
                 DispatchNumberStatus.WAITING,
                 true,
-                LocalDate.now().minusDays(7),
-                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now().plusDays(7),
                 "dispatchName",
                 "Dispatch Number 1 for Center 1"
         );
@@ -195,7 +189,7 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("status", request.status().toString())
                         .param("isManager", String.valueOf(request.isManager()))
-                        .param("startDate", request.startDate().toString())
+                        .param("startDateTime", request.startDateTime().toString())
                         .param("endDateTime", request.endDateTime().toString())
                         .param("searchOption", request.searchOption())
                         .param("searchKeyword", request.searchKeyword()))
@@ -213,8 +207,8 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
         DispatchNumberSearchRequest request = new DispatchNumberSearchRequest(
                 DispatchNumberStatus.WAITING,
                 true,
-                LocalDate.now().minusDays(7),
-                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now().plusDays(7),
                 "manager",
                 "exampleAdmin"
         );
@@ -224,7 +218,7 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("status", request.status().toString())
                         .param("isManager", String.valueOf(request.isManager()))
-                        .param("startDate", request.startDate().toString())
+                        .param("startDateTime", request.startDateTime().toString())
                         .param("endDateTime", request.endDateTime().toString())
                         .param("searchOption", request.searchOption())
                         .param("searchKeyword", request.searchKeyword()))
@@ -242,8 +236,8 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
         DispatchNumberSearchRequest request = new DispatchNumberSearchRequest(
                 DispatchNumberStatus.WAITING,
                 true,
-                LocalDate.now().minusDays(7),
-                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now().plusDays(7),
                 "driver",
                 "SM Name 1"
         );
@@ -253,7 +247,7 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("status", request.status().toString())
                         .param("isManager", String.valueOf(request.isManager()))
-                        .param("startDate", request.startDate().toString())
+                        .param("startDateTime", request.startDateTime().toString())
                         .param("endDateTime", request.endDateTime().toString())
                         .param("searchOption", request.searchOption())
                         .param("searchKeyword", request.searchKeyword()))
@@ -270,8 +264,8 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
         DispatchNumberSearchRequest request = new DispatchNumberSearchRequest(
                 DispatchNumberStatus.WAITING,
                 true,
-                LocalDate.now().minusDays(7),
-                LocalDateTime.now(),
+                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now().plusDays(7),
                 "invalidOption",
                 "someKeyword"
         );
@@ -281,13 +275,13 @@ class DispatchNumberControllerTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("status", request.status().toString())
                         .param("isManager", String.valueOf(request.isManager()))
-                        .param("startDate", request.startDate().toString())
+                        .param("startDateTime", request.startDateTime().toString())
                         .param("endDateTime", request.endDateTime().toString())
                         .param("searchOption", request.searchOption())
                         .param("searchKeyword", request.searchKeyword()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("400 wrong search option"))
-                .andExpect(jsonPath("$.statusMessage").value("wrong search option"))
+                .andExpect(jsonPath("$.message").value("400 올바르지 않은 검색 옵션 입니다."))
+                .andExpect(jsonPath("$.statusMessage").value("올바르지 않은 검색 옵션 입니다."))
                 .andDo(result -> log.info("Response: {}", result.getResponse().getContentAsString()));
 
         log.info("searchDispatches invalid search option test completed successfully");
