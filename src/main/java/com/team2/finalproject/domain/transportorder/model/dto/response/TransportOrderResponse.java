@@ -11,18 +11,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TransportOrderResponse {
 
-    @Schema(example = "20240808274985", description = "운송장 번호")
-    private String shipmentNumber;
     @Schema(example = "지입", description = "배송 유형")
     private String deliveryType;
+    @Schema(example = "홍길동", description = "SM명")
+    private String smName;
+    @Schema(example = "20240808274985", description = "운송장 번호")
+    private String shipmentNumber;
+    @Schema(example = "240812_공동구매", description = "업체주문번호")
+    private String orderNumber;
+    @Schema(example = "배송", description = "주문 유형(배송/수거)")
+    private String orderType;
     @Schema(example = "2024-08-19", description = "작업희망일")
     private LocalDate requestedWorkDate;
+    @Schema(example = "2024-08-18", description = "주문 접수일")
+    private LocalDate orderDate;
     @Schema(example = "14:00", description = "희망도착시간")
     private LocalTime requestedArrivalTime;
     @Schema(example = "00:30", description = "예상작업 소요시간")
     private LocalTime estimatedWorkTime;
-    @Schema(example = "홍길동", description = "기사명")
-    private String smName;
     @Schema(example = "사과", description = "상품명")
     private String productName;
     @Schema(example = "4", description = "상품 수량")
@@ -34,7 +40,11 @@ public class TransportOrderResponse {
     private DestinationInfo destinationInfo;
     private ClientInfo clientInfo;
 
-    private TransportOrderResponse(String shipmentNumber,String deliveryType,LocalDate requestedWorkDate, LocalTime requestedArrivalTime,LocalTime estimatedWorkTime, String smName,String productName, int productCount, double volume, double weight,DestinationInfo destinationInfo,ClientInfo clientInfo){
+    private TransportOrderResponse(String shipmentNumber, String deliveryType, LocalDate requestedWorkDate,
+                                   LocalTime requestedArrivalTime, LocalTime estimatedWorkTime, String smName,
+                                   String productName, int productCount, double volume, double weight,
+                                   String orderNumber, LocalDate orderDate, String orderType,
+                                   DestinationInfo destinationInfo, ClientInfo clientInfo) {
         this.shipmentNumber = shipmentNumber;
         this.deliveryType = deliveryType;
         this.requestedWorkDate = requestedWorkDate;
@@ -45,46 +55,58 @@ public class TransportOrderResponse {
         this.productCount = productCount;
         this.volume = volume;
         this.weight = weight;
+        this.orderNumber = orderNumber;
+        this.orderDate = orderDate;
+        this.orderType = orderType;
         this.destinationInfo = destinationInfo;
         this.clientInfo = clientInfo;
     }
 
-    public static TransportOrderResponse of(TransportOrder transportOrder,String managerName, String phoneNumber, Long deliveryDestinationCode){
+    public static TransportOrderResponse of(TransportOrder transportOrder, String managerName, String phoneNumber,
+                                            Long deliveryDestinationCode) {
         return new TransportOrderResponse(
-            transportOrder.getShipmentNumber(),
-            transportOrder.getDeliveryType(),
-            transportOrder.getRequestedWorkDate(),
-            transportOrder.getRequestedArrivalTime(),
-            transportOrder.getEstimatedWorkTime(),
-            transportOrder.getSmName(),
-            transportOrder.getProductName(),
-            transportOrder.getProductCount(),
-            transportOrder.getVolume(),
-            transportOrder.getWeight(),
-            DestinationInfo.of(managerName, phoneNumber, deliveryDestinationCode),
-            null
+                transportOrder.getShipmentNumber(),
+                transportOrder.getDeliveryType(),
+                transportOrder.getRequestedWorkDate(),
+                transportOrder.getRequestedArrivalTime(),
+                transportOrder.getEstimatedWorkTime(),
+                transportOrder.getSmName(),
+                transportOrder.getProductName(),
+                transportOrder.getProductCount(),
+                transportOrder.getVolume(),
+                transportOrder.getWeight(),
+                transportOrder.getOrderNumber(),
+                transportOrder.getOrderDate(),
+                transportOrder.getOrderType(),
+                DestinationInfo.of(managerName, phoneNumber, deliveryDestinationCode),
+                null
         );
     }
-    public static TransportOrderResponse of(TransportOrder transportOrder,String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+
+    public static TransportOrderResponse of(TransportOrder transportOrder, String clientName, String phoneNumber,
+                                            String roadAddress, String detailAddress, String note) {
         return new TransportOrderResponse(
-            transportOrder.getShipmentNumber(),
-            transportOrder.getDeliveryType(),
-            transportOrder.getRequestedWorkDate(),
-            transportOrder.getRequestedArrivalTime(),
-            transportOrder.getEstimatedWorkTime(),
-            transportOrder.getSmName(),
-            transportOrder.getProductName(),
-            transportOrder.getProductCount(),
-            transportOrder.getVolume(),
-            transportOrder.getWeight(),
-            null,
-            ClientInfo.of(clientName, phoneNumber, roadAddress, detailAddress, note)
+                transportOrder.getShipmentNumber(),
+                transportOrder.getDeliveryType(),
+                transportOrder.getRequestedWorkDate(),
+                transportOrder.getRequestedArrivalTime(),
+                transportOrder.getEstimatedWorkTime(),
+                transportOrder.getSmName(),
+                transportOrder.getProductName(),
+                transportOrder.getProductCount(),
+                transportOrder.getVolume(),
+                transportOrder.getWeight(),
+                transportOrder.getOrderNumber(),
+                transportOrder.getOrderDate(),
+                transportOrder.getOrderType(),
+                null,
+                ClientInfo.of(clientName, phoneNumber, roadAddress, detailAddress, note)
         );
     }
 
     @Getter
     @NoArgsConstructor
-    public static class DestinationInfo{
+    public static class DestinationInfo {
         @Schema(example = "유관순", description = "담당자명")
         private String managerName;
         @Schema(example = "010-1111-2222", description = "담당자 연락처")
@@ -92,20 +114,20 @@ public class TransportOrderResponse {
         @Schema(example = "4", description = "배송처 코드")
         private Long deliveryDestinationCode;
 
-        private DestinationInfo(String managerName, String phoneNumber, Long deliveryDestinationCode){
+        private DestinationInfo(String managerName, String phoneNumber, Long deliveryDestinationCode) {
             this.managerName = managerName;
             this.phoneNumber = phoneNumber;
             this.deliveryDestinationCode = deliveryDestinationCode;
         }
 
-        private static DestinationInfo of(String managerName, String phoneNumber, Long deliveryDestinationCode){
+        private static DestinationInfo of(String managerName, String phoneNumber, Long deliveryDestinationCode) {
             return new DestinationInfo(managerName, phoneNumber, deliveryDestinationCode);
         }
     }
 
     @Getter
     @NoArgsConstructor
-    public static class ClientInfo{
+    public static class ClientInfo {
         @Schema(example = "홍길동", description = "고객명")
         private String clientName;
         @Schema(example = "01012345678", description = "연락처")
@@ -117,7 +139,8 @@ public class TransportOrderResponse {
         @Schema(example = "조심히 다뤄주세요.", description = "고객 전달 사항")
         private String note;
 
-        private ClientInfo(String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+        private ClientInfo(String clientName, String phoneNumber, String roadAddress, String detailAddress,
+                           String note) {
             this.clientName = clientName;
             this.phoneNumber = phoneNumber;
             this.roadAddress = roadAddress;
@@ -125,7 +148,8 @@ public class TransportOrderResponse {
             this.note = note;
         }
 
-        private static ClientInfo of(String clientName, String phoneNumber, String roadAddress, String detailAddress, String note){
+        private static ClientInfo of(String clientName, String phoneNumber, String roadAddress, String detailAddress,
+                                     String note) {
             return new ClientInfo(clientName, phoneNumber, roadAddress, detailAddress, note);
         }
     }

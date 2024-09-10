@@ -13,16 +13,17 @@ import org.springframework.data.repository.query.Param;
 
 public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDestination, Long> {
 
-    @Query("SELECT d.zipCode, d.id FROM DeliveryDestination d")
-    List<Object[]> findAllZipCodesWithIds();
+    // TODO: 사용되지 않는 메소드
+//    @Query("SELECT d.zipCode, d.id FROM DeliveryDestination d")
+//    List<Object[]> findAllZipCodesWithIds();
 
-    default Map<String, Integer> findAllZipCodeWithIdsToMap() {
-        return findAllZipCodesWithIds().stream()
-                .collect(Collectors.toMap(
-                        row -> (String) row[0],
-                        row -> ((Long) row[1]).intValue()
-                ));
-    }
+//    default Map<String, Integer> findAllZipCodeWithIdsToMap() {
+//        return findAllZipCodesWithIds().stream()
+//                .collect(Collectors.toMap(
+//                        row -> (String) row[0],
+//                        row -> ((Long) row[1]).intValue()
+//                ));
+//    }
 
     default DeliveryDestination findByIdOrThrow(Long id){
         return findById(id).orElseThrow(
@@ -35,6 +36,9 @@ public interface DeliveryDestinationRepository extends JpaRepository<DeliveryDes
     default DeliveryDestination findByFullAddress(String roadAddress, String detailAddress) {
         return findByRoadAddressAndDetailAddress(roadAddress, detailAddress).orElse(null);
     }
+
+    @Query("SELECT d FROM DeliveryDestination d JOIN FETCH d.center WHERE d.id = :id")
+    Optional<DeliveryDestination> findByIdWithCenter(@Param("id") Long id);
 
 
     @Query("SELECT d.comment FROM DeliveryDestination d WHERE d.id = :id")

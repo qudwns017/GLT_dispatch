@@ -38,17 +38,14 @@ public record DispatchConfirmRequest(
             @Schema(example = "1", description = "기사 ID")
             long smId,
 
-            @Schema(example = "5", description = "주문 수")
-            long orderNum,
+            @Schema(example = "14:00:00", description = "휴식 시작 시간")
+            LocalTime breakStartTime,
 
-            @Schema(example = "150", description = "주행 거리 (km)")
-            int mileage,
+            @Schema(example = "15:00:00", description = "휴식 종료 시간")
+            LocalTime breakEndTime,
 
-            @Schema(example = "180", description = "총 주행 시간 (분)")
-            int totalTime,
-
-            @Schema(example = "2023-08-30T08:30:00", description = "출발 시간")
-            LocalDateTime departureTime,
+            @Schema(example = "4", description = "휴식 경유지 위치 (해당 경유지의 바로 앞)")
+            int restingStopover,
 
             @Schema(description = "배송 상세 리스트")
             List<DispatchDetailList> dispatchDetailList,
@@ -73,9 +70,6 @@ public record DispatchConfirmRequest(
             List<Coordinate> coordinates
     ) {
         public record DispatchDetailList(
-                @Schema(example = "80", description = "상차율")
-                int loadingRate,
-
                 @Schema(example = "홍길동", description = "기사 이름")
                 String smName,
 
@@ -91,10 +85,7 @@ public record DispatchConfirmRequest(
                 @Schema(example = "1", description = "배송처 ID")
                 Long deliveryDestinationId,
 
-                @Schema(example = "김매니저", description = "담당자 이름")
-                String managerName,
-
-                @Schema(example = "010-1234-5678", description = "담당자 전화번호")
+                @Schema(example = "010-1234-5678", description = "고객 전화번호")
                 String phoneNumber,
 
                 @Schema(example = "ORD123456", description = "주문 번호")
@@ -118,14 +109,8 @@ public record DispatchConfirmRequest(
                 @Schema(example = "C0029384889", description = "운송장 번호")
                 String shipmentNumber,
 
-                @Schema(example = "240812_공동구매", description = "업체 주문 번호")
-                String clientOrderKey,
-
                 @Schema(example = "배송", description = "주문 유형 (배송, 수거)")
                 String orderType,
-
-                @Schema(example = "2023-08-25", description = "주문 접수일")
-                LocalDate receivedDate,
 
                 @Schema(example = "2023-08-28", description = "작업 희망일")
                 LocalDate serviceRequestDate,
@@ -135,9 +120,6 @@ public record DispatchConfirmRequest(
 
                 @Schema(example = "홍길동", description = "고객 이름")
                 String clientName,
-
-                @Schema(example = "010-9876-5432", description = "고객 연락처")
-                String contact,
 
                 @Schema(example = "서울특별시 강남구 강남동 37", description = "주소")
                 String lotNumberAddress,
@@ -199,7 +181,8 @@ public record DispatchConfirmRequest(
             double totalWeight,
             double totalDistance,
             int totalTime,
-            LineString path
+            LineString path,
+            DispatchList list
     ) {
         return Dispatch.builder()
                 .dispatchNumber(dispatchNumber)
@@ -216,6 +199,9 @@ public record DispatchConfirmRequest(
                 .departurePlaceCode(center.getCenterCode()) // 센터코드
                 .departurePlaceName(center.getCenterName()) // 센터명
                 .departureTime(request.loadingStartTime.plusMinutes(center.getDelayTime())) // 상차 시작 + center의 delayTime
+                .breakStartTime(list.breakStartTime())
+                .breakEndTime(list.breakEndTime())
+                .restingStopover(list.restingStopover())
                 .arrivalTime(null)
                 .deliveryStatus(DispatchStatus.WAITING)
                 .issue("")

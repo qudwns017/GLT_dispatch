@@ -17,8 +17,8 @@ public class StartStopoverResponse {
     @Schema(description = "센터 ID (출발지)", example = "123")
     private long centerId;
 
-    @Schema(description = "출발지 주소", example = "서울시 강동구 천호동")
-    private String fullAddress;
+    @Schema(description = "출발지 이름", example = "물류센터")
+    private String centerName;
 
     @Schema(description = "출발지 위도", example = "37.5409")
     private double lat;

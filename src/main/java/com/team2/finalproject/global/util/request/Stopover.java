@@ -10,4 +10,9 @@ public record Stopover(
         double lat,
         double lon,
         LocalTime delayTime
-) {}
+) {
+
+    public static Stopover of(String address, Double lat, Double lon, LocalTime delayTime) {
+        return new Stopover(address,lat,lon,delayTime);
+    }
+}

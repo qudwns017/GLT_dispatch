@@ -134,19 +134,21 @@ public class TransportOrderService {
         }
     }
 
-    public List<SmNameAndSmIdResponse> validateSmNames(List<SmNameRequest> requests) {
-        return requests.stream()
+    public SmNameAndSmIdResponse validateSmNames(List<SmNameRequest> requests) {
+        List<SmNameAndSmIdResponse.ValidList> validLists = requests.stream()
                 .map(request -> {
                     Long smId = smRepository.findSmIdBySmName(request.smName());
                     boolean isValid = smId != null;
                     int resultSmId = isValid ? smId.intValue() : 0;
 
-                    return SmNameAndSmIdResponse.builder()
+                    return SmNameAndSmIdResponse.ValidList.builder()
                             .smNameValid(isValid)
                             .smId(resultSmId)
                             .build();
                 })
                 .toList();
+
+        return new SmNameAndSmIdResponse(validLists);
     }
 
     private Center getCenterByUser(Users user) {
@@ -276,7 +278,7 @@ public class TransportOrderService {
     private StartStopoverResponse createStartStopoverResponse(TransportOrderRequest request, Center center) {
         return StartStopoverResponse.builder()
                 .centerId(center.getId())
-                .fullAddress(center.getLotNumberAddress() + " " + center.getDetailAddress())
+                .centerName(center.getCenterName())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
                 .expectedServiceDuration(LocalTime.of(center.getDelayTime() / 60,
@@ -297,6 +299,7 @@ public class TransportOrderService {
                 .totalTime(courses.stream().mapToInt(CourseResponse::getTotalTime).sum())
                 .totalFloorAreaRatio(totalFloorAreaRatio)
                 .loadingStartTime(request.loadingStartTime())
+                .contractType(request.orderReuquestList().get(0).deliveryType())
                 .startStopoverResponse(startStopoverResponse)
                 .course(courses)
                 .build();

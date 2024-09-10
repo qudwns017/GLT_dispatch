@@ -1,5 +1,6 @@
 package com.team2.finalproject.global.util.optimization;
 
+import com.team2.finalproject.global.util.request.Stopover;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -9,9 +10,13 @@ public record OptimizationResponse (
     double totalDistance,
     long totalTime,
     LocalDateTime startTime,
-    StartStopover startStopover,
+    Stopover startStopover,
+    LocalTime breakStartTime,
+    LocalTime breakEndTime,
+    int restingPosition, // 휴식경유지 해당 경유지 도착전
     List<ResultStopover> resultStopoverList,
     List<Map<String,Double>> coordinates
+
 ){
 
     public record ResultStopover(
@@ -23,15 +28,6 @@ public record OptimizationResponse (
         Long timeFromPrevious,
         LocalDateTime startTime,
         LocalDateTime endTime
-    ){
-
-    }
-
-    public record StartStopover(
-        String address,
-        Double lat,
-        Double lon,
-        LocalTime delayTime
     ){
 
     }

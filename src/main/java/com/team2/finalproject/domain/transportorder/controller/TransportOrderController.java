@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/transport-order")
@@ -47,10 +46,10 @@ public class TransportOrderController implements SwaggerTransportOrderController
     }
 
     @PostMapping("/valid")
-    public ResponseEntity<List<SmNameAndSmIdResponse>> validateSmNameAndSmIds(
+    public ResponseEntity<SmNameAndSmIdResponse> validateSmNameAndSmIds(
             @RequestBody ValidationListRequest request) {
 
-        List<SmNameAndSmIdResponse> results = transportOrderService.validateSmNames(request.requests());
+        SmNameAndSmIdResponse results = transportOrderService.validateSmNames(request.requests());
 
         return ApiResponse.OK(results);
     }
