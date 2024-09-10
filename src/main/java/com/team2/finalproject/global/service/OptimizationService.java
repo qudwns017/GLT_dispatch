@@ -118,7 +118,7 @@ public class OptimizationService {
         // 계약 타입에 따른 최대 계약 수 비교
         if (sm.getContractType() == ContractType.JIIP) {
             // 지입일 경우 거리로 계산
-            double totalDistance = sm.getCompletedNumOfMonth() + stopover.getDistance();
+            double totalDistance = sm.getCompletedNumOfMonth() + stopover.getDistance() / 1000.0;
             return totalDistance > sm.getContractNumOfMonth();
         } else if (sm.getContractType() == ContractType.DELIVERY) {
             // 택배일 경우 주문 수로 계산
@@ -155,7 +155,8 @@ public class OptimizationService {
                 .lat(stopover.getLat())
                 .lon(stopover.getLon())
                 .distance(stopover.getDistance() / 1000.0)
-                .roadAddress(stopover.getAddress().replace(addressMapping.get(stopover.getAddress())[1], ""))
+                .roadAddress(stopover.getAddress().replace(addressMapping.get(stopover.getAddress())[1], "")
+                        .substring(0, stopover.getAddress().replace(addressMapping.get(stopover.getAddress())[1], "").length() - 1))
                 .lotNumberAddress(addressMapping.get(stopover.getAddress())[0])
                 .detailAddress(addressMapping.get(stopover.getAddress())[1])
                 .expectedServiceDuration(TransportOrderUtil.convertLocalTimeToMinutes(stopover.getDelayTime()))
@@ -212,7 +213,7 @@ public class OptimizationService {
                                                List<CourseResponse.CoordinatesResponse> coordinatesResponseList) {
 
         boolean errorYn = courseDetailResponseList.stream().anyMatch(
-                detail -> detail.isRestrictedTonCode() || detail.isDelayRequestTime());
+                detail -> detail.isRestrictedTonCode() || detail.isDelayRequestTime() || detail.isOverContractNum());
 
         return CourseResponse.builder()
                 .errorYn(errorYn)
