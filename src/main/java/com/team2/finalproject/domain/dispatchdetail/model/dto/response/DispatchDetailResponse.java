@@ -43,16 +43,16 @@ public class DispatchDetailResponse {
     @Schema(example = "75", description = "진행률")
     private int progressionRate;
 
-    @Schema(example = "20.8", description = "총 주행 거리")
-    private double totalDistance;
-
     @Schema(example = "10", description = "완료주문")
     private int completedOrderCount;
 
     @Schema(example = "20", description = "주문 수")
     private int deliveryOrderCount;
 
-    @Schema(example = "2:00:00", description = "주행시간")
+    @Schema(example = "20.8", description = "총 주행 거리")
+    private double totalDistance;
+
+    @Schema(example = "2:00:00", description = "총 주행시간")
     private LocalTime totalTime;
 
     @Schema(example = "No issues", description = "이슈 및 메모")

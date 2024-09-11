@@ -22,7 +22,7 @@ public interface SwaggerDispatchDetailController {
 
     @Operation(summary = "차량 관제 배차 상세 조회", description = "특정 배차 ID에 대한 상세 정보를 조회합니다.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "배차 상세 조회 성공"),
+        @ApiResponse(responseCode = "200", description = "배차 상세 조회 성공", content = @Content(schema = @Schema(implementation = DispatchDetailResponse.class))),
         @ApiResponse(responseCode = "404", description = "존재하지 않는 배차입니다", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 센터입니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 배송처입니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
