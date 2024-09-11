@@ -42,12 +42,14 @@ public class DispatchDetailService {
     @Transactional(readOnly = true)
     public DispatchDetailResponse getDispatchDetail(Long dispatchId) {
         Dispatch dispatch = dispatchRepository.findByIdWithDetailsOrThrow(dispatchId);
+        log.info("정보를 가져올 dispatchId: {}", dispatchId);
 
         Sm sm = dispatch.getSm();
         Users users = sm.getUsers();
         Vehicle vehicle = sm.getVehicle();
 
         List<DispatchDetail> dispatchDetails = dispatch.getDispatchDetailList();
+        log.info("배차 상세 개수: {}", dispatchDetails.size());
 
         // startStopover
         Center center = centerRepository.findByCenterCodeOrThrow(dispatch.getDeparturePlaceCode());

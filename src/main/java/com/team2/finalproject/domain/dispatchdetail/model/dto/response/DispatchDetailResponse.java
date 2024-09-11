@@ -43,6 +43,9 @@ public class DispatchDetailResponse {
     @Schema(example = "75", description = "진행률")
     private int progressionRate;
 
+    @Schema(example = "20.8", description = "총 주행 거리")
+    private double totalDistance;
+
     @Schema(example = "10", description = "완료주문")
     private int completedOrderCount;
 
@@ -181,6 +184,7 @@ public class DispatchDetailResponse {
                 .vehicleType(vehicle.getVehicleType())
                 .vehicleTon(vehicle.getVehicleTon())
                 .progressionRate(calcProgress(dispatch.getDeliveryOrderCount(), dispatch.getCompletedOrderCount()))
+                .totalDistance(dispatch.getTotalDistance())
                 .completedOrderCount(dispatch.getCompletedOrderCount())
                 .deliveryOrderCount(dispatch.getDeliveryOrderCount())
                 .totalTime(dispatch.getTotalTime())
