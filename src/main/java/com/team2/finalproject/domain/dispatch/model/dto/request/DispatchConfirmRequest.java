@@ -3,13 +3,11 @@ package com.team2.finalproject.domain.dispatch.model.dto.request;
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchConfirmRequest.DispatchList.DispatchDetailList;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
-import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatchdetail.model.entity.DispatchDetail;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DestinationType;
 import com.team2.finalproject.domain.dispatchdetail.model.type.DispatchDetailStatus;
 import com.team2.finalproject.domain.dispatchnumber.model.entity.DispatchNumber;
 import com.team2.finalproject.domain.dispatchnumber.model.type.DispatchNumberStatus;
-
 import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.transportorder.model.entity.TransportOrder;
 import com.team2.finalproject.domain.users.model.entity.Users;
@@ -203,7 +201,6 @@ public record DispatchConfirmRequest(
                 .breakEndTime(list.breakEndTime())
                 .restingStopover(list.restingStopover())
                 .arrivalTime(null)
-                .deliveryStatus(DispatchStatus.WAITING)
                 .issue("")
                 .totalTime(LocalTime.of(totalTime / 60, totalTime % 60)) // 시간 합
                 .path(path)
