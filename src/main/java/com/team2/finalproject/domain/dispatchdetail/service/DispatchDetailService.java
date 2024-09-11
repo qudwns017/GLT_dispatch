@@ -50,6 +50,7 @@ public class DispatchDetailService {
 
         List<DispatchDetail> dispatchDetails = dispatch.getDispatchDetailList();
         log.info("배차 상세 개수: {}", dispatchDetails.size());
+        log.info("despatchDetailIds: {}", dispatchDetails.stream().map(DispatchDetail::getId).toList());
 
         // startStopover
         Center center = centerRepository.findByCenterCodeOrThrow(dispatch.getDeparturePlaceCode());
