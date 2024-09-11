@@ -18,6 +18,16 @@ public record TransportOrderExcelHeader(String name, String required, String com
                 "예시) 이서원"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
+                "고객명", "필수",
+                "고객님의 성함 또는 상호를 입력해주세요.",
+                "예시) 홍길동"
+        ));
+        transportOrders.add(new TransportOrderExcelHeader(
+                "주소", "필수",
+                "도로명 주소와 건물번호를 입력해주세요.\n주소정보누리집(www.juso.go.kr) 양식을 따릅니다.",
+                "예시) 테헤란로 11길 22"
+        ));
+        transportOrders.add(new TransportOrderExcelHeader(
                 "운송장번호", "필수",
                 "주문번호에 할당된 운송장번호를 입력해주세요.",
                 "예시) C0029384889"
@@ -43,24 +53,14 @@ public record TransportOrderExcelHeader(String name, String required, String com
                 "예시) YYYYMMDD"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
-                "희망도착시간", "필수",
+                "희망도착시간", "선택",
                 "희망 도착시간을 양식에 맞게 입력해 주세요.\n24시간제를 기준으로 작성 해주세요.",
                 "예시) 15:30"
-        ));
-        transportOrders.add(new TransportOrderExcelHeader(
-                "고객명", "필수",
-                "고객님의 성함 또는 상호를 입력해주세요.",
-                "예시) 홍길동"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
                 "고객연락처", "필수",
                 "고객님의 연락처를 입력해주세요.",
                 "예시) 0212345678, 01000000000"
-        ));
-        transportOrders.add(new TransportOrderExcelHeader(
-                "주소", "필수",
-                "도로명 주소와 건물번호를 입력해주세요.\n주소정보누리집(www.juso.go.kr) 양식을 따릅니다.",
-                "예시) 테헤란로 11길 22"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
                 "상세주소", "필수",
@@ -93,7 +93,7 @@ public record TransportOrderExcelHeader(String name, String required, String com
                 "예시) 30"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
-                "상품명", "필수",
+                "상품명", "선택",
                 "상품명을 모두 입력해주세요.\n상품이 여러개인 경우 운송장번호를 동일하게 사용하여 다음줄에 입력해주세요.",
                 "예시) 스탠리텀블러50"
         ));
@@ -103,7 +103,7 @@ public record TransportOrderExcelHeader(String name, String required, String com
                 "예시) st05"
         ));
         transportOrders.add(new TransportOrderExcelHeader(
-                "상품 수량", "필수",
+                "상품 수량", "선택",
                 "상품의 수량을 정수 형태로 입력해주세요.\n상품수량 셀이 비어있으면 기본값으로 1을 인식합니다.",
                 "예시) 5"
         ));
