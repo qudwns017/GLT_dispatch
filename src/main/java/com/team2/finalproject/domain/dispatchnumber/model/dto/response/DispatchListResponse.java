@@ -132,20 +132,20 @@ public class DispatchListResponse {
         private String address;
         @Schema(example = "2", description = "배송처 id(null이면 배송처정보 없음)")
         private Long deliveryDestinationId;
-        @Schema(example = "화물 엘레베이터 대기시간 1시간", description = "배송처 비고")
-        private String issue;
+        @Schema(example = "20", description = "지연된 시간")
+        private Integer delayedTime;
 
-        private Issue(Long dispatchCodeId,Long dispatchId,String smName,String address,Long deliveryDestinationId,String issue){
+        private Issue(Long dispatchCodeId,Long dispatchId,String smName,String address,Long deliveryDestinationId,Integer delayedTime){
             this.dispatchCodeId = dispatchCodeId;
             this.dispatchId = dispatchId;
             this.smName = smName;
             this.address = address;
             this.deliveryDestinationId = deliveryDestinationId;
-            this.issue = issue;
+            this.delayedTime = delayedTime;
         }
 
-        public static Issue of(Long dispatchCodeId,Long dispatchId,String smName,String address,Long deliveryDestinationId,String issue){
-            return new Issue(dispatchCodeId,dispatchId,smName,address,deliveryDestinationId,issue);
+        public static Issue of(Long dispatchCodeId,Long dispatchId,String smName,String address,Long deliveryDestinationId,Integer delayedTime){
+            return new Issue(dispatchCodeId,dispatchId,smName,address,deliveryDestinationId,delayedTime);
         }
 
     }

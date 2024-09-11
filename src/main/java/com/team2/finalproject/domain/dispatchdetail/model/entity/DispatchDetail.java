@@ -74,6 +74,9 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = true)
     private LocalDateTime loadingCompletionTime; // 상차완료시간
 
+    @Column(nullable = true)
+    private Integer delayedTime; // 지연시간 (분)
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Dispatch dispatch;
 
