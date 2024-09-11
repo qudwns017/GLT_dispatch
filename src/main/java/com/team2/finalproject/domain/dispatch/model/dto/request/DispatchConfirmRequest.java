@@ -205,7 +205,7 @@ public record DispatchConfirmRequest(
                 .arrivalTime(null)
                 .deliveryStatus(DispatchStatus.WAITING)
                 .issue("")
-                .totalTime(LocalTime.of(0, totalTime)) // 시간 합
+                .totalTime(LocalTime.of(totalTime / 60, totalTime % 60)) // 시간 합
                 .path(path)
                 .build();
     }
@@ -258,7 +258,8 @@ public record DispatchConfirmRequest(
                 .detailAddress(list.detailAddress())
                 .requestedArrivalTime(list.serviceRequestTime())
                 .requestedWorkDate(list.serviceRequestDate())
-                .estimatedWorkTime(LocalTime.of(0, list.expectedServiceDuration()))
+                .estimatedWorkTime(
+                        LocalTime.of(list.expectedServiceDuration() / 60, list.expectedServiceDuration() % 60))
                 .isPending(false)
                 .smName(list.smName)
                 .build();
