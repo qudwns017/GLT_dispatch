@@ -106,7 +106,7 @@ public class DispatchDetailService {
 
         DispatchNumber dispatchNumber = dispatch.getDispatchNumber();
         boolean allCompleted = dispatchNumber.getDispatchList().stream()
-            .allMatch(dispatchNumberDispatch -> dispatchNumberDispatch.getDeliveryStatus() == DispatchStatus.COMPLETED);
+            .allMatch(dispatchNumberDispatch -> dispatchNumberDispatch.getDeliveryStatus() == DispatchStatus.TRANSPORTATION_COMPLETED);
         if(allCompleted){
             dispatchNumber.complete();
             dispatchNumberRepository.save(dispatchNumber);
