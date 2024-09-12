@@ -140,17 +140,13 @@ public class DispatchNumberService {
 
         for (DispatchDetail dispatchDetail : dispatch.getDispatchDetailList()) {
             if (dispatchDetail.getDispatchDetailStatus() == DispatchDetailStatus.DELIVERY_DELAY) {
-                String comment = null;
-                if (dispatchDetail.getDestinationId() != null) {
-                    comment = deliveryDestinationRepository.findByIdOrThrow(dispatchDetail.getDestinationId()).getComment();
-                }
                 DispatchListResponse.Issue issue = DispatchListResponse.Issue.of(
                     dispatchCodeId,
                     dispatch.getId(),
                     dispatch.getSmName(),
                     dispatchDetail.getTransportOrder().getLotNumberAddress(),
                     dispatchDetail.getDestinationId(),
-                    comment
+                    dispatchDetail.getDelayedTime()
                 );
                 issueList.add(issue);
             }

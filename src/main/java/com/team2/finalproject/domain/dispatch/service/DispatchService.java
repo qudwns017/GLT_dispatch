@@ -296,7 +296,7 @@ public class DispatchService {
     // Dispatch 상태 COMPLETED로 변경, 미 배송 상태 취소로 변경, 총 주문 수에서 취소 주문 수 빼기, 운송 주문 보류 처리
     private void processDispatchCancellation(Dispatch dispatch) {
         // Dispatch 상태 COMPLETED로 변경
-        dispatch.setDeliveryStatus(DispatchStatus.COMPLETED);
+        dispatch.setDeliveryStatus(DispatchStatus.TRANSPORTATION_COMPLETED);
 
         // 미 배송된 DispatchDetail 개수
         long undeliveredCount = dispatch.getDispatchDetailList().stream()
