@@ -80,20 +80,21 @@ public class OptimizationService {
         Sm sm = smRepository.findByIdOrThrow(mapOrderAndAddress.get(mapOrderAndAddress.keySet().iterator().next()).get(0).smId());
         Vehicle vehicle = vehicleRepository.findBySm(sm);
 
-        List<CourseResponse.CourseDetailResponse> courseDetailResponseList =
+        CourseDetailResult courseDetailResult =
                 createCourseDetailResponseList(sm, response.getResultStopoverList(), mapOrderAndAddress, vehicle, addressMapping);
 
-        int floorAreaRatio = calculateFloorAreaRatio(vehicle, courseDetailResponseList);
+        int floorAreaRatio = calculateFloorAreaRatio(vehicle, courseDetailResult.courseDetailResponseList);
         List<CourseResponse.CoordinatesResponse> coordinatesResponseList = mapCoordinates(response);
 
-        return buildCourseResponse(sm, vehicle, response, floorAreaRatio, courseDetailResponseList, coordinatesResponseList);
+        return buildCourseResponse(sm, vehicle, response, floorAreaRatio, courseDetailResult, coordinatesResponseList);
     }
 
-    private List<CourseResponse.CourseDetailResponse> createCourseDetailResponseList(Sm sm, List<ResultStopover> stopovers,
+    private CourseDetailResult createCourseDetailResponseList(Sm sm, List<ResultStopover> stopovers,
                                                                                      Map<String, List<OrderRequest>> orderRequestMap,
                                                                                      Vehicle vehicle,
                                                                                      Map<String, String[]> addressMapping) {
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList = new ArrayList<>();
+        int contractNum = sm.getCompletedNumOfMonth();
 
         for (ResultStopover stopover : stopovers) {
             // 앞서 만든 특정 기사의 (주소, 주문) 맵에서 도로명 주소가 매칭되는 주문 불러오기
@@ -106,26 +107,39 @@ public class OptimizationService {
             boolean isDelayed = checkDelayedTime(TransportOrderUtil.addDelayTime(stopover.getEndTime(), stopover.getDelayTime()),
                     matchingOrder.serviceRequestTime(), matchingOrder.serviceRequestDate());
 
-            boolean isOverContractNum = checkOverContractNum(sm, stopover);
+            boolean isOverContractNum = checkOverContractNum(sm, stopover, contractNum);
+
+            contractNum = updateContractNum(sm, stopover, contractNum);
 
             courseDetailResponseList.add(createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, isDelayed, isOverContractNum, addressMapping));
         }
 
-        return courseDetailResponseList;
+        return new CourseDetailResult(courseDetailResponseList, contractNum);
     }
 
-    private boolean checkOverContractNum(Sm sm, ResultStopover stopover) {
-        // 계약 타입에 따른 최대 계약 수 비교
+    public record CourseDetailResult(List<CourseResponse.CourseDetailResponse> courseDetailResponseList,
+                                         int updatedContractNum) {
+
+    }
+
+    private boolean checkOverContractNum(Sm sm, ResultStopover stopover, int contractNum) {
         if (sm.getContractType() == ContractType.JIIP) {
-            // 지입일 경우 거리로 계산
-            double totalDistance = sm.getCompletedNumOfMonth() + stopover.getDistance() / 1000.0;
+            double totalDistance = contractNum + stopover.getDistance() / 1000.0;
             return totalDistance > sm.getContractNumOfMonth();
         } else if (sm.getContractType() == ContractType.DELIVERY) {
-            // 택배일 경우 주문 수로 계산
-            int completedOrders = sm.getCompletedNumOfMonth() + 1;
+            int completedOrders = contractNum + 1;
             return completedOrders > sm.getContractNumOfMonth();
         }
         return false;
+    }
+
+    private int updateContractNum(Sm sm, ResultStopover stopover, int contractNum) {
+        if (sm.getContractType() == ContractType.JIIP) {
+            return contractNum + (int) (stopover.getDistance() / 1000.0);
+        } else if (sm.getContractType() == ContractType.DELIVERY) {
+            return contractNum + 1;
+        }
+        return contractNum;
     }
 
     private OrderRequest findMatchingOrder(Map<String, List<OrderRequest>> orderRequestMap, String address) {
@@ -208,13 +222,15 @@ public class OptimizationService {
 
     private CourseResponse buildCourseResponse(Sm sm, Vehicle vehicle, OptimizationResponse response,
                                                int floorAreaRatio,
-                                               List<CourseResponse.CourseDetailResponse> courseDetailResponseList,
+                                               CourseDetailResult courseDetailResult,
                                                List<CourseResponse.CoordinatesResponse> coordinatesResponseList) {
 
-        boolean errorYn = courseDetailResponseList.stream().anyMatch(
+        boolean errorYn = courseDetailResult.courseDetailResponseList.stream().anyMatch(
                 detail -> detail.isRestrictedTonCode() || detail.isDelayRequestTime() || detail.isOverContractNum());
 
         return CourseResponse.builder()
+                .completedNumOfMonth(courseDetailResult.updatedContractNum)
+                .contractNumOfMonth(sm.getContractNumOfMonth())
                 .errorYn(errorYn)
                 .smName(sm.getSmName())
                 .smPhoneNumber(sm.getUsers().getPhoneNumber())
@@ -227,7 +243,7 @@ public class OptimizationService {
                 .breakStartTime(response.getBreakStartTime())
                 .breakEndTime(response.getBreakEndTime())
                 .restingPosition(response.getRestingPosition())
-                .courseDetailResponseList(courseDetailResponseList)
+                .courseDetailResponseList(courseDetailResult.courseDetailResponseList)
                 .coordinatesResponseList(coordinatesResponseList)
                 .build();
     }
