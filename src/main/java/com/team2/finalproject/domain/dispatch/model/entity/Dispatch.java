@@ -86,7 +86,7 @@ public class Dispatch extends BaseEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DispatchStatus deliveryStatus = DispatchStatus.IN_TRANSIT; // 배차상태
+    private DispatchStatus deliveryStatus = DispatchStatus.WORK_WAITING; // 배차상태
 
     @Column(columnDefinition = "geometry(LineString)", nullable = false)
     private LineString path;
@@ -128,6 +128,6 @@ public class Dispatch extends BaseEntity {
     }
 
     public void complete() {
-        this.deliveryStatus = DispatchStatus.COMPLETED;
+        this.deliveryStatus = DispatchStatus.TRANSPORTATION_COMPLETED;
     }
 }
