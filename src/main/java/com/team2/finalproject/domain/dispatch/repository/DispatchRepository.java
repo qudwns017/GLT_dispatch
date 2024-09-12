@@ -23,7 +23,7 @@ public interface DispatchRepository extends JpaRepository<Dispatch, Long> {
     }
 
     // id로 Dispatch 조회할 때,
-    // Sm과 Users, Vehicle, VehicleDetail
+    // Sm과 Users, Vehicle
     // DispatchDetailList와 TransportOrder 같이 조회
     @Query("SELECT d FROM Dispatch d " +
             "JOIN FETCH d.sm s " +
