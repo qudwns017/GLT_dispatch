@@ -116,7 +116,7 @@ public class Dispatch extends BaseEntity {
         this.totalVolume = totalVolume;
         this.totalWeight = totalWeight;
         this.totalDistance = totalDistance;
-        this.totalTime = LocalTime.of(0, totalTime);
+        this.totalTime = LocalTime.of(totalTime / 60, totalTime % 60);
     }
 
     public void minusOrderCount(int minusOrderCount) {
