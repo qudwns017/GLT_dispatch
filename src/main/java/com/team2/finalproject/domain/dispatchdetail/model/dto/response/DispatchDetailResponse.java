@@ -127,6 +127,9 @@ public class DispatchDetailResponse {
         @Schema(example = "Handle with care", description = "배송처 비고")
         private String destinationComment;
 
+        @Schema(example = "2", description = "지연 시간")
+        private Integer delayedTime;
+
         @Schema(example = "123 Main St", description = "지번 주소")
         private String address;
 
@@ -165,6 +168,7 @@ public class DispatchDetailResponse {
                 .destinationType(dispatchDetail.getDestinationType())
                 .destinationId(dispatchDetail.getDestinationId())
                 .destinationComment(comment)
+                .delayedTime(dispatchDetail.getDelayedTime())
                 .address(transportOrder.getLotNumberAddress())
                 .transportOrderId(transportOrder.getId())
                 .lat(dispatchDetail.getDestinationLatitude())
