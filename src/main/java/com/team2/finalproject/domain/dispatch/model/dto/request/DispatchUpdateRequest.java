@@ -21,7 +21,7 @@ public record DispatchUpdateRequest(
         @Schema(example = "충남 천안시 서북구 백석로 123", description = "주소", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank String roadAddress,
         @Schema(example = "지하 1층", description = "상세 주소", requiredMode = Schema.RequiredMode.REQUIRED)
-        @NotBlank String detailAddress,
+        String detailAddress,
         @Schema(example = "36.4501", description = "위도", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull Double lat,
         @Schema(example = "127.1234", description = "경도", requiredMode = Schema.RequiredMode.REQUIRED)

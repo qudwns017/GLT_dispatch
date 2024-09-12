@@ -98,11 +98,11 @@ public class DispatchService {
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(resultStopoverList, orders ,request.loadingStartTime(),sm.getVehicle());
 
-        // 기사 계약에 따른 전체 주문 or 거리
-        int totalOrderOrDistanceNum = sm.getCompletedNumOfMonth() + ( sm.getContractType() == ContractType.JIIP ?  + (int) (optimizationResponse.totalDistance() / 1000) : orders.size());
+        // 주문의 전체 주문 수 or 거리
+        int totalOrderOrDistanceNum = sm.getContractType() == ContractType.JIIP ? (int) (optimizationResponse.totalDistance() / 1000) : orders.size();
 
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
-            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,totalOrderOrDistanceNum ,sm.getContractNumOfMonth(), sm.getContractType().getContractType(),startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
+            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,totalOrderOrDistanceNum ,sm.getContractNumOfMonth() - sm.getCompletedNumOfMonth(), sm.getContractType().getContractType(),startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
     }
 
     @Transactional
