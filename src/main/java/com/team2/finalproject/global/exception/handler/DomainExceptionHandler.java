@@ -16,8 +16,10 @@ public class DomainExceptionHandler {
     @ExceptionHandler(HttpStatusCodeException.class)
     public ResponseEntity<ErrorResponse> exception(HttpStatusCodeException exception) {
         log.error("", exception);
+
+        String statusCode = exception.getStatusCode().toString();
         return ResponseEntity
                 .status(exception.getStatusCode())
-                .body(new ErrorResponse(exception.getStatusText(), exception.getMessage()));
+                .body(new ErrorResponse(statusCode.substring(statusCode.indexOf(" ") + 1), exception.getStatusText()));
     }
 }

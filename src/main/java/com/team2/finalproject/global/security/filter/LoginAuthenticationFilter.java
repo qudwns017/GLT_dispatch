@@ -101,7 +101,7 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
             errorMessage = failed.getMessage();
         } else {
             statusCode = HttpStatus.UNAUTHORIZED.value();
-            errorMessage = "로그인 실패";
+            errorMessage = "로그인에 실패했습니다.";
         }
 
         response.setStatus(statusCode);
@@ -109,7 +109,7 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
         response.setCharacterEncoding("UTF-8");  // 문자 인코딩을 UTF-8로 설정
 
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "로그인 실패");
+        errorResponse.put("statusMessage", HttpStatus.valueOf(statusCode).getReasonPhrase());
         errorResponse.put("message", errorMessage);
 
         objectMapper.writeValue(response.getWriter(), errorResponse);
