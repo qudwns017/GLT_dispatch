@@ -208,7 +208,7 @@ public abstract class BaseIntegrationTest {
                                 "departure_place_name, departure_time, path, delivery_status, issue, total_time, break_start_time, break_end_time, resting_stopover, create_at, update_at) " +
                                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ST_GeomFromText(?), ?, ?, ?, '00:00:00', '00:00:00', 0, NOW(), NOW())",
                         dispatchNumberId, 1, "SM Name " + dispatchNumberId, j, j * 2, 5, 100.0 / j,
-                        1000.0 * j, 100.0 * j, 50.0 * j, "DP01", "Departure Place", lineString, "IN_TRANSIT", "No issues", "00:30:00"
+                        1000.0 * j, 100.0 * j, 50.0 * j, "DP01", "Departure Place", lineString, "MOVING", "No issues", "00:30:00"
                 );
             }
         }
@@ -222,8 +222,8 @@ public abstract class BaseIntegrationTest {
                         "INSERT INTO dispatch_detail (dispatch_id, transport_order_id, destination_id, destination_latitude, " +
                                 "destination_longitude, distance, expectation_operation_start_time, expectation_operation_end_time, " +
                                 "operation_start_time, operation_end_time, destination_type, dispatch_detail_status, ett, is_resting, " +
-                                "create_at, update_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW(), NOW(), ?, ?, ?, ?, NOW(), NOW())",
-                        dispatchId, j, j, 37.0 + j * 0.01, 127.0 + j * 0.01, 10.0 * j, "DELIVERY_DESTINATION", "MOVING", 30, false
+                                "delayed_time, create_at, update_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW(), NOW(), ?, ?, ?, ?, ?, NOW(), NOW())",
+                        dispatchId, j, j, 37.0 + j * 0.01, 127.0 + j * 0.01, 10.0 * j, "DELIVERY_DESTINATION", "MOVING", 30, false, 0
                 );
             }
         }
