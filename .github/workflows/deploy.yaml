@@ -21,12 +21,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      
 
       - name: set yaml file
         uses: microsoft/variable-substitution@v1
         with:
-          files: ./src/main/resources/application.yaml
+          files: ./src/main/resources/application-prod.yaml
         env:
           spring.datasource.url: ${{ secrets.MYSQL_URL }}
           spring.datasource.username: ${{ secrets.MYSQL_USERNAME }}
@@ -41,6 +40,8 @@ jobs:
           optimization-api.uri: ${{ secrets.OPTIMIZATION_API_URI }}
           kakao.api.key :  ${{ secrets.KAKAO_API_KEY }}
           server.url: ${{ secrets.SERVER_URL }}
+          spring.profiles.default: ${{ secrets.DEPLOYMENT_ENVIRONMENT }}
+          sentry.dsn: ${{ secrets.SENTRY_DSN }}
 
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
