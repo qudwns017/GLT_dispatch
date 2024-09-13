@@ -1,5 +1,7 @@
 package com.team2.finalproject.domain.transportorder.service;
 
+import com.team2.finalproject.domain.center.exception.CenterErrorCode;
+import com.team2.finalproject.domain.center.exception.CenterException;
 import com.team2.finalproject.domain.center.model.entity.Center;
 import com.team2.finalproject.domain.center.repository.CenterRepository;
 import com.team2.finalproject.domain.deliverydestination.model.entity.DeliveryDestination;
@@ -27,6 +29,7 @@ import com.team2.finalproject.global.util.request.OptimizationRequest;
 import com.team2.finalproject.global.util.request.Stopover;
 import com.team2.finalproject.global.util.response.AddressInfo;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -152,8 +155,10 @@ public class TransportOrderService {
     }
 
     private Center getCenterByUser(Users user) {
-        Long centerId = user.getCenter().getId();
-        return centerRepository.findById(centerId).orElseThrow();
+        Long centerId = Optional.ofNullable(user.getCenter())
+                .map(Center::getId)
+                .orElseThrow(() -> new CenterException(CenterErrorCode.NOT_FOUND_CENTER));
+        return centerRepository.findByIdOrThrow(centerId);
     }
 
     private Stopover createStartStopover(Center center) {
@@ -313,7 +318,8 @@ public class TransportOrderService {
         String centerCode = center.getCenterCode();
 
         // 센터에 해당하는 당일 날짜의 배차 개수 조회
-        int dispatchCount = dispatchNumberRepository.countByCenterAndLoadingStartTimeOnDate(center, request.loadingStartTime());
+        int dispatchCount = dispatchNumberRepository.countByCenterAndLoadingStartTimeOnDate(center,
+                request.loadingStartTime());
 
         // 배차 번호 생성: 개수 + 1
         String dispatchNumber = String.valueOf(dispatchCount + 1);
@@ -377,15 +383,19 @@ public class TransportOrderService {
 
     @Transactional(readOnly = true)
     public TransportOrderResponse getTransportOrderById(Long transportOrderId) {
-        TransportOrder transportOrder = transportOrderRepository.findOrderWithDispatchDetailByIdOrThrow(transportOrderId);
+        TransportOrder transportOrder = transportOrderRepository.findOrderWithDispatchDetailByIdOrThrow(
+                transportOrderId);
         Long destinationId = transportOrder.getDispatchDetail().getDestinationId();
 
-        if (destinationId != null){
+        if (destinationId != null) {
             DeliveryDestination deliveryDestination = deliveryDestinationRepository.findByIdOrThrow(destinationId);
-            return TransportOrderResponse.of(transportOrder,deliveryDestination.getManagerName(),deliveryDestination.getPhoneNumber(),destinationId);
+            return TransportOrderResponse.of(transportOrder, deliveryDestination.getManagerName(),
+                    deliveryDestination.getPhoneNumber(), destinationId);
         }
 
-        return TransportOrderResponse.of(transportOrder,transportOrder.getCustomerName(),transportOrder.getCustomerPhoneNumber(),transportOrder.getRoadAddress(),transportOrder.getDetailAddress(),transportOrder.getCustomerNotes());
+        return TransportOrderResponse.of(transportOrder, transportOrder.getCustomerName(),
+                transportOrder.getCustomerPhoneNumber(), transportOrder.getRoadAddress(),
+                transportOrder.getDetailAddress(), transportOrder.getCustomerNotes());
     }
 }
 

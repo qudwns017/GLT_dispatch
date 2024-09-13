@@ -6,6 +6,8 @@ import com.team2.finalproject.domain.dispatch.model.dto.response.CourseResponse;
 import com.team2.finalproject.domain.sm.model.entity.Sm;
 import com.team2.finalproject.domain.sm.model.type.ContractType;
 import com.team2.finalproject.domain.sm.repository.SmRepository;
+import com.team2.finalproject.domain.transportorder.exception.TransportOrderErrorCode;
+import com.team2.finalproject.domain.transportorder.exception.TransportOrderException;
 import com.team2.finalproject.domain.transportorder.model.dto.request.OrderRequest;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.domain.vehicle.model.type.VehicleType;
@@ -58,7 +60,7 @@ public class OptimizationService {
                 .block();
 
         if (responses == null || responses.isEmpty()) {
-            throw new RuntimeException("Failed to optimize route");
+            throw new TransportOrderException(TransportOrderErrorCode.FAILED_OPTIMIZE_ROUTE);
         }
 
         List<Long> keys = new ArrayList<>(mapOrderAndAddressBySmId.keySet());
