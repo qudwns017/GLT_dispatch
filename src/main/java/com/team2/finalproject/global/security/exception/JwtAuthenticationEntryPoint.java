@@ -18,7 +18,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+                         AuthenticationException authException) throws IOException {
         SecurityException securityException = (SecurityException) request.getAttribute("securityException");
         // 기본 설정 - 로그인 하지 않은 상태에 대한 예외 처리
         if (securityException == null) {
@@ -29,7 +30,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ErrorResponse errorResponse = new ErrorResponse(securityException.getStatusText(), securityException.getMessage());
+        String statusCode = securityException.getStatusCode().toString();
+        ErrorResponse errorResponse = new ErrorResponse(statusCode.substring(statusCode.indexOf(" ") + 1),
+                securityException.getStatusText());
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }
