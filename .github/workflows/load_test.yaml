@@ -82,7 +82,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           username: ubuntu
-          host: ${{ secrets.SERVER_HOST }}
+          host: ${{ secrets.LOAD_TEST_SERVER_HOST }}
           key: ${{ secrets.SERVER_HOST_SECRETKEY }}
 
           # 도커 작업
