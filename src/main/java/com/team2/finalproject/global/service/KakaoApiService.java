@@ -34,6 +34,7 @@ public class KakaoApiService {
             // 지번 주소가 있는 경우, 지번 주소를 사용
             String customerAddress = addressNode != null ?
                     addressNode.get("address_name").asText() : document.get("address_name").asText();
+
             double latitude = document.get("y").asDouble();  // 위도
             double longitude = document.get("x").asDouble();  // 경도
 
@@ -44,11 +45,9 @@ public class KakaoApiService {
                     .build();
         }
 
-        if (response == null || response.isEmpty()) {
-            throw new RuntimeException("Failed to kakao Api exception");
+        else {
+            throw new RuntimeException("존재하지 않는 주소입니다.");
         }
-
-        return null;
     }
 }
 
