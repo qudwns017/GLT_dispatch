@@ -16,6 +16,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseResponse {
+    @Schema(description = "전체 주문의 수 or 거리 ", example = "20")
+    private int totalOrderOrDistanceNum;
+
+    @Schema(description = "가용주문 수 or 거리", example = "80")
+    private int availableNum;
+
     @Schema(description = "오류 여부", example = "false")
     private boolean errorYn;
 
