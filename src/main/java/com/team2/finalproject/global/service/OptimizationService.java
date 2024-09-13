@@ -232,6 +232,7 @@ public class OptimizationService {
                 .totalOrderOrDistanceNum(courseDetailResult.updatedContractNum)
                 .availableNum(sm.getContractNumOfMonth()-sm.getCompletedNumOfMonth())
                 .errorYn(errorYn)
+                .smId(sm.getId())
                 .smName(sm.getSmName())
                 .smPhoneNumber(sm.getUsers().getPhoneNumber())
                 .vehicleType(vehicle.getVehicleType().toString())
