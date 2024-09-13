@@ -94,7 +94,7 @@ public class OptimizationService {
                                                                                      Vehicle vehicle,
                                                                                      Map<String, String[]> addressMapping) {
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList = new ArrayList<>();
-        int contractNum = 0;
+        int orderOrDistanceNum = 0;
 
         for (ResultStopover stopover : stopovers) {
             // 앞서 만든 특정 기사의 (주소, 주문) 맵에서 도로명 주소가 매칭되는 주문 불러오기
@@ -107,14 +107,14 @@ public class OptimizationService {
             boolean isDelayed = checkDelayedTime(TransportOrderUtil.addDelayTime(stopover.getEndTime(), stopover.getDelayTime()),
                     matchingOrder.serviceRequestTime(), matchingOrder.serviceRequestDate());
 
-            boolean isOverContractNum = checkOverContractNum(sm, stopover, contractNum);
+            boolean isOverContractNum = checkOverContractNum(sm, stopover, orderOrDistanceNum);
 
-            contractNum = updateContractNum(sm, stopover, contractNum);
+            orderOrDistanceNum = updateContractNum(sm, stopover, orderOrDistanceNum);
 
             courseDetailResponseList.add(createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, isDelayed, isOverContractNum, addressMapping));
         }
 
-        return new CourseDetailResult(courseDetailResponseList, contractNum);
+        return new CourseDetailResult(courseDetailResponseList, orderOrDistanceNum);
     }
 
     public record CourseDetailResult(List<CourseResponse.CourseDetailResponse> courseDetailResponseList,
@@ -133,13 +133,13 @@ public class OptimizationService {
         return false;
     }
 
-    private int updateContractNum(Sm sm, ResultStopover stopover, int contractNum) {
+    private int updateContractNum(Sm sm, ResultStopover stopover, int orderOrDistanceNum) {
         if (sm.getContractType() == ContractType.JIIP) {
-            return contractNum + (int) (stopover.getDistance() / 1000.0);
+            return orderOrDistanceNum + (int) (stopover.getDistance() / 1000.0);
         } else if (sm.getContractType() == ContractType.DELIVERY) {
-            return contractNum + 1;
+            return orderOrDistanceNum + 1;
         }
-        return contractNum;
+        return orderOrDistanceNum;
     }
 
     private OrderRequest findMatchingOrder(Map<String, List<OrderRequest>> orderRequestMap, String address) {
@@ -229,8 +229,8 @@ public class OptimizationService {
                 detail -> detail.isRestrictedTonCode() || detail.isDelayRequestTime() || detail.isOverContractNum());
 
         return CourseResponse.builder()
-                .completedNumOfMonth(courseDetailResult.updatedContractNum)
-                .contractNumOfMonth(sm.getContractNumOfMonth()-sm.getCompletedNumOfMonth())
+                .totalOrderOrDistanceNum(courseDetailResult.updatedContractNum)
+                .availableNum(sm.getContractNumOfMonth()-sm.getCompletedNumOfMonth())
                 .errorYn(errorYn)
                 .smName(sm.getSmName())
                 .smPhoneNumber(sm.getUsers().getPhoneNumber())
