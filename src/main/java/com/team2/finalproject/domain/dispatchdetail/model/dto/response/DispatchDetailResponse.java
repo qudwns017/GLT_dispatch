@@ -49,7 +49,10 @@ public class DispatchDetailResponse {
     @Schema(example = "20", description = "주문 수")
     private int deliveryOrderCount;
 
-    @Schema(example = "2:00:00", description = "주행시간")
+    @Schema(example = "20.8", description = "총 주행 거리")
+    private double totalDistance;
+
+    @Schema(example = "2:00:00", description = "총 주행시간")
     private LocalTime totalTime;
 
     @Schema(example = "No issues", description = "이슈 및 메모")
@@ -124,6 +127,9 @@ public class DispatchDetailResponse {
         @Schema(example = "Handle with care", description = "배송처 비고")
         private String destinationComment;
 
+        @Schema(example = "2", description = "지연 시간")
+        private Integer delayedTime;
+
         @Schema(example = "123 Main St", description = "지번 주소")
         private String address;
 
@@ -162,6 +168,7 @@ public class DispatchDetailResponse {
                 .destinationType(dispatchDetail.getDestinationType())
                 .destinationId(dispatchDetail.getDestinationId())
                 .destinationComment(comment)
+                .delayedTime(dispatchDetail.getDelayedTime())
                 .address(transportOrder.getLotNumberAddress())
                 .transportOrderId(transportOrder.getId())
                 .lat(dispatchDetail.getDestinationLatitude())
@@ -181,6 +188,7 @@ public class DispatchDetailResponse {
                 .vehicleType(vehicle.getVehicleType())
                 .vehicleTon(vehicle.getVehicleTon())
                 .progressionRate(calcProgress(dispatch.getDeliveryOrderCount(), dispatch.getCompletedOrderCount()))
+                .totalDistance(dispatch.getTotalDistance())
                 .completedOrderCount(dispatch.getCompletedOrderCount())
                 .deliveryOrderCount(dispatch.getDeliveryOrderCount())
                 .totalTime(dispatch.getTotalTime())
