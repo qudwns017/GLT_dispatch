@@ -94,7 +94,7 @@ public class OptimizationService {
                                                                                      Vehicle vehicle,
                                                                                      Map<String, String[]> addressMapping) {
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList = new ArrayList<>();
-        int contractNum = sm.getCompletedNumOfMonth();
+        int contractNum = 0;
 
         for (ResultStopover stopover : stopovers) {
             // 앞서 만든 특정 기사의 (주소, 주문) 맵에서 도로명 주소가 매칭되는 주문 불러오기
@@ -135,7 +135,7 @@ public class OptimizationService {
 
     private int updateContractNum(Sm sm, ResultStopover stopover, int contractNum) {
         if (sm.getContractType() == ContractType.JIIP) {
-            return contractNum + (int) (stopover.getDistance() / 1000.0);
+            return (int) (stopover.getDistance() / 1000.0);
         } else if (sm.getContractType() == ContractType.DELIVERY) {
             return contractNum + 1;
         }
@@ -230,7 +230,7 @@ public class OptimizationService {
 
         return CourseResponse.builder()
                 .completedNumOfMonth(courseDetailResult.updatedContractNum)
-                .contractNumOfMonth(sm.getContractNumOfMonth())
+                .contractNumOfMonth(sm.getContractNumOfMonth()-sm.getCompletedNumOfMonth())
                 .errorYn(errorYn)
                 .smName(sm.getSmName())
                 .smPhoneNumber(sm.getUsers().getPhoneNumber())
