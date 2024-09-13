@@ -135,7 +135,7 @@ public class OptimizationService {
 
     private int updateContractNum(Sm sm, ResultStopover stopover, int contractNum) {
         if (sm.getContractType() == ContractType.JIIP) {
-            return (int) (stopover.getDistance() / 1000.0);
+            return contractNum + (int) (stopover.getDistance() / 1000.0);
         } else if (sm.getContractType() == ContractType.DELIVERY) {
             return contractNum + 1;
         }
