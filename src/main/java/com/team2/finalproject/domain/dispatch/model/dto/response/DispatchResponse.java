@@ -58,6 +58,8 @@ public class DispatchResponse {
             example = """
         [
             {
+                "completedNumOfMonth": 20,
+                "contractNumOfMonth": 80,
                 "errorYn": false,
                 "smName": "홍길동",
                 "smPhoneNumber": "010-1234-5678",
@@ -72,7 +74,9 @@ public class DispatchResponse {
                 "restingPosition": 2,
                 "courseDetailResponseList": [
                     {
-                        "errorYn": false,
+                        "restrictedTonCode": false,
+                        "delayRequestTime": true,
+                        "overContractNum": true,
                         "ett": 30,
                         "expectationOperationStartTime": "2024-08-30T09:30:00",
                         "expectationOperationEndTime": "2024-08-30T10:00:00",

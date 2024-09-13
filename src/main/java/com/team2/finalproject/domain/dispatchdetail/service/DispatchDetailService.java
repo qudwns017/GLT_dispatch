@@ -42,12 +42,15 @@ public class DispatchDetailService {
     @Transactional(readOnly = true)
     public DispatchDetailResponse getDispatchDetail(Long dispatchId) {
         Dispatch dispatch = dispatchRepository.findByIdWithDetailsOrThrow(dispatchId);
+        log.info("정보를 가져올 dispatchId: {}", dispatchId);
 
         Sm sm = dispatch.getSm();
         Users users = sm.getUsers();
         Vehicle vehicle = sm.getVehicle();
 
         List<DispatchDetail> dispatchDetails = dispatch.getDispatchDetailList();
+        log.info("배차 상세 개수: {}", dispatchDetails.size());
+        log.info("despatchDetailIds: {}", dispatchDetails.stream().map(DispatchDetail::getId).toList());
 
         // startStopover
         Center center = centerRepository.findByCenterCodeOrThrow(dispatch.getDeparturePlaceCode());
@@ -103,7 +106,7 @@ public class DispatchDetailService {
 
         DispatchNumber dispatchNumber = dispatch.getDispatchNumber();
         boolean allCompleted = dispatchNumber.getDispatchList().stream()
-            .allMatch(dispatchNumberDispatch -> dispatchNumberDispatch.getDeliveryStatus() == DispatchStatus.COMPLETED);
+            .allMatch(dispatchNumberDispatch -> dispatchNumberDispatch.getDeliveryStatus() == DispatchStatus.TRANSPORTATION_COMPLETED);
         if(allCompleted){
             dispatchNumber.complete();
             dispatchNumberRepository.save(dispatchNumber);

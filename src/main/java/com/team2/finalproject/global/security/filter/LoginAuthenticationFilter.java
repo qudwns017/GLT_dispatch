@@ -78,7 +78,8 @@ public class LoginAuthenticationFilter extends AbstractAuthenticationProcessingF
                 .name(userDetails.getUsers().getName())
                 .build();
 
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
+
         objectMapper.writeValue(response.getWriter(), loginResponse);
 
         log.info("사용자 로그인 성공: {}", username);

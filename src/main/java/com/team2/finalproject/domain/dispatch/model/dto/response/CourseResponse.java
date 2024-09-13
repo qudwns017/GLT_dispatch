@@ -16,6 +16,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseResponse {
+    @Schema(description = "한달 완료 진행 수", example = "20")
+    private int completedNumOfMonth;
+
+    @Schema(description = "한달 계약 수", example = "80")
+    private int contractNumOfMonth;
+
     @Schema(description = "오류 여부", example = "false")
     private boolean errorYn;
 
