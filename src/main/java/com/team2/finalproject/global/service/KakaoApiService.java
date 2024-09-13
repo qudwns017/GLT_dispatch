@@ -1,6 +1,8 @@
 package com.team2.finalproject.global.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.team2.finalproject.domain.transportorder.exception.TransportOrderErrorCode;
+import com.team2.finalproject.domain.transportorder.exception.TransportOrderException;
 import com.team2.finalproject.global.util.response.AddressInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,10 +45,8 @@ public class KakaoApiService {
                     .lat(latitude)
                     .lon(longitude)
                     .build();
-        }
-
-        else {
-            throw new RuntimeException("존재하지 않는 주소입니다.");
+        } else {
+            throw new TransportOrderException(TransportOrderErrorCode.NOT_FOUND_ADDRESS);
         }
     }
 }
