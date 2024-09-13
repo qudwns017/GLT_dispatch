@@ -25,6 +25,9 @@ public class CourseResponse {
     @Schema(description = "오류 여부", example = "false")
     private boolean errorYn;
 
+    @Schema(description = "기사 ID", example = "123")
+    private Long smId;
+
     @Schema(description = "기사 이름", example = "홍길동")
     private String smName;
 
