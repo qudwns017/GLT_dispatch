@@ -120,10 +120,10 @@ public class OptimizationService {
 
             int floorAreaRatio;
             if (ContractType.DELIVERY.equals(sm.getContractType())) {
-                totalVolumeOrWeight += matchingOrder.volume();
+                totalVolumeOrWeight += matchingOrder.volume() * matchingOrder.productQuantity();
                 floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadVolume() * 100);
             } else {
-                totalVolumeOrWeight += matchingOrder.weight();
+                totalVolumeOrWeight += matchingOrder.weight() * matchingOrder.productQuantity();
                 floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadWeight() * 100);
             }
 
