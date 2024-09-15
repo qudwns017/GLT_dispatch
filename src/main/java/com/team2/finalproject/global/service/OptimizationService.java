@@ -99,6 +99,8 @@ public class OptimizationService {
                                                               Map<String, String[]> addressMapping) {
         List<CourseResponse.CourseDetailResponse> courseDetailResponseList = new ArrayList<>();
         int orderOrDistanceNum = 0;
+        boolean overFloorAreaRatio = false;
+        double totalVolumeOrWeight = 0.0;
 
         for (ResultStopover stopover : stopovers) {
             // 앞서 만든 특정 기사의 (주소, 주문) 맵에서 도로명 주소가 매칭되는 주문 불러오기
@@ -116,9 +118,22 @@ public class OptimizationService {
 
             orderOrDistanceNum = updateContractNum(sm, stopover, orderOrDistanceNum);
 
+            int floorAreaRatio;
+            if (ContractType.DELIVERY.equals(sm.getContractType())) {
+                totalVolumeOrWeight += matchingOrder.volume();
+                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadVolume() * 100);
+            } else {
+                totalVolumeOrWeight += matchingOrder.weight();
+                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadWeight() * 100);
+            }
+
+            if (floorAreaRatio > 100) {
+                overFloorAreaRatio = true;
+            }
+
             courseDetailResponseList.add(
                     createCourseDetailResponse(stopover, matchingOrder, destination, isRestricted, isDelayed,
-                            isOverContractNum, addressMapping));
+                            isOverContractNum, overFloorAreaRatio, addressMapping));
         }
 
         return new CourseDetailResult(courseDetailResponseList, orderOrDistanceNum);
@@ -126,7 +141,6 @@ public class OptimizationService {
 
     public record CourseDetailResult(List<CourseResponse.CourseDetailResponse> courseDetailResponseList,
                                      int updatedContractNum) {
-
     }
 
     private boolean checkOverContractNum(Sm sm, ResultStopover stopover, int contractNum) {
@@ -164,11 +178,13 @@ public class OptimizationService {
                                                                            boolean isRestricted,
                                                                            boolean isDelayed,
                                                                            boolean isOverContractNum,
+                                                                           boolean overFloorAreaRatio,
                                                                            Map<String, String[]> addressMapping) {
         return CourseResponse.CourseDetailResponse.builder()
                 .restrictedTonCode(isRestricted)
                 .delayRequestTime(isDelayed)
                 .overContractNum(isOverContractNum)
+                .overFloorAreaRatio(overFloorAreaRatio)
                 .ett(stopover.getTimeFromPrevious() / 1000 / 60)
                 .expectationOperationStartTime(stopover.getEndTime())
                 .expectationOperationEndTime(
@@ -243,7 +259,7 @@ public class OptimizationService {
 
         return CourseResponse.builder()
                 .totalOrderOrDistanceNum(courseDetailResult.updatedContractNum)
-                .availableNum(sm.getContractNumOfMonth() - sm.getCompletedNumOfMonth())
+                .availableNum(Math.max(sm.getContractNumOfMonth() - sm.getCompletedNumOfMonth(), 0))
                 .errorYn(errorYn)
                 .smId(sm.getId())
                 .smName(sm.getSmName())

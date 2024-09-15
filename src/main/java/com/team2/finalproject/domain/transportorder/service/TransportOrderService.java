@@ -89,14 +89,21 @@ public class TransportOrderService {
         List<CourseResponse> courses = optimizationService.
                 callOptimizationApi(optimizationRequests, mapOrderAndAddressBySmId, addressMapping);
 
+        // 총 무게
+        double totalWeight = calculateTotalWeight(courses);
+
+        // 총 부피
+        double totalVolume = calculateTotalVolume(courses);
+
         // 용적률 계산
-        int totalFloorAreaRatio = calculateTotalFloorAreaRatio(request, courses);
+        int totalFloorAreaRatio = calculateTotalFloorAreaRatio(request, totalWeight, totalVolume, courses);
 
         // 출발지 응답 생성
         StartStopoverResponse startStopoverResponse = createStartStopoverResponse(request, center);
 
         // 최종 DispatchResponse 반환
-        return createDispatchResponse(request, center, courses, totalFloorAreaRatio, startStopoverResponse);
+        return createDispatchResponse(request, center, courses, totalWeight, totalVolume, totalFloorAreaRatio,
+                startStopoverResponse);
     }
 
     public void downloadOrderFormExcel(HttpServletResponse response) {
@@ -253,31 +260,53 @@ public class TransportOrderService {
     }
 
 
-    private int calculateTotalFloorAreaRatio(TransportOrderRequest request, List<CourseResponse> courses) {
-        double totalVolume = 0;
-        double totalWeight = 0;
-        double maxLoadVolumeSum = 0;
-        double maxLoadWeightSum = 0;
+    private int calculateTotalFloorAreaRatio(TransportOrderRequest request, double totalWeight, double totalVolume,
+                                             List<CourseResponse> courses) {
+        String deliveryType = request.orderReuquestList().get(0).deliveryType();
+        if ("지입".equals(deliveryType)) {
+            return (int) ((totalWeight / calculateMaxLoadWeightSum(courses)) * 100);
+        } else if ("택배".equals(deliveryType)) {
+            return (int) ((totalVolume / calculateMaxLoadVolumeSum(courses)) * 100);
+        }
+        return 0;
+    }
 
+    private double calculateTotalVolume(List<CourseResponse> courses) {
+        double totalVolume = 0;
         for (CourseResponse course : courses) {
             for (CourseResponse.CourseDetailResponse detail : course.getCourseDetailResponseList()) {
                 totalVolume += detail.getVolume();
+            }
+        }
+        return totalVolume;
+    }
+
+    private double calculateTotalWeight(List<CourseResponse> courses) {
+        double totalWeight = 0;
+        for (CourseResponse course : courses) {
+            for (CourseResponse.CourseDetailResponse detail : course.getCourseDetailResponseList()) {
                 totalWeight += detail.getWeight();
             }
+        }
+        return totalWeight;
+    }
 
+    private double calculateMaxLoadVolumeSum(List<CourseResponse> courses) {
+        double maxLoadVolumeSum = 0;
+        for (CourseResponse course : courses) {
             Vehicle vehicle = vehicleRepository.findBySm_Id(course.getCourseDetailResponseList().get(0).getSmId());
             maxLoadVolumeSum += vehicle.getMaxLoadVolume();
+        }
+        return maxLoadVolumeSum;
+    }
+
+    private double calculateMaxLoadWeightSum(List<CourseResponse> courses) {
+        double maxLoadWeightSum = 0;
+        for (CourseResponse course : courses) {
+            Vehicle vehicle = vehicleRepository.findBySm_Id(course.getCourseDetailResponseList().get(0).getSmId());
             maxLoadWeightSum += vehicle.getMaxLoadWeight();
         }
-
-        String deliveryType = request.orderReuquestList().get(0).deliveryType();
-        if ("지입".equals(deliveryType)) {
-            return (int) ((totalWeight / maxLoadWeightSum) * 100);
-        } else if ("택배".equals(deliveryType)) {
-            return (int) ((totalVolume / maxLoadVolumeSum) * 100);
-        }
-
-        return 0;
+        return maxLoadWeightSum;
     }
 
     private StartStopoverResponse createStartStopoverResponse(TransportOrderRequest request, Center center) {
@@ -294,7 +323,9 @@ public class TransportOrderService {
     }
 
     private DispatchResponse createDispatchResponse(TransportOrderRequest request, Center center,
-                                                    List<CourseResponse> courses, int totalFloorAreaRatio,
+                                                    List<CourseResponse> courses, double totalWeight,
+                                                    double totalVolume,
+                                                    int totalFloorAreaRatio,
                                                     StartStopoverResponse startStopoverResponse) {
         return DispatchResponse.builder()
                 .dispatchCode(generateDispatchCode(request, center))
@@ -303,6 +334,8 @@ public class TransportOrderService {
                 .totalErrorNum((int) courses.stream().filter(CourseResponse::isErrorYn).count())
                 .totalTime(courses.stream().mapToInt(CourseResponse::getTotalTime).sum())
                 .totalFloorAreaRatio(totalFloorAreaRatio)
+                .totalWeight(totalWeight)
+                .totalVolume(totalVolume)
                 .loadingStartTime(request.loadingStartTime())
                 .contractType(request.orderReuquestList().get(0).deliveryType())
                 .startStopoverResponse(startStopoverResponse)

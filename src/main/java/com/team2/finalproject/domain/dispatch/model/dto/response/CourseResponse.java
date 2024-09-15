@@ -81,6 +81,9 @@ public class CourseResponse {
         @Schema(description = "계약 초과 위반 여부", example = "false")
         private boolean overContractNum;
 
+        @Schema(description = "용적률 초과", example = "false")
+        private boolean overFloorAreaRatio;
+
         @Schema(description = "예상 이동 시간 (분)", example = "30")
         private int ett;
 
