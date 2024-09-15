@@ -34,46 +34,52 @@ import java.util.stream.Collectors;
 public class DispatchNumberService {
 
     private final DispatchNumberRepository dispatchNumberRepository;
-    private final DeliveryDestinationRepository deliveryDestinationRepository;
     private final UsersRepository usersRepository;
     private final DispatchRepository dispatchRepository;
 
-    public DispatchListResponse getDispatchList(Long dispatchCodeId){
+    public DispatchListResponse getDispatchList(Long dispatchCodeId) {
 
         DispatchNumber dispatchNumber = dispatchNumberRepository.findByIdWithJoinOrThrow(dispatchCodeId);
 
         List<Dispatch> dispatchList = dispatchNumber.getDispatchList();
 
         int totalCompletedOrderCount = dispatchList.stream()
-            .mapToInt(Dispatch::getCompletedOrderCount) // Dispatch 객체의 getCompletedOrderCount 값을 int로 변환
-            .sum(); // 모든 값을 합산
+                .mapToInt(Dispatch::getCompletedOrderCount) // Dispatch 객체의 getCompletedOrderCount 값을 int로 변환
+                .sum(); // 모든 값을 합산
         int totalDeliveryOrderCount = dispatchList.stream()
-            .mapToInt(Dispatch::getDeliveryOrderCount)
-            .sum();
+                .mapToInt(Dispatch::getDeliveryOrderCount)
+                .sum();
         double totalProgressionRate = (double) totalDeliveryOrderCount / totalCompletedOrderCount * 100;
 
         Center center = dispatchNumber.getCenter();
-        DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),center.getLotNumberAddress(),center.getLatitude(),center.getLongitude(), center.getDelayTime());
+        DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),
+                center.getLotNumberAddress(), center.getLatitude(), center.getLongitude(), center.getDelayTime());
 
         List<DispatchListResponse.Issue> issueList = new ArrayList<>();
 
         List<DispatchSimpleResponse> dispatchResponseList = dispatchList.stream()
-            .map(dispatch -> {
-                double progressionRate = (double) dispatch.getDeliveryOrderCount() / dispatch.getCompletedOrderCount() * 100;
+                .map(dispatch -> {
+                    double progressionRate =
+                            (double) dispatch.getDeliveryOrderCount() / dispatch.getCompletedOrderCount() * 100;
 
-                List<Map<String, Double>> stopoverList = createStopoverList(dispatch);
-                List<Map<String, Double>> coordinates = createCoordinateList(dispatch);
+                    List<Map<String, Double>> stopoverList = createStopoverList(dispatch);
+                    List<Map<String, Double>> coordinates = createCoordinateList(dispatch);
 
-                issueList.addAll(getIssueListOfDispatch(dispatch, dispatchCodeId));
+                    issueList.addAll(getIssueListOfDispatch(dispatch, dispatchCodeId));
 
-                return DispatchSimpleResponse.of(dispatch.getId(), dispatch.getDeliveryStatus().getDescription(), dispatch.getSmName(), dispatch.getCompletedOrderCount(), dispatch.getDeliveryOrderCount(), (int) progressionRate,stopoverList,coordinates );
-            }).toList();
+                    return DispatchSimpleResponse.of(dispatch.getId(), dispatch.getDeliveryStatus(),
+                            dispatch.getSmName(), dispatch.getCompletedOrderCount(), dispatch.getDeliveryOrderCount(),
+                            (int) progressionRate, stopoverList, coordinates);
+                }).toList();
 
-        return DispatchListResponse.of(dispatchNumber.getDispatchNumber(), dispatchNumber.getDispatchName(),(int) totalProgressionRate,totalCompletedOrderCount,totalDeliveryOrderCount,issueList.size(),startStopover,dispatchResponseList,issueList);
+        return DispatchListResponse.of(dispatchNumber.getDispatchNumber(), dispatchNumber.getDispatchName(),
+                (int) totalProgressionRate, totalCompletedOrderCount, totalDeliveryOrderCount, issueList.size(),
+                startStopover, dispatchResponseList, issueList);
     }
 
     @Transactional(readOnly = true)
-    public DispatchNumberSearchResponse searchDispatches(DispatchNumberSearchRequest request, UserDetailsImpl userDetails) {
+    public DispatchNumberSearchResponse searchDispatches(DispatchNumberSearchRequest request,
+                                                         UserDetailsImpl userDetails) {
         Users users = userDetails.getUsers();
         Center center = userDetails.getCenter();
         LocalDateTime startDateTime = request.startDateTime();
@@ -107,9 +113,9 @@ public class DispatchNumberService {
         List<DispatchNumberSearchResponse.DispatchResult> results = createDispatchResults(dispatchMap, status);
 
         return DispatchNumberSearchResponse.builder()
-                .inProgress((int)inTransitCount)
-                .waiting((int)waitingCount)
-                .completed((int)completedCount)
+                .inProgress((int) inTransitCount)
+                .waiting((int) waitingCount)
+                .completed((int) completedCount)
                 .results(results)
                 .build();
 
@@ -117,22 +123,22 @@ public class DispatchNumberService {
 
     private List<Map<String, Double>> createStopoverList(Dispatch dispatch) {
         return dispatch.getDispatchDetailList().stream()
-            .map(detail -> {
-                Map<String, Double> stopover = new HashMap<>();
-                stopover.put("lat", detail.getDestinationLatitude());
-                stopover.put("lon", detail.getDestinationLongitude());
-                return stopover;
-            }).toList();
+                .map(detail -> {
+                    Map<String, Double> stopover = new HashMap<>();
+                    stopover.put("lat", detail.getDestinationLatitude());
+                    stopover.put("lon", detail.getDestinationLongitude());
+                    return stopover;
+                }).toList();
     }
 
     private List<Map<String, Double>> createCoordinateList(Dispatch dispatch) {
         return Arrays.stream(dispatch.getPath().getCoordinates())
-            .map(coord -> {
-                Map<String, Double> coordinate = new HashMap<>();
-                coordinate.put("lat", coord.getX());
-                coordinate.put("lon", coord.getY());
-                return coordinate;
-            }).toList();
+                .map(coord -> {
+                    Map<String, Double> coordinate = new HashMap<>();
+                    coordinate.put("lat", coord.getX());
+                    coordinate.put("lon", coord.getY());
+                    return coordinate;
+                }).toList();
     }
 
     private List<DispatchListResponse.Issue> getIssueListOfDispatch(Dispatch dispatch, Long dispatchCodeId) {
@@ -141,12 +147,12 @@ public class DispatchNumberService {
         for (DispatchDetail dispatchDetail : dispatch.getDispatchDetailList()) {
             if (dispatchDetail.getDispatchDetailStatus() == DispatchDetailStatus.DELIVERY_DELAY) {
                 DispatchListResponse.Issue issue = DispatchListResponse.Issue.of(
-                    dispatchCodeId,
-                    dispatch.getId(),
-                    dispatch.getSmName(),
-                    dispatchDetail.getTransportOrder().getLotNumberAddress(),
-                    dispatchDetail.getDestinationId(),
-                    dispatchDetail.getDelayedTime()
+                        dispatchCodeId,
+                        dispatch.getId(),
+                        dispatch.getSmName(),
+                        dispatchDetail.getTransportOrder().getLotNumberAddress(),
+                        dispatchDetail.getDestinationId(),
+                        dispatchDetail.getDelayedTime()
                 );
                 issueList.add(issue);
             }
@@ -160,7 +166,7 @@ public class DispatchNumberService {
         log.info("검색 옵션: {}", request.searchOption());
         boolean isManager = request.isManager(); // 담당자 여부
         // 검색 옵션에 다른 검색 (검색창 검색)
-        if(request.searchOption() != null) {
+        if (request.searchOption() != null) {
             // 배차 코드 검색
             return switch (request.searchOption()) {
                 case "dispatchCode" -> searchByDispatchCode(request, users, center,
@@ -184,7 +190,8 @@ public class DispatchNumberService {
 
     // 배차 코드에 대한 검색
     private List<DispatchNumber> searchByDispatchCode(DispatchNumberSearchRequest request, Users users, Center center,
-                                                      LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
+                                                      LocalDateTime startDateTime, LocalDateTime endDateTime,
+                                                      boolean isManager) {
         log.info("배송 코드 검색: {}", request.searchKeyword());
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndDispatchCodeAndLoadStartDateTimeBetween(
@@ -196,7 +203,8 @@ public class DispatchNumberService {
 
     // 배차 명에 대한 검색
     private List<DispatchNumber> searchByDispatchName(DispatchNumberSearchRequest request, Users users, Center center,
-                                                      LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
+                                                      LocalDateTime startDateTime, LocalDateTime endDateTime,
+                                                      boolean isManager) {
         log.info("배송 명 검색: {}", request.searchKeyword());
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndDispatchNameAndLoadStartDateTimeBetween(
@@ -208,7 +216,8 @@ public class DispatchNumberService {
 
     // 담당자에 대한 검색
     private List<DispatchNumber> searchByManager(DispatchNumberSearchRequest request, Users users, Center center,
-                                                 LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
+                                                 LocalDateTime startDateTime, LocalDateTime endDateTime,
+                                                 boolean isManager) {
         Users manager = usersRepository.findByNameOrNull(request.searchKeyword());
         log.info("담당자 검색: {}", request.searchKeyword());
         // 자신 담당만 보기 & 다른 사람 검색 이면 빈 값 출력
@@ -221,7 +230,8 @@ public class DispatchNumberService {
 
     // 기사에 대한 검색
     private List<DispatchNumber> searchByDriverId(DispatchNumberSearchRequest request, Users users, Center center,
-                                                  LocalDateTime startDateTime, LocalDateTime endDateTime, boolean isManager) {
+                                                  LocalDateTime startDateTime, LocalDateTime endDateTime,
+                                                  boolean isManager) {
         log.info("기사 검색: {}", request.searchKeyword());
         if (isManager) {
             return dispatchNumberRepository.findByCenterAndUsersAndSmNameAndLoadStartDateTimeBetween(
@@ -251,14 +261,16 @@ public class DispatchNumberService {
     }
 
     // 상태에 따른 DispatchNumber 필터
-    private List<DispatchNumber> filterDispatchNumbersByStatus(List<DispatchNumber> dispatchNumbers, DispatchNumberStatus status) {
+    private List<DispatchNumber> filterDispatchNumbersByStatus(List<DispatchNumber> dispatchNumbers,
+                                                               DispatchNumberStatus status) {
         return dispatchNumbers.stream()
                 .filter(d -> d.getStatus() == status)
                 .toList();
     }
 
     // DispatchResult 리스트 생성
-    private List<DispatchNumberSearchResponse.DispatchResult> createDispatchResults(Map<DispatchNumber, List<Dispatch>> dispatchMap, DispatchNumberStatus status) {
+    private List<DispatchNumberSearchResponse.DispatchResult> createDispatchResults(
+            Map<DispatchNumber, List<Dispatch>> dispatchMap, DispatchNumberStatus status) {
         List<DispatchNumberSearchResponse.DispatchResult> results = new ArrayList<>();
         for (Map.Entry<DispatchNumber, List<Dispatch>> entry : dispatchMap.entrySet()) {
             DispatchNumber dispatchNumber = entry.getKey();

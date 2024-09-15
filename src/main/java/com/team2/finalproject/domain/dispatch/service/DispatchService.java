@@ -31,6 +31,7 @@ import com.team2.finalproject.domain.transportorder.repository.TransportOrderRep
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.vehicle.model.entity.Vehicle;
 import com.team2.finalproject.domain.vehicle.model.type.VehicleType;
+import com.team2.finalproject.domain.vehicle.repository.VehicleRepository;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
 import com.team2.finalproject.global.util.optimization.OptimizationApiUtil;
 import com.team2.finalproject.global.util.optimization.OptimizationRequest;
@@ -66,9 +67,10 @@ public class DispatchService {
     private final CenterRepository centerRepository;
 
     private final DeliveryDestinationRepository deliveryDestinationRepository;
+    private final VehicleRepository vehicleRepository;
 
     @Transactional(readOnly = true)
-    public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request,UserDetailsImpl userDetails) {
+    public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request, UserDetailsImpl userDetails) {
         List<DispatchUpdateRequest.Order> orders = request.orderList();
 
         Long centerId = userDetails.getUsers().getCenter().getId();
@@ -84,7 +86,15 @@ public class DispatchService {
 
         Sm sm = smRepository.findByIdOrThrow(request.smId());
 
-        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList, sm.getBreakStartTime(), sm.getBreakTime()));
+        OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(
+                OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList,
+                        sm.getBreakStartTime(), sm.getBreakTime()));
+
+        int availableNum = sm.getContractNumOfMonth() - sm.getCompletedNumOfMonth(); // 가용주문
+        // 주문의 전체 주문 수 or 거리
+        int totalOrderOrDistanceNum =
+                sm.getContractType() == ContractType.JIIP ? (int) (optimizationResponse.totalDistance() / 1000)
+                        : orders.size();
 
         DispatchUpdateResponse.StartStopover startStopover = DispatchUpdateResponse.StartStopover.of(
                 optimizationResponse.startStopover().address(),
@@ -96,13 +106,41 @@ public class DispatchService {
         );
 
         List<OptimizationResponse.ResultStopover> resultStopoverList = optimizationResponse.resultStopoverList();
-        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(resultStopoverList, orders ,request.loadingStartTime(),sm.getVehicle());
+        List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = dispatchDetailResponseList(
+                resultStopoverList, orders, request.loadingStartTime(), sm, availableNum);
 
-        // 주문의 전체 주문 수 or 거리
-        int totalOrderOrDistanceNum = sm.getContractType() == ContractType.JIIP ? (int) (optimizationResponse.totalDistance() / 1000) : orders.size();
+        int floorAreaRatio;
+
+        if (ContractType.DELIVERY.equals(sm.getContractType())) {
+            double totalVolume = orders.stream()
+                    .mapToDouble(order -> order.volume() != null ? order.volume() : 0.0)
+                    .sum();
+            floorAreaRatio = (int) (totalVolume / sm.getVehicle().getMaxLoadVolume() * 100);
+        } else {
+            double totalWeight = orders.stream()
+                    .mapToDouble(order -> order.weight() != null ? order.weight() : 0.0)
+                    .sum();
+            floorAreaRatio = (int) (totalWeight / sm.getVehicle().getMaxLoadWeight() * 100);
+        }
 
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
-            optimizationResponse.breakStartTime(),optimizationResponse.breakEndTime() ,optimizationResponse.restingPosition() ,totalOrderOrDistanceNum ,sm.getContractNumOfMonth() - sm.getCompletedNumOfMonth(), sm.getContractType().getContractType(),startStopover, dispatchDetailResponseList, optimizationResponse.coordinates());
+                optimizationResponse.breakStartTime(), optimizationResponse.breakEndTime(),
+                optimizationResponse.restingPosition(), totalOrderOrDistanceNum,
+                calculateTotalFloorAreaRatio(request.totalWeight(), request.totalVolume(), sm.getContractType(),
+                        request.smIdList()),
+                floorAreaRatio, availableNum,
+                sm.getContractType().getContractType(), startStopover, dispatchDetailResponseList,
+                optimizationResponse.coordinates());
+    }
+
+    private int calculateTotalFloorAreaRatio(double totalWeight, double totalVolume, ContractType contractType,
+                                             List<Long> smIds) {
+        if (ContractType.JIIP.equals(contractType)) {
+            return (int) ((totalWeight / vehicleRepository.findTotalMaxLoadWeightBySmIds(smIds)) * 100);
+        } else if (ContractType.DELIVERY.equals(contractType)) {
+            return (int) ((totalVolume / vehicleRepository.findTotalMaxLoadVolumeBySmIds(smIds)) * 100);
+        }
+        return 0;
     }
 
     @Transactional
@@ -163,9 +201,21 @@ public class DispatchService {
         dispatchDetailRepository.saveAll(pendingDispatchDetailList);
     }
 
-    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(List<OptimizationResponse.ResultStopover> resultStopoverList, List<DispatchUpdateRequest.Order> orderList, LocalDateTime startDateTime , Vehicle vehicle) {
+    private List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList(
+            List<OptimizationResponse.ResultStopover> resultStopoverList,
+            List<DispatchUpdateRequest.Order> orderList,
+            LocalDateTime startDateTime,
+            Sm sm,
+            int availableNum
+    ) {
 
         List<DispatchUpdateResponse.DispatchDetailResponse> dispatchDetailResponseList = new ArrayList<>();
+
+        int totalOrderOrDistanceNum = 0;
+        Vehicle vehicle = sm.getVehicle();
+        boolean overFloorAreaRatio = false;
+        double totalVolumeOrWeight = 0.0;
+
         for (int i = 0; i < resultStopoverList.size(); i++) {
 
             boolean delayRequestTime = false;
@@ -175,33 +225,56 @@ public class DispatchService {
 
             // 희망 도착시간 및 도착일 초과 확인
             if (order.serviceRequestDate().isBefore(startDateTime.toLocalDate()) ||
-                (order.serviceRequestTime() != null &&
-                    order.serviceRequestTime().isBefore(resultStopover.endTime().toLocalTime()) &&
-                    order.serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
+                    (order.serviceRequestTime() != null &&
+                            order.serviceRequestTime().isBefore(resultStopover.endTime().toLocalTime()) &&
+                            order.serviceRequestDate().isEqual(startDateTime.toLocalDate()))) {
                 delayRequestTime = true;
             }
 
             // 배송처 오류 확인
-            DeliveryDestination destination = deliveryDestinationRepository.findByFullAddress(order.roadAddress(), order.detailAddress());
+            DeliveryDestination destination = deliveryDestinationRepository.findByFullAddress(order.roadAddress(),
+                    order.detailAddress());
 
-            boolean isEntryRestricted = checkRestrictedTonCodes(vehicle,destination);
+            boolean isEntryRestricted = checkRestrictedTonCodes(vehicle, destination);
+
+            boolean overContractNum = false;
+            totalOrderOrDistanceNum +=
+                    sm.getContractType() == ContractType.JIIP ? (int) (resultStopoverList.get(i).distance() / 1000) : 1;
+            if (totalOrderOrDistanceNum > availableNum) {
+                overContractNum = true;
+            }
+
+            int floorAreaRatio;
+            if (ContractType.DELIVERY.equals(sm.getContractType())) {
+                totalVolumeOrWeight += order.volume();
+                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadVolume() * 100);
+            } else {
+                totalVolumeOrWeight += order.weight();
+                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadWeight() * 100);
+            }
+
+            if (floorAreaRatio > 100) {
+                overFloorAreaRatio = true;
+            }
 
             DispatchUpdateResponse.DispatchDetailResponse dispatchDetailResponse = DispatchUpdateResponse.DispatchDetailResponse.of(
-                resultStopover.address(),
-                resultStopover.timeFromPrevious() / 60000, // ms -> 분
-                resultStopover.endTime(),
+                    resultStopover.address(),
+                    resultStopover.timeFromPrevious() / 60000, // ms -> 분
+                    resultStopover.endTime(),
                     i + 1 != resultStopoverList.size() ? resultStopoverList.get(i + 1).startTime()
                             : resultStopover.endTime()
                                     .plusHours(resultStopover.delayTime().getHour())
                                     .plusMinutes(resultStopover.delayTime().getMinute())
                                     .plusSeconds(resultStopover.delayTime().getSecond()),
-                resultStopover.delayTime().getHour() * 60
+                    resultStopover.delayTime().getHour() * 60
                             + resultStopover.delayTime().getMinute(),
-                resultStopover.lat(),
-                resultStopover.lon(),
-                resultStopover.distance(),
-                delayRequestTime,
-                isEntryRestricted
+                    resultStopover.lat(),
+                    resultStopover.lon(),
+                    resultStopover.distance(),
+                    delayRequestTime,
+                    isEntryRestricted,
+                    overContractNum,
+                    overFloorAreaRatio
             );
             dispatchDetailResponseList.add(dispatchDetailResponse);
         }
@@ -233,9 +306,9 @@ public class DispatchService {
             return false;
         }
         return Arrays.stream(restrictedTonCode.split(","))
-            .map(String::trim)
-            .mapToDouble(Double::parseDouble)
-            .anyMatch(vehicleTon::equals);
+                .map(String::trim)
+                .mapToDouble(Double::parseDouble)
+                .anyMatch(vehicleTon::equals);
     }
 
     // 배차 탭에서의 배차 취소
@@ -261,7 +334,8 @@ public class DispatchService {
 
         // DispatchNumber 리스트를 상태에 따라 분리
         Map<Boolean, List<DispatchNumber>> partitionedDispatchNumbers = dispatchNumbers.stream()
-                .collect(Collectors.partitioningBy(dispatchNumber -> dispatchNumber.getStatus() == DispatchNumberStatus.IN_TRANSIT));
+                .collect(Collectors.partitioningBy(
+                        dispatchNumber -> dispatchNumber.getStatus() == DispatchNumberStatus.IN_TRANSIT));
 
         List<DispatchNumber> inTransitDispatchNumbers = partitionedDispatchNumbers.get(true);
         List<DispatchNumber> waitingDispatchNumbers = partitionedDispatchNumbers.get(false);
