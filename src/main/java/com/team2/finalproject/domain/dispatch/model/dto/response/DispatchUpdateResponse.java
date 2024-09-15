@@ -23,12 +23,12 @@ public class DispatchUpdateResponse {
     private LocalTime breakEndTime;
     @Schema(example = "3", description = "휴식경유지(해당경유지로 이동중)")
     private int restingStopover;
-    @Schema(example = "true", description = "진입불가 톤 코드 오류인 주문이 있는지 없는지")
-    private boolean isRestricted;
-    @Schema(example = "true", description = "최대 계약 초과 오류")
-    private boolean maxContractOver;
     @Schema(example = "20", description = "전체 주문 or 거리")
     private int totalOrderOrDistanceNum;
+    @Schema(description = "모든 배차의 용적률", example = "90")
+    private int totalFloorAreaRatio;
+    @Schema(description = "배차 하나의 용적률", example = "85")
+    private int floorAreaRatio;
     @Schema(example = "80", description = "가용 주문")
     private int availableNum;
     @Schema(example = "지입", description = "배송 유형")
@@ -36,35 +36,36 @@ public class DispatchUpdateResponse {
     private StartStopover startStopover;
     private List<DispatchDetailResponse> dispatchDetailList;
     @ArraySchema(
-        arraySchema = @Schema(description = "경로 좌표 리스트"),
-        schema = @Schema(
-            example = "{\"lat\": 37.5665, \"lon\": 126.9780}",
-            description = "경로 좌표"
-        )
+            arraySchema = @Schema(description = "경로 좌표 리스트"),
+            schema = @Schema(
+                    example = "{\"lat\": 37.5665, \"lon\": 126.9780}",
+                    description = "경로 좌표"
+            )
     )
     private List<Map<String, Double>> coordinates;
 
     private DispatchUpdateResponse(
-        Double mileage,
-        Long totalTime,
-        LocalTime breakStartTime,
-        LocalTime breakEndTime,
-        int restingStopover,
-        int totalOrderOrDistanceNum,
-        int availableNum,
-        String contractType,
-        StartStopover startStopover,
-        List<DispatchDetailResponse> dispatchDetailList,
-        List<Map<String, Double>> coordinates) {
+            Double mileage,
+            Long totalTime,
+            LocalTime breakStartTime,
+            LocalTime breakEndTime,
+            int restingStopover,
+            int totalOrderOrDistanceNum,
+            int totalFloorAreaRatio,
+            int floorAreaRatio,
+            int availableNum,
+            String contractType,
+            StartStopover startStopover,
+            List<DispatchDetailResponse> dispatchDetailList,
+            List<Map<String, Double>> coordinates) {
         this.mileage = mileage;
         this.totalTime = totalTime;
         this.breakStartTime = breakStartTime;
         this.breakEndTime = breakEndTime;
         this.restingStopover = restingStopover;
-        this.isRestricted = dispatchDetailList.stream()
-            .anyMatch(DispatchDetailResponse::isEntryRestricted); // 집입제한 조건이 하나라도 오류이면 true
-        this.maxContractOver = totalOrderOrDistanceNum > availableNum; // 계약에 다른 최대치 초과 오류
         this.totalOrderOrDistanceNum = totalOrderOrDistanceNum;
+        this.totalFloorAreaRatio = totalFloorAreaRatio;
+        this.floorAreaRatio = floorAreaRatio;
         this.availableNum = availableNum;
         this.contractType = contractType;
         this.startStopover = startStopover;
@@ -73,19 +74,22 @@ public class DispatchUpdateResponse {
     }
 
     public static DispatchUpdateResponse of(
-        Double mileage,
-        Long totalTime,
-        LocalTime breakStartTime,
-        LocalTime breakEndTime,
-        int restingStopover,
-        int totalOrderOrDistanceNum,
-        int availableNum,
-        String contractType,
-        StartStopover startStopover,
-        List<DispatchDetailResponse> dispatchDetailList,
-        List<Map<String, Double>> coordinates)
-    {
-        return new DispatchUpdateResponse(mileage, totalTime, breakStartTime, breakEndTime, restingStopover, totalOrderOrDistanceNum, availableNum, contractType, startStopover, dispatchDetailList, coordinates);
+            Double mileage,
+            Long totalTime,
+            LocalTime breakStartTime,
+            LocalTime breakEndTime,
+            int restingStopover,
+            int totalOrderOrDistanceNum,
+            int totalFloorAreaRatio,
+            int floorAreaRatio,
+            int availableNum,
+            String contractType,
+            StartStopover startStopover,
+            List<DispatchDetailResponse> dispatchDetailList,
+            List<Map<String, Double>> coordinates) {
+        return new DispatchUpdateResponse(mileage, totalTime, breakStartTime, breakEndTime, restingStopover,
+                totalOrderOrDistanceNum, totalFloorAreaRatio, floorAreaRatio, availableNum, contractType, startStopover,
+                dispatchDetailList, coordinates);
     }
 
     @Getter
@@ -104,7 +108,7 @@ public class DispatchUpdateResponse {
         private LocalDateTime departureTime;
 
         private StartStopover(String address, Double lat, Double lon, int delayTime,
-            LocalDateTime departureTime) {
+                              LocalDateTime departureTime) {
             this.address = address;
             this.lat = lat;
             this.lon = lon;
@@ -114,9 +118,9 @@ public class DispatchUpdateResponse {
         }
 
         public static DispatchUpdateResponse.StartStopover of(String address, Double lat,
-            Double lon, int delayTime, LocalDateTime departureTime) {
+                                                              Double lon, int delayTime, LocalDateTime departureTime) {
             return new DispatchUpdateResponse.StartStopover(address, lat, lon, delayTime,
-                departureTime);
+                    departureTime);
         }
     }
 
@@ -144,11 +148,17 @@ public class DispatchUpdateResponse {
         private boolean delayRequestTime;
         @Schema(example = "true", description = "진입불가 톤 코드 오류")
         private boolean isEntryRestricted;
+        @Schema(description = "계약 초과 위반 여부", example = "false")
+        private boolean overContractNum;
+        @Schema(description = "용적률 초과", example = "false")
+        private boolean overFloorAreaRatio;
 
         private DispatchDetailResponse(String address, Long ett,
-            LocalDateTime expectationOperationStartTime, LocalDateTime expectationOperationEndTime,
-            int expectedServiceDuration, Double lat, Double lon, Double distance,
-            boolean delayRequestTime, boolean isEntryRestricted) {
+                                       LocalDateTime expectationOperationStartTime,
+                                       LocalDateTime expectationOperationEndTime,
+                                       int expectedServiceDuration, Double lat, Double lon, Double distance,
+                                       boolean delayRequestTime, boolean isEntryRestricted, boolean overContractNum,
+                                       boolean overFloorAreaRatio) {
             this.address = address;
             this.ett = ett;
             this.expectationOperationStartTime = expectationOperationStartTime;
@@ -159,15 +169,20 @@ public class DispatchUpdateResponse {
             this.distance = distance;
             this.delayRequestTime = delayRequestTime;
             this.isEntryRestricted = isEntryRestricted;
+            this.overContractNum = overContractNum;
+            this.overFloorAreaRatio = overFloorAreaRatio;
         }
 
         public static DispatchDetailResponse of(String address, Long ett,
-            LocalDateTime expectationOperationStartTime, LocalDateTime expectationOperationEndTime,
-            int expectedServiceDuration, Double lat, Double lon, Double distanceTypeMeter,
-            boolean delayRequestTime,boolean isEntryRestricted) {
+                                                LocalDateTime expectationOperationStartTime,
+                                                LocalDateTime expectationOperationEndTime,
+                                                int expectedServiceDuration, Double lat, Double lon,
+                                                Double distanceTypeMeter,
+                                                boolean delayRequestTime, boolean isEntryRestricted,
+                                                boolean overContractNum, boolean overFloorAreaRatio) {
             return new DispatchDetailResponse(address, ett, expectationOperationStartTime,
-                expectationOperationEndTime, expectedServiceDuration, lat, lon,
-                distanceTypeMeter / 1000, delayRequestTime,isEntryRestricted);
+                    expectationOperationEndTime, expectedServiceDuration, lat, lon,
+                    distanceTypeMeter / 1000, delayRequestTime, isEntryRestricted, overContractNum, overFloorAreaRatio);
         }
 
 

@@ -32,6 +32,12 @@ public class DispatchResponse {
     @Schema(description = "총 용적률", example = "85")
     private int totalFloorAreaRatio;
 
+    @Schema(description = "총 무게", example = "2000")
+    private double totalWeight;
+
+    @Schema(description = "총 부피", example = "2000")
+    private double totalVolume;
+
     @Schema(description = "상차 시작 시간", example = "2024-08-30T09:00:00")
     private LocalDateTime loadingStartTime;
 
