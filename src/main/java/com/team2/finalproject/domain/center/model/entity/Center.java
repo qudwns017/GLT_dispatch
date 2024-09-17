@@ -52,13 +52,13 @@ public class Center extends BaseEntity {
     @Column(nullable = false)
     private Double longitude;  // 경도
 
-    @Column(nullable = true, length = 20)
+    @Column(nullable = true, length = 50)
     private String restrictedWingBody;  // 진입 불가 톤 코드
 
-    @Column(nullable = true, length = 20)
+    @Column(nullable = true, length = 50)
     private String restrictedBox;       // 진입 불가 톤 코드
 
-    @Column(nullable = true, length = 20)
+    @Column(nullable = true, length = 50)
     private String restrictedCargo;     // 진입 불가 톤 코드
 
     @Column(nullable = false, length = 20)
