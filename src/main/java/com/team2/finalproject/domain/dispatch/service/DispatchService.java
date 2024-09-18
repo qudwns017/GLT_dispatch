@@ -77,7 +77,7 @@ public class DispatchService {
         Center center = centerRepository.findByIdOrThrow(centerId);
         Stopover startStopoverRequest = Stopover.of(center.getRoadAddress(),
                 center.getLatitude(), center.getLongitude(),
-                LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0));
+                LocalTime.of((center.getDelayTime() / 60)+1, center.getDelayTime() % 60, 0));  // 상차 추가작업시간 + 상차기본시간 1시간
 
         List<Stopover> stopoverList = orders.stream()
                 .map((order) -> Stopover.of(order.roadAddress(), order.lat(), order.lon(),
