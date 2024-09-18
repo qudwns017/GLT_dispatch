@@ -156,10 +156,10 @@ public class DispatchService {
         DispatchNumber dispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
 
         for (DispatchList dispatch : request.dispatchList()) {
-            double totalVolume = 0;
-            double totalWeight = 0;
-            double totalDistance = 0;
-            int totalTime = 0;
+            double totalVolume = dispatch.dispatchDetailList().stream().mapToDouble((dispatchDetailList -> dispatchDetailList.volume() * dispatchDetailList.productQuantity())).sum();
+            double totalWeight = dispatch.dispatchDetailList().stream().mapToDouble((dispatchDetailList -> dispatchDetailList.weight() * dispatchDetailList.productQuantity())).sum();
+            double totalDistance = dispatch.dispatchDetailList().stream().mapToDouble((DispatchDetailList::distance)).sum();
+            int totalTime = dispatch.dispatchDetailList().stream().mapToInt((DispatchDetailList::ett)).sum();
 
             Sm smEntity = smRepository.findByIdOrThrow(dispatch.smId());
 
