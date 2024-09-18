@@ -113,12 +113,12 @@ public class DispatchService {
 
         if (ContractType.DELIVERY.equals(sm.getContractType())) {
             double totalVolume = orders.stream()
-                    .mapToDouble(order -> order.volume() != null ? order.volume() : 0.0)
+                    .mapToDouble(order -> order.volume() != null ? order.volume() * order.productQuantity() : 0.0)
                     .sum();
             floorAreaRatio = (int) (totalVolume / sm.getVehicle().getMaxLoadVolume() * 100);
         } else {
             double totalWeight = orders.stream()
-                    .mapToDouble(order -> order.weight() != null ? order.weight() : 0.0)
+                    .mapToDouble(order -> order.weight() != null ? order.weight() * order.productQuantity() : 0.0)
                     .sum();
             floorAreaRatio = (int) (totalWeight / sm.getVehicle().getMaxLoadWeight() * 100);
         }
