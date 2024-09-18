@@ -51,7 +51,7 @@ public class DispatchNumberService {
         int totalDeliveryOrderCount = dispatchList.stream()
                 .mapToInt(Dispatch::getDeliveryOrderCount)
                 .sum();
-        double totalProgressionRate = (double) (totalCompletedOrderCount / totalDeliveryOrderCount) * 100;
+        double totalProgressionRate = ((double) totalCompletedOrderCount / totalDeliveryOrderCount) * 100;
 
         Center center = dispatchNumber.getCenter();
         DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),
@@ -61,7 +61,7 @@ public class DispatchNumberService {
 
         List<DispatchSimpleResponse> dispatchResponseList = dispatchList.stream()
                 .map(dispatch -> {
-                    double progressionRate = (double) (dispatch.getCompletedOrderCount() / dispatch.getDeliveryOrderCount())  * 100;
+                    double progressionRate = ((double)dispatch.getCompletedOrderCount() / dispatch.getDeliveryOrderCount())  * 100;
 
                     List<Map<String, Double>> stopoverList = createStopoverList(dispatch);
                     List<Map<String, Double>> coordinates = createCoordinateList(dispatch);
