@@ -115,12 +115,13 @@ public class DispatchService {
             double totalVolume = orders.stream()
                     .mapToDouble(order -> order.volume() != null ? order.volume() * order.productQuantity() : 0.0)
                     .sum();
-            floorAreaRatio = (int) (totalVolume / sm.getVehicle().getMaxLoadVolume() * 100);
+            floorAreaRatio = (int) ((totalVolume / sm.getVehicle().getMaxLoadVolume()) * 100);
         } else {
             double totalWeight = orders.stream()
                     .mapToDouble(order -> order.weight() != null ? order.weight() * order.productQuantity() : 0.0)
                     .sum();
-            floorAreaRatio = (int) (totalWeight / sm.getVehicle().getMaxLoadWeight() * 100);
+            floorAreaRatio = (int) ((totalWeight / sm.getVehicle().getMaxLoadWeight()) * 100);
+            System.out.println("totalWeight: " + totalWeight + " maxLoadWeight: " + sm.getVehicle().getMaxLoadWeight());
         }
 
         return DispatchUpdateResponse.of(optimizationResponse.totalDistance() / 1000, optimizationResponse.totalTime(),
