@@ -51,7 +51,7 @@ public class DispatchNumberService {
         int totalDeliveryOrderCount = dispatchList.stream()
                 .mapToInt(Dispatch::getDeliveryOrderCount)
                 .sum();
-        double totalProgressionRate = (double) totalDeliveryOrderCount / totalCompletedOrderCount * 100;
+        double totalProgressionRate = (double) (totalCompletedOrderCount / totalDeliveryOrderCount) * 100;
 
         Center center = dispatchNumber.getCenter();
         DispatchListResponse.StartStopover startStopover = DispatchListResponse.StartStopover.of(center.getId(),
@@ -61,8 +61,7 @@ public class DispatchNumberService {
 
         List<DispatchSimpleResponse> dispatchResponseList = dispatchList.stream()
                 .map(dispatch -> {
-                    double progressionRate =
-                            (double) dispatch.getDeliveryOrderCount() / dispatch.getCompletedOrderCount() * 100;
+                    double progressionRate = (double) (dispatch.getCompletedOrderCount() / dispatch.getDeliveryOrderCount())  * 100;
 
                     List<Map<String, Double>> stopoverList = createStopoverList(dispatch);
                     List<Map<String, Double>> coordinates = createCoordinateList(dispatch);
@@ -71,11 +70,11 @@ public class DispatchNumberService {
 
                     return DispatchSimpleResponse.of(dispatch.getId(), dispatch.getDeliveryStatus(),
                             dispatch.getSmName(), dispatch.getCompletedOrderCount(), dispatch.getDeliveryOrderCount(),
-                            (int) progressionRate, stopoverList, coordinates);
+                        (int)progressionRate, stopoverList, coordinates);
                 }).toList();
 
         return DispatchListResponse.of(dispatchNumber.getDispatchNumber(), dispatchNumber.getDispatchName(),
-                (int) totalProgressionRate, totalCompletedOrderCount, totalDeliveryOrderCount, issueList.size(),
+            (int)totalProgressionRate, totalCompletedOrderCount, totalDeliveryOrderCount, issueList.size(),
                 startStopover, dispatchResponseList, issueList);
     }
 

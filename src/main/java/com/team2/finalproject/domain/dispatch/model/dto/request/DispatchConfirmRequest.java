@@ -177,6 +177,7 @@ public record DispatchConfirmRequest(
             Center center,
             double totalVolume,
             double totalWeight,
+            int deliveryOrderCount,
             double totalDistance,
             int totalTime,
             LineString path,
@@ -187,10 +188,10 @@ public record DispatchConfirmRequest(
                 .sm(sm)
                 .smName(sm.getSmName())
                 .completedOrderCount(0)
-                .deliveryOrderCount(request.dispatchList.size())
-                .destinationCount(request.dispatchList.size())
+                .deliveryOrderCount(deliveryOrderCount)
+                .destinationCount(deliveryOrderCount)
                 .loadingRate(
-                        totalVolume / sm.getVehicle().getMaxLoadVolume()) // 전체 용적률 평균, 용적률(볼륨) = 볼륨 합 / 차량 부피 * 100
+                    (totalVolume / sm.getVehicle().getMaxLoadVolume() * 100)) // 전체 용적률 평균, 용적률(볼륨) = 볼륨 합 / 차량 부피 * 100
                 .totalVolume(totalVolume) // 볼륨 합
                 .totalWeight(totalWeight) // 무게 합
                 .totalDistance(totalDistance) // 거리 합

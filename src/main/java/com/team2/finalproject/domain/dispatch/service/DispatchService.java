@@ -156,10 +156,10 @@ public class DispatchService {
         DispatchNumber dispatchNumber = dispatchNumberRepository.save(dispatchNumberEntity);
 
         for (DispatchList dispatch : request.dispatchList()) {
-            double totalVolume = 0;
-            double totalWeight = 0;
-            double totalDistance = 0;
-            int totalTime = 0;
+            double totalVolume = dispatch.dispatchDetailList().stream().mapToDouble((dispatchDetailList -> dispatchDetailList.volume() * dispatchDetailList.productQuantity())).sum();
+            double totalWeight = dispatch.dispatchDetailList().stream().mapToDouble((dispatchDetailList -> dispatchDetailList.weight() * dispatchDetailList.productQuantity())).sum();
+            double totalDistance = dispatch.dispatchDetailList().stream().mapToDouble((DispatchDetailList::distance)).sum();
+            int totalTime = dispatch.dispatchDetailList().stream().mapToInt((DispatchDetailList::ett)).sum();
 
             Sm smEntity = smRepository.findByIdOrThrow(dispatch.smId());
 
@@ -174,7 +174,7 @@ public class DispatchService {
 
             Dispatch dispatchEntity = DispatchConfirmRequest.toDispatchEntity(
                     request, dispatchNumber, smEntity, centerEntity,
-                    totalVolume, totalWeight, totalDistance, totalTime, path, dispatch
+                    totalVolume, totalWeight, dispatch.dispatchDetailList().size() ,totalDistance, totalTime, path, dispatch
             );
 
             Dispatch savedDispatch = dispatchRepository.save(dispatchEntity);
@@ -185,16 +185,10 @@ public class DispatchService {
                                 dispatchDetail, centerEntity
                         ));
 
-                totalVolume += dispatchDetail.volume();
-                totalWeight += dispatchDetail.weight();
-                totalDistance += dispatchDetail.distance();
-                totalTime += dispatchDetail.ett();
-
                 pendingDispatchDetailList.add(DispatchConfirmRequest.toDispatchDetailEntity(
                         dispatchDetail, savedDispatch, savedTransportOrderEntity
                 ));
             }
-            savedDispatch.update(totalVolume, totalWeight, totalDistance, totalTime);
             updateDispatchList.add(savedDispatch);
         }
 
