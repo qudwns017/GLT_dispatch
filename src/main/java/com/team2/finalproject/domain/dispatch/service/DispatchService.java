@@ -185,16 +185,10 @@ public class DispatchService {
                                 dispatchDetail, centerEntity
                         ));
 
-                totalVolume += dispatchDetail.volume();
-                totalWeight += dispatchDetail.weight();
-                totalDistance += dispatchDetail.distance();
-                totalTime += dispatchDetail.ett();
-
                 pendingDispatchDetailList.add(DispatchConfirmRequest.toDispatchDetailEntity(
                         dispatchDetail, savedDispatch, savedTransportOrderEntity
                 ));
             }
-            savedDispatch.update(totalVolume, totalWeight, totalDistance, totalTime);
             updateDispatchList.add(savedDispatch);
         }
 
