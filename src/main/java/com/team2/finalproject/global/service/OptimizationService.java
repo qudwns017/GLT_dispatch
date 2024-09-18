@@ -105,7 +105,7 @@ public class OptimizationService {
         for (ResultStopover stopover : stopovers) {
             // 앞서 만든 특정 기사의 (주소, 주문) 맵에서 도로명 주소가 매칭되는 주문 불러오기
             OrderRequest matchingOrder = findMatchingOrder(orderRequestMap, stopover.getAddress());
-            DeliveryDestination destination = findDestination(stopover);
+            DeliveryDestination destination = findDestination(matchingOrder.address(),matchingOrder.detailAddress());  //order request에서 주소를 찾는걸로 하면될듯
 
             // 배송처(경유지)별로 진입 불가 톤코드를 검사
             boolean isRestricted = checkRestrictedTonCodes(vehicle, destination);
@@ -168,9 +168,9 @@ public class OptimizationService {
         return matchingOrders.remove(0);
     }
 
-    private DeliveryDestination findDestination(ResultStopover stopover) {
-        String[] addressParts = TransportOrderUtil.splitAddress(stopover.getAddress());
-        return deliveryDestinationRepository.findByFullAddress(addressParts[0], addressParts[1]);
+    private DeliveryDestination findDestination(String address, String detailAddress) {
+//        String[] addressParts = TransportOrderUtil.splitAddress(stopover.getAddress());
+        return deliveryDestinationRepository.findByFullAddress(address, detailAddress);
     }
 
     private CourseResponse.CourseDetailResponse createCourseDetailResponse(ResultStopover stopover, OrderRequest order,

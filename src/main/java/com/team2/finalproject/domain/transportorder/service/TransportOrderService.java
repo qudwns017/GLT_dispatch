@@ -173,7 +173,7 @@ public class TransportOrderService {
                 .address(center.getRoadAddress() + " " + center.getDetailAddress())
                 .lat(center.getLatitude())
                 .lon(center.getLongitude())
-                .delayTime(LocalTime.of(center.getDelayTime() / 60, center.getDelayTime() % 60, 0))
+                .delayTime(LocalTime.of((center.getDelayTime() / 60)+1, center.getDelayTime() % 60, 0)) // 센터의 작업추가소요시간 + 기본상차시간 1시간
                 .build();
     }
 

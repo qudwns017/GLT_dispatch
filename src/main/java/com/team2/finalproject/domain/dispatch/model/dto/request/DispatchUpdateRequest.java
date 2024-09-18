@@ -31,6 +31,8 @@ public record DispatchUpdateRequest(
             Double volume,
             @Schema(example = "10.0", description = "무게", requiredMode = Schema.RequiredMode.REQUIRED)
             Double weight,
+            @Schema(example = "5", description = "상품 수량", requiredMode = Schema.RequiredMode.REQUIRED)
+            Integer productQuantity,
             @Schema(example = "36.4501", description = "위도", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull Double lat,
             @Schema(example = "127.1234", description = "경도", requiredMode = Schema.RequiredMode.REQUIRED)
