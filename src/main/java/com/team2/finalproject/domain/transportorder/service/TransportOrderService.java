@@ -275,7 +275,7 @@ public class TransportOrderService {
         double totalVolume = 0;
         for (CourseResponse course : courses) {
             for (CourseResponse.CourseDetailResponse detail : course.getCourseDetailResponseList()) {
-                totalVolume += detail.getVolume();
+                totalVolume += detail.getVolume() * detail.getProductQuantity();
             }
         }
         return totalVolume;
@@ -285,7 +285,7 @@ public class TransportOrderService {
         double totalWeight = 0;
         for (CourseResponse course : courses) {
             for (CourseResponse.CourseDetailResponse detail : course.getCourseDetailResponseList()) {
-                totalWeight += detail.getWeight();
+                totalWeight += detail.getWeight() * detail.getProductQuantity();
             }
         }
         return totalWeight;
