@@ -59,7 +59,7 @@ public class DispatchUpdateResponse {
             List<DispatchDetailResponse> dispatchDetailList,
             List<Map<String, Double>> coordinates) {
         this.mileage = mileage;
-        this.totalTime = totalTime;
+        this.totalTime = totalTime / 1000 / 60;
         this.breakStartTime = breakStartTime;
         this.breakEndTime = breakEndTime;
         this.restingStopover = restingStopover;
