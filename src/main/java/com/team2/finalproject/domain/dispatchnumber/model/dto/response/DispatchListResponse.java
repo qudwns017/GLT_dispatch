@@ -141,6 +141,8 @@ public class DispatchListResponse {
         private Long dispatchCodeId;
         @Schema(example = "2", description = "배차id")
         private Long dispatchId;
+        @Schema(example = "2", description = "배차상세id")
+        private Long dispatchDetailId;
         @Schema(example = "홍길동", description = "기사명")
         private String smName;
         @Schema(example = "서울시 강동구 천호동", description = "주소")
@@ -150,19 +152,20 @@ public class DispatchListResponse {
         @Schema(example = "20", description = "지연된 시간")
         private Integer delayedTime;
 
-        private Issue(Long dispatchCodeId, Long dispatchId, String smName, String address, Long deliveryDestinationId,
+        private Issue(Long dispatchCodeId, Long dispatchId, Long dispatchDetailId, String smName, String address, Long deliveryDestinationId,
                       Integer delayedTime) {
             this.dispatchCodeId = dispatchCodeId;
             this.dispatchId = dispatchId;
+            this.dispatchDetailId = dispatchDetailId;
             this.smName = smName;
             this.address = address;
             this.deliveryDestinationId = deliveryDestinationId;
             this.delayedTime = delayedTime;
         }
 
-        public static Issue of(Long dispatchCodeId, Long dispatchId, String smName, String address,
+        public static Issue of(Long dispatchCodeId, Long dispatchId, Long dispatchDetailId, String smName, String address,
                                Long deliveryDestinationId, Integer delayedTime) {
-            return new Issue(dispatchCodeId, dispatchId, smName, address, deliveryDestinationId, delayedTime);
+            return new Issue(dispatchCodeId, dispatchId, dispatchDetailId, smName, address, deliveryDestinationId, delayedTime);
         }
 
     }

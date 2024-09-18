@@ -1,7 +1,6 @@
 package com.team2.finalproject.domain.dispatchnumber.service;
 
 import com.team2.finalproject.domain.center.model.entity.Center;
-import com.team2.finalproject.domain.deliverydestination.repository.DeliveryDestinationRepository;
 import com.team2.finalproject.domain.dispatch.exception.DispatchErrorCode;
 import com.team2.finalproject.domain.dispatch.exception.DispatchException;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
@@ -18,14 +17,17 @@ import com.team2.finalproject.domain.dispatchnumber.repository.DispatchNumberRep
 import com.team2.finalproject.domain.users.model.entity.Users;
 import com.team2.finalproject.domain.users.repository.UsersRepository;
 import com.team2.finalproject.global.security.details.UserDetailsImpl;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -149,6 +151,7 @@ public class DispatchNumberService {
                 DispatchListResponse.Issue issue = DispatchListResponse.Issue.of(
                         dispatchCodeId,
                         dispatch.getId(),
+                        dispatchDetail.getId(),
                         dispatch.getSmName(),
                         dispatchDetail.getTransportOrder().getLotNumberAddress(),
                         dispatchDetail.getDestinationId(),
