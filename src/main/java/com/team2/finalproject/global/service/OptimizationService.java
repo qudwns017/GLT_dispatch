@@ -121,10 +121,10 @@ public class OptimizationService {
             int floorAreaRatio;
             if (ContractType.DELIVERY.equals(sm.getContractType())) {
                 totalVolumeOrWeight += matchingOrder.volume() * matchingOrder.productQuantity();
-                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadVolume() * 100);
+                floorAreaRatio = (int) ((totalVolumeOrWeight / vehicle.getMaxLoadVolume()) * 100);
             } else {
                 totalVolumeOrWeight += matchingOrder.weight() * matchingOrder.productQuantity();
-                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadWeight() * 100);
+                floorAreaRatio = (int) ((totalVolumeOrWeight / vehicle.getMaxLoadWeight()) * 100);
             }
 
             if (floorAreaRatio > 100) {
@@ -226,9 +226,10 @@ public class OptimizationService {
     private int calculateFloorAreaRatio(Vehicle vehicle,
                                         List<CourseResponse.CourseDetailResponse> courseDetailResponseList) {
         double totalWeight = courseDetailResponseList.stream()
-                .mapToDouble(CourseResponse.CourseDetailResponse::getWeight).sum();
+                .mapToDouble((courseDetailResponse ->
+                    courseDetailResponse.getWeight() * courseDetailResponse.getProductQuantity())).sum();
         double totalVolume = courseDetailResponseList.stream()
-                .mapToDouble(CourseResponse.CourseDetailResponse::getVolume).sum();
+                .mapToDouble((courseDetailResponse -> courseDetailResponse.getVolume() * courseDetailResponse.getProductQuantity())).sum();
 
         String deliveryType = courseDetailResponseList.get(0).getDeliveryType();
         if ("지입".equals(deliveryType)) {
