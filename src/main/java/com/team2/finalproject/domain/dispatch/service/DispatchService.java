@@ -174,7 +174,7 @@ public class DispatchService {
 
             Dispatch dispatchEntity = DispatchConfirmRequest.toDispatchEntity(
                     request, dispatchNumber, smEntity, centerEntity,
-                    totalVolume, totalWeight, totalDistance, totalTime, path, dispatch
+                    totalVolume, totalWeight, dispatch.dispatchDetailList().size() ,totalDistance, totalTime, path, dispatch
             );
 
             Dispatch savedDispatch = dispatchRepository.save(dispatchEntity);
