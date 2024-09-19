@@ -32,7 +32,7 @@ public class DispatchDetailResponse {
     private String smPhoneNumber;
 
     @Schema(example = "80", description = "용적률")
-    private double floorAreaRatio;
+    private int floorAreaRatio;
 
     @Schema(example = "WING_BODY", description = "차종")
     private VehicleType vehicleType;
@@ -184,7 +184,7 @@ public class DispatchDetailResponse {
         return DispatchDetailResponse.builder()
                 .smName(sm.getSmName())
                 .smPhoneNumber(users.getPhoneNumber())
-                .floorAreaRatio(dispatch.getLoadingRate())
+                .floorAreaRatio((int)dispatch.getLoadingRate())
                 .vehicleType(vehicle.getVehicleType())
                 .vehicleTon(vehicle.getVehicleTon())
                 .progressionRate(calcProgress(dispatch.getDeliveryOrderCount(), dispatch.getCompletedOrderCount()))
