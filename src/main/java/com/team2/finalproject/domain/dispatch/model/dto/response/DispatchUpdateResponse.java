@@ -60,11 +60,15 @@ public class DispatchUpdateResponse {
             StartStopover startStopover,
             List<DispatchDetailResponse> dispatchDetailList,
             List<Map<String, Double>> coordinates) {
-        this.errorYn = dispatchDetailList.stream().anyMatch((dispatchDetailResponse ->
-            dispatchDetailResponse.isEntryRestricted()
-                || dispatchDetailResponse.isDelayRequestTime()
-                || dispatchDetailResponse.isOverContractNum()
-                || dispatchDetailResponse.isOverFloorAreaRatio()));
+        if (dispatchDetailList == null || dispatchDetailList.isEmpty()){
+            this.errorYn = false;
+        }else{
+            this.errorYn = dispatchDetailList.stream().anyMatch((dispatchDetailResponse ->
+                dispatchDetailResponse.isEntryRestricted()
+                    || dispatchDetailResponse.isDelayRequestTime()
+                    || dispatchDetailResponse.isOverContractNum()
+                    || dispatchDetailResponse.isOverFloorAreaRatio()));
+        }
         this.mileage = mileage;
         this.totalTime = totalTime / 1000 / 60;
         this.breakStartTime = breakStartTime;
