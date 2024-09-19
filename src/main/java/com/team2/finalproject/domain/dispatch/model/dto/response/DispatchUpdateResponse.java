@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DispatchUpdateResponse {
 
+    @Schema(description = "오류 여부", example = "false")
+    private boolean errorYn;
     @Schema(example = "30.5", description = "주행거리 (km)")
     private Double mileage;  // 주행거리 (km)
     @Schema(example = "34", description = "주행시간 (분)")
@@ -58,6 +60,11 @@ public class DispatchUpdateResponse {
             StartStopover startStopover,
             List<DispatchDetailResponse> dispatchDetailList,
             List<Map<String, Double>> coordinates) {
+        this.errorYn = dispatchDetailList.stream().anyMatch((dispatchDetailResponse ->
+            dispatchDetailResponse.isEntryRestricted()
+                || dispatchDetailResponse.isDelayRequestTime()
+                || dispatchDetailResponse.isOverContractNum()
+                || dispatchDetailResponse.isOverFloorAreaRatio()));
         this.mileage = mileage;
         this.totalTime = totalTime / 1000 / 60;
         this.breakStartTime = breakStartTime;
