@@ -12,6 +12,7 @@ import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRe
 import com.team2.finalproject.domain.dispatch.model.dto.request.DispatchUpdateRequest.Order;
 import com.team2.finalproject.domain.dispatch.model.dto.request.IssueRequest;
 import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse;
+import com.team2.finalproject.domain.dispatch.model.dto.response.DispatchUpdateResponse.StartStopover;
 import com.team2.finalproject.domain.dispatch.model.entity.Dispatch;
 import com.team2.finalproject.domain.dispatch.model.type.DispatchStatus;
 import com.team2.finalproject.domain.dispatch.repository.DispatchRepository;
@@ -73,18 +74,33 @@ public class DispatchService {
     public DispatchUpdateResponse updateDispatch(DispatchUpdateRequest request, UserDetailsImpl userDetails) {
         List<DispatchUpdateRequest.Order> orders = request.orderList();
 
+        Sm sm = smRepository.findByIdOrThrow(request.smId());
+
         Long centerId = userDetails.getUsers().getCenter().getId();
         Center center = centerRepository.findByIdOrThrow(centerId);
         Stopover startStopoverRequest = Stopover.of(center.getRoadAddress(),
-                center.getLatitude(), center.getLongitude(),
-                LocalTime.of((center.getDelayTime() / 60)+1, center.getDelayTime() % 60, 0));  // 상차 추가작업시간 + 상차기본시간 1시간
+            center.getLatitude(), center.getLongitude(),
+            LocalTime.of((center.getDelayTime() / 60)+1, center.getDelayTime() % 60, 0));  // 상차 추가작업시간 + 상차기본시간 1시간
+
+        if (orders.isEmpty()){
+            return DispatchUpdateResponse.of(0.0, 0L,
+                LocalTime.of(0,0,0), LocalTime.of(0,0,0),
+                0, 0,
+                calculateTotalFloorAreaRatio(request.totalWeight(), request.totalVolume(), sm.getContractType(),
+                    request.smIdList()),
+                0, sm.getContractNumOfMonth()-sm.getCompletedNumOfMonth(),
+                sm.getContractType().getContractType(),
+                StartStopover.of(startStopoverRequest.address(),startStopoverRequest.lat(),startStopoverRequest.lon(),startStopoverRequest.delayTime().getMinute(),request.loadingStartTime().plusHours(1))
+                , null,
+                null);
+        }
+
+
 
         List<Stopover> stopoverList = orders.stream()
                 .map((order) -> Stopover.of(order.roadAddress(), order.lat(), order.lon(),
                         LocalTime.of(order.expectedServiceDuration() / 60, order.expectedServiceDuration() % 60, 0)))
                 .toList();
-
-        Sm sm = smRepository.findByIdOrThrow(request.smId());
 
         OptimizationResponse optimizationResponse = optimizationApiUtil.getOptimizationResponse(
                 OptimizationRequest.of(request.loadingStartTime(), startStopoverRequest, stopoverList,
