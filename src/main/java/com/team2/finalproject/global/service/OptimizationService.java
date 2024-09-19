@@ -146,10 +146,10 @@ public class OptimizationService {
     private boolean checkOverContractNum(Sm sm, ResultStopover stopover, int contractNum) {
         if (sm.getContractType() == ContractType.JIIP) {
             double totalDistance = contractNum + stopover.getDistance() / 1000.0;
-            return totalDistance > sm.getContractNumOfMonth();
+            return totalDistance > ( sm.getContractNumOfMonth() - sm.getCompletedNumOfMonth());
         } else if (sm.getContractType() == ContractType.DELIVERY) {
             int completedOrders = contractNum + 1;
-            return completedOrders > sm.getContractNumOfMonth();
+            return completedOrders > ( sm.getContractNumOfMonth() - sm.getCompletedNumOfMonth());
         }
         return false;
     }
