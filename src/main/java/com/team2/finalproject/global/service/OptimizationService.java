@@ -256,7 +256,7 @@ public class OptimizationService {
                                                List<CourseResponse.CoordinatesResponse> coordinatesResponseList) {
 
         boolean errorYn = courseDetailResult.courseDetailResponseList.stream().anyMatch(
-                detail -> detail.isRestrictedTonCode() || detail.isDelayRequestTime() || detail.isOverContractNum());
+                detail -> detail.isRestrictedTonCode() || detail.isDelayRequestTime() || detail.isOverContractNum() || detail.isOverFloorAreaRatio());
 
         return CourseResponse.builder()
                 .totalOrderOrDistanceNum(courseDetailResult.updatedContractNum)
