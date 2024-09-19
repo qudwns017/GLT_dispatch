@@ -38,7 +38,7 @@ public class TransportOrder extends BaseEntity {
     @Column(nullable = false)
     private LocalDate requestedWorkDate;  // 작업희망일
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalTime requestedArrivalTime; // 희망도착시간
 
     @Column(nullable = false, length = 30)
