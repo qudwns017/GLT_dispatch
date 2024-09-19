@@ -29,7 +29,6 @@ import com.team2.finalproject.global.util.request.OptimizationRequest;
 import com.team2.finalproject.global.util.request.Stopover;
 import com.team2.finalproject.global.util.response.AddressInfo;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -43,10 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -331,7 +327,7 @@ public class TransportOrderService {
                 .dispatchCode(generateDispatchCode(request, center))
                 .dispatchName(request.dispatchName())
                 .totalOrder(courses.stream().mapToInt(CourseResponse::getOrderNum).sum())
-                .totalErrorNum((int) courses.stream().filter(CourseResponse::isErrorYn).count())
+                .totalErrorNum(countTotalError(courses))
                 .totalTime(courses.stream().mapToInt(CourseResponse::getTotalTime).sum())
                 .totalFloorAreaRatio(totalFloorAreaRatio)
                 .totalWeight(totalWeight)
@@ -341,6 +337,23 @@ public class TransportOrderService {
                 .startStopoverResponse(startStopoverResponse)
                 .course(courses)
                 .build();
+    }
+
+    private int countTotalError(List<CourseResponse> courses) {
+        int totalErrors = 0;
+
+        for (CourseResponse course : courses) {
+            for (CourseResponse.CourseDetailResponse courseDetail : course.getCourseDetailResponseList()) {
+                if (courseDetail.isRestrictedTonCode() ||
+                    courseDetail.isDelayRequestTime() ||
+                    courseDetail.isOverContractNum() ||
+                    courseDetail.isOverFloorAreaRatio()) {
+                    totalErrors++;
+                }
+            }
+        }
+
+        return totalErrors;
     }
 
     private String generateDispatchCode(TransportOrderRequest request, Center center) {
