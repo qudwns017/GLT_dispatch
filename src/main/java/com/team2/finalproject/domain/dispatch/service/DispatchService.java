@@ -241,11 +241,11 @@ public class DispatchService {
 
             int floorAreaRatio;
             if (ContractType.DELIVERY.equals(sm.getContractType())) {
-                totalVolumeOrWeight += order.volume();
-                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadVolume() * 100);
+                totalVolumeOrWeight += order.volume() * order.productQuantity();
+                floorAreaRatio = (int) ((totalVolumeOrWeight / vehicle.getMaxLoadVolume()) * 100);
             } else {
-                totalVolumeOrWeight += order.weight();
-                floorAreaRatio = (int) (totalVolumeOrWeight / vehicle.getMaxLoadWeight() * 100);
+                totalVolumeOrWeight += order.weight() * order.productQuantity();
+                floorAreaRatio = (int) ((totalVolumeOrWeight / vehicle.getMaxLoadWeight()) * 100);
             }
 
             if (floorAreaRatio > 100) {
