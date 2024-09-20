@@ -222,8 +222,9 @@ public record DispatchConfirmRequest(
                 .expectationOperationStartTime(list.expectationOperationStartTime())
                 .expectationOperationEndTime(list.expectationOperationEndTime())
                 .loadingCompletionTime(null)
-                .operationStartTime(list.expectationOperationStartTime()) // 작업 시작 시간 : 경로 계산 결과 필요
+                .operationStartTime(list.expectationOperationStartTime())
                 .operationEndTime(list.expectationOperationEndTime())
+                .ett(list.ett())
                 .transportationStartTime(null)
                 .destinationType(list.deliveryDestinationId() != null ? DestinationType.DELIVERY_DESTINATION
                         : DestinationType.CUSTOMER_DESTINATION)
