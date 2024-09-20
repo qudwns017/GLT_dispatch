@@ -47,10 +47,10 @@ public class DispatchDetail extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime expectationOperationEndTime; // 예정작업종료시간
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime operationStartTime; // 작업시작시간
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime operationEndTime; // 작업종료시간
 
     @Column(nullable = false)
