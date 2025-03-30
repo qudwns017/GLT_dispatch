@@ -76,8 +76,3 @@ ID/PW 탈취가 아닌 토큰만 탈취한 경우, 공격자는 오직 AT의 유
 동일한 Http Status Code의 여러 개 response가 있을 때, 가장 앞에 위치한 response 예시만 출력 되는 문제가 발생
 #### 해결 방법
 스웨거의 기본 동작 방식과 유사하게 사용할 수 있도록 커스텀 어노테이션을 생성하여 응답에 대한 데이터를 받고 Operation의 Response 객체를 커스텀하여 기본적으로 단일 객체로 설정되어 있던 Response를 List 형태로 변경
-
-### 4. Filter 내 Exception 처리 문제
-#### 문제 상황
-
-#### 해결 방법
